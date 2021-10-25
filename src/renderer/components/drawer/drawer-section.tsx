@@ -19,13 +19,46 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-.DrawerTitle {
-  padding: $padding * 1.5 $padding * 3;
-  margin: $margin * 3 (-$margin * 3);
-  background: var(--drawerSubtitleBackground);
+import React from "react";
+import { DrawerSubTitle } from ".";
+import { DrawerTitle } from "./drawer-title";
+
+export interface DrawerSectionProps {
+  className?: string;
+  title?: React.ReactNode;
+  hidden?: boolean;
 }
 
-.DrawerSubTitle {
-  padding: $padding $padding * 2;
-  background: var(--drawerSubtitleBackground);
+export class DrawerSection extends React.Component<DrawerSectionProps> {
+  render() {
+    const { title, children, className, hidden } = this.props;
+
+    if (hidden) {
+      return null;
+    }
+
+    return (
+      <>
+        <DrawerTitle className={className} title={title} />
+        {children}
+      </>
+    );
+  }
+}
+
+export class DrawerSubSection extends React.Component<DrawerSectionProps> {
+  render() {
+    const { title, children, className, hidden } = this.props;
+
+    if (hidden) {
+      return null;
+    }
+
+    return (
+      <>
+        <DrawerSubTitle className={className} title={title} />
+        {children}
+      </>
+    );
+  }
 }
