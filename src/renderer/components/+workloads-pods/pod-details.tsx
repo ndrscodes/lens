@@ -148,7 +148,7 @@ export class PodDetails extends React.Component<Props> {
         </DrawerItem>
       </>
     ),
-    ephemeral: ({ volumeClaimTemplate: { metadata, spec } }, { pod, volumeName }) => (
+    ephemeral: ({ volumeClaimTemplate: { metadata, spec }}, { pod, volumeName }) => (
       <>
         <DrawerItem name="PVC Template Name">
           {pod.getName()}-{volumeName}
@@ -674,7 +674,7 @@ export class PodDetails extends React.Component<Props> {
                   {type}
                   {isDeprecated && <Icon title="Deprecated" material="warning_amber" />}
                 </DrawerItem>
-                {renderVolume(volume[type] as any, { pod: this.props.object, volumeName: volume.name})}
+                {renderVolume(volume[type] as any, { pod: this.props.object, volumeName: volume.name })}
               </>
             )
             : type
