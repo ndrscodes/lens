@@ -211,373 +211,433 @@ export interface IPodContainerStatus {
   started?: boolean;
 }
 
-export interface PodVolumeVariants {
-  awsElasticBlockStore: {
-    volumeID: string;
-    fsType: string;
-  };
-  azureDisk: {
-    /**
-     * The name of the VHD blob object OR the name of an Azure managed data disk if `kind` is `"Managed"`.
-     */
-    diskName: string;
-    /**
-     * The URI of the vhd blob object OR the `resourceID` of an Azure managed data disk if `kind` is `"Managed"`.
-     */
-    diskURI: string;
-    /**
-     * Kind of disk
-     * @default "Shared"
-     */
-    kind?: "Shared" | "Dedicated" | "Managed";
-    /**
-     * Disk caching mode.
-     * @default "None"
-     */
-    cachingMode?: "None" | "ReadOnly" | "ReadWrite";
-    /**
-     * The filesystem type to mount.
-     * @default "ext4"
-     */
-    fsType?: string;
-    /**
-     * Whether the filesystem is used as readOnly.
-     * @default false
-     */
-    readonly?: boolean;
-  };
-  azureFile: {
-    /**
-     * The name of the secret that contains both Azure storage account name and key.
-     */
-    secretName: string;
-    /**
-     * The share name to be used.
-     */
-    shareName: string;
-    /**
-     * In case the secret is stored in a different namespace.
-     * @default "default"
-     */
-    secretNamespace?: string;
-    /**
-     * Whether the filesystem is used as readOnly.
-     */
-    readOnly: boolean;
-  };
-  cephfs: {
-    /**
-     * List of Ceph monitors
-     */
-    monitors: string[];
-    /**
-     * Used as the mounted root, rather than the full Ceph tree.
-     * @default "/"
-     */
-    path?: string;
-    /**
-     * The RADOS user name.
-     * @default "admin"
-     */
-    user?: string;
-    /**
-     * The path to the keyring file.
-     * @default "/etc/ceph/user.secret"
-     */
-    secretFile?: string;
-    /**
-     * Reference to Ceph authentication secrets. If provided, then the secret overrides `secretFile`
-     */
-    secretRef?: SecretReference;
-    /**
-     * Whether the filesystem is used as readOnly.
-     */
-    readOnly: boolean;
-  };
-  cinder: {
-    volumeID: string;
-    fsType: string;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-    secretRef?: SecretReference;
-  };
-  configMap: {
-    name: string;
-    items: {
-      key: string;
-      path: string;
-    }[];
-  };
-  downwardAPI: {
-    items: {
-      path: string;
-      fieldRef: {
-        fieldPath: string;
-      };
-    }[];
-  };
-  ephemeral: {
-    volumeClaimTemplate: {
-      /**
-       * All the rest of the fields are ignored and rejected during validation
-       */
-      metadata?: Pick<KubeObjectMetadata, "labels" | "annotations">;
-      spec: PersistentVolumeClaimSpec;
+export interface AwsElasticBlockStoreSource {
+  volumeID: string;
+  fsType: string;
+}
+
+export interface AzureDiskSource {
+  /**
+   * The name of the VHD blob object OR the name of an Azure managed data disk if `kind` is `"Managed"`.
+   */
+  diskName: string;
+  /**
+   * The URI of the vhd blob object OR the `resourceID` of an Azure managed data disk if `kind` is `"Managed"`.
+   */
+  diskURI: string;
+  /**
+   * Kind of disk
+   * @default "Shared"
+   */
+  kind?: "Shared" | "Dedicated" | "Managed";
+  /**
+   * Disk caching mode.
+   * @default "None"
+   */
+  cachingMode?: "None" | "ReadOnly" | "ReadWrite";
+  /**
+   * The filesystem type to mount.
+   * @default "ext4"
+   */
+  fsType?: string;
+  /**
+   * Whether the filesystem is used as readOnly.
+   * @default false
+   */
+  readonly?: boolean;
+}
+
+export interface AzureFileSource {
+  /**
+   * The name of the secret that contains both Azure storage account name and key.
+   */
+  secretName: string;
+  /**
+   * The share name to be used.
+   */
+  shareName: string;
+  /**
+   * In case the secret is stored in a different namespace.
+   * @default "default"
+   */
+  secretNamespace?: string;
+  /**
+   * Whether the filesystem is used as readOnly.
+   */
+  readOnly: boolean;
+}
+
+export interface CephfsSource {
+  /**
+   * List of Ceph monitors
+   */
+  monitors: string[];
+  /**
+   * Used as the mounted root, rather than the full Ceph tree.
+   * @default "/"
+   */
+  path?: string;
+  /**
+   * The RADOS user name.
+   * @default "admin"
+   */
+  user?: string;
+  /**
+   * The path to the keyring file.
+   * @default "/etc/ceph/user.secret"
+   */
+  secretFile?: string;
+  /**
+   * Reference to Ceph authentication secrets. If provided, then the secret overrides `secretFile`
+   */
+  secretRef?: SecretReference;
+  /**
+   * Whether the filesystem is used as readOnly.
+   */
+  readOnly: boolean;
+}
+
+export interface CinderSource {
+  volumeID: string;
+  fsType: string;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+  secretRef?: SecretReference;
+}
+
+export interface ConfigMapSource {
+  name: string;
+  items: {
+    key: string;
+    path: string;
+  }[];
+}
+
+export interface DownwardApiSource {
+  items: {
+    path: string;
+    fieldRef: {
+      fieldPath: string;
     };
-  };
-  emptyDir: {
-    medium?: string;
-    sizeLimit?: string;
-  };
-  fc: {
+  }[];
+}
+
+export interface EphemeralSource {
+  volumeClaimTemplate: {
     /**
-     * A list of World Wide Names
+     * All the rest of the fields are ignored and rejected during validation
      */
-    targetWWNs: string[];
-    /**
-     * Logical Unit number
-     */
-    lun: number;
-    /**
-     * The type of filesystem
-     * @default "ext4"
-     */
-    fsType?: string;
-    readOnly: boolean;
+    metadata?: Pick<KubeObjectMetadata, "labels" | "annotations">;
+    spec: PersistentVolumeClaimSpec;
   };
-  flocker: {
-    datasetName: string;
-  };
-  flexVolume: {
-    driver: string;
-    fsType?: string;
-    secretRef?: LocalObjectReference;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-    options?: Record<string, string>;
-  };
-  gcePersistentDisk: {
-    pdName: string;
-    fsType: string;
-  };
-  gitRepo: {
-    repository: string;
-    revision: string;
-  };
-  glusterfs: {
-    /**
-     * The name of the Endpoints object that represents a Gluster cluster configuration.
-     */
-    endpoints: string;
-    /**
-     * The Glusterfs volume name.
-     */
-    path: string;
-    /**
-     * The boolean that sets the mountpoint readOnly or readWrite.
-     */
-    readOnly: boolean;
-  };
-  hostPath: {
-    path: string;
-    /**
-     * Determines the sorts of checks that will be done
-     * @default ""
-     */
-    type?: "" | "DirectoryOrCreate" | "Directory" | "FileOrCreate" | "File" | "Socket" | "CharDevice" | "BlockDevice";
-  };
-  iscsi: {
-    targetPortal: string;
-    iqn: string;
-    lun: number;
-    fsType: string;
-    readOnly: boolean;
-    chapAuthDiscovery?: boolean;
-    chapAuthSession?: boolean;
-    secretRef?: SecretReference;
-  };
-  local: {
-    path: string;
-  };
-  nfs: {
-    server: string;
-    path: string;
-    readOnly?: boolean;
-  };
-  persistentVolumeClaim: {
-    claimName: string;
-  };
-  photonPersistentDisk: {
-    pdID: string;
-    /**
-     * @default "ext4"
-     */
-    fsType?: string;
-  };
-  portworxVolume: {
-    volumeID: string;
-    fsType?: string;
-    readOnly?: boolean;
-  };
-  projected: {
-    sources: {
-      secret?: {
-        name: string;
-        items?: {
-          key: string;
-          path: string;
-          mode?: number;
-        }[];
-      };
-      downwardAPI?: {
-        items?: {
-          path: string;
-          fieldRef?: {
-            fieldPath: string;
-            apiVersion?: string;
-          };
-          resourceFieldRef?: {
-            resource: string;
-            containerName?: string;
-          };
-          mode?: number;
-        }[];
-      };
-      configMap?: {
-        name: string;
-        items?: {
-          key: string;
-          path: string;
-          mode?: number;
-        }[];
-        optional?: boolean;
-      };
-      serviceAccountToken?: {
-        audience?: string;
-        expirationSeconds?: number;
+}
+
+export interface EmptyDirSource {
+  medium?: string;
+  sizeLimit?: string;
+}
+
+export interface FiberChannelSource {
+  /**
+   * A list of World Wide Names
+   */
+  targetWWNs: string[];
+  /**
+   * Logical Unit number
+   */
+  lun: number;
+  /**
+   * The type of filesystem
+   * @default "ext4"
+   */
+  fsType?: string;
+  readOnly: boolean;
+}
+
+export interface FlokerSource {
+  datasetName: string;
+}
+
+export interface FlexVolumeSource {
+  driver: string;
+  fsType?: string;
+  secretRef?: LocalObjectReference;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+  options?: Record<string, string>;
+}
+
+export interface GcePersistentDiskSource {
+  pdName: string;
+  fsType: string;
+}
+
+export interface GitRepoSource {
+  repository: string;
+  revision: string;
+}
+
+export interface GlusterFsSource {
+  /**
+   * The name of the Endpoints object that represents a Gluster cluster configuration.
+   */
+  endpoints: string;
+  /**
+   * The Glusterfs volume name.
+   */
+  path: string;
+  /**
+   * The boolean that sets the mountpoint readOnly or readWrite.
+   */
+  readOnly: boolean;
+}
+
+export interface HostPathSource {
+  path: string;
+  /**
+   * Determines the sorts of checks that will be done
+   * @default ""
+   */
+  type?: "" | "DirectoryOrCreate" | "Directory" | "FileOrCreate" | "File" | "Socket" | "CharDevice" | "BlockDevice";
+}
+
+export interface IscsiSource {
+  targetPortal: string;
+  iqn: string;
+  lun: number;
+  fsType: string;
+  readOnly: boolean;
+  chapAuthDiscovery?: boolean;
+  chapAuthSession?: boolean;
+  secretRef?: SecretReference;
+}
+
+export interface LocalSource {
+  path: string;
+}
+
+export interface NetworkFsSource {
+  server: string;
+  path: string;
+  readOnly?: boolean;
+}
+
+export interface PVCSource {
+  claimName: string;
+}
+
+export interface PhotonPersistentDiskSource {
+  pdID: string;
+  /**
+   * @default "ext4"
+   */
+  fsType?: string;
+}
+
+export interface PortworxVolumeSource {
+  volumeID: string;
+  fsType?: string;
+  readOnly?: boolean;
+}
+
+export interface ProjectedSource {
+  sources: {
+    secret?: {
+      name: string;
+      items?: {
+        key: string;
         path: string;
-      };
-    }[];
-    defaultMode: number;
-  };
-  quobyte: {
-    registry: string;
-    volume: string;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-    /**
-     * @default "serivceaccount"
-     */
-    user?: string;
-    group?: string;
-    tenant?: string;
-  };
-  rbd: {
-    monitors: string[];
-    image: string;
-    /**
-     * @default "ext4"
-     */
-    fsType?: string;
-    /**
-     * @default "rbd"
-     */
-    pool?: string;
-    /**
-     * @default "admin"
-     */
-    user?: string;
-    /**
-     * @default "/etc/ceph/keyring"
-     */
-    keyring?: string;
-    secretRef?: SecretReference;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-  };
-  scaleIO: {
-    gateway: string;
-    system: string;
-    secretRef?: LocalObjectReference;
-    /**
-     * @default false
-     */
-    sslEnabled?: boolean;
-    protectionDomain?: string;
-    storagePool?: string;
-    /**
-     * @default "ThinProvisioned"
-     */
-    storageMode?: "ThickProvisioned" | "ThinProvisioned";
-    volumeName: string;
-    /**
-     * @default "xfs"
-     */
-    fsType?: string;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-  };
-  secret: {
-    secretName: string;
-    items?: {
-      key: string;
+        mode?: number;
+      }[];
+    };
+    downwardAPI?: {
+      items?: {
+        path: string;
+        fieldRef?: {
+          fieldPath: string;
+          apiVersion?: string;
+        };
+        resourceFieldRef?: {
+          resource: string;
+          containerName?: string;
+        };
+        mode?: number;
+      }[];
+    };
+    configMap?: {
+      name: string;
+      items?: {
+        key: string;
+        path: string;
+        mode?: number;
+      }[];
+      optional?: boolean;
+    };
+    serviceAccountToken?: {
+      audience?: string;
+      expirationSeconds?: number;
       path: string;
-      mode?: number;
-    }[];
-    defaultMode?: number;
-    optional?: boolean;
-  };
-  storageos: {
-    volumeName: string;
-    /**
-     * @default Pod.metadata.namespace
-     */
-    volumeNamespace?: string;
-    /**
-     * @default "ext4"
-     */
-    fsType?: string;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-    secretRef?: LocalObjectReference;
-  };
-  vsphereVolume: {
-    volumePath: string;
-    /**
-     * @default "ext4"
-     */
-    fsType?: string;
-    storagePolicyName?: string;
-    storagePolicyID?: string;
-  };
-  csi: {
-    driver: string;
-    /**
-     * @default false
-     */
-    readOnly?: boolean;
-    /**
-     * @default "ext4"
-     */
-    fsType?: string;
-    volumeAttributes?: Record<string, string>;
-    controllerPublishSecretRef?: SecretReference;
-    nodeStageSecretRef?: SecretReference;
-    nodePublishSecretRef?: SecretReference;
-    controllerExpandSecretRef?: SecretReference;
-  };
+    };
+  }[];
+  defaultMode: number;
+}
+
+export interface QuobyteSource {
+  registry: string;
+  volume: string;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+  /**
+   * @default "serivceaccount"
+   */
+  user?: string;
+  group?: string;
+  tenant?: string;
+}
+
+export interface RbdSource {
+  monitors: string[];
+  image: string;
+  /**
+   * @default "ext4"
+   */
+  fsType?: string;
+  /**
+   * @default "rbd"
+   */
+  pool?: string;
+  /**
+   * @default "admin"
+   */
+  user?: string;
+  /**
+   * @default "/etc/ceph/keyring"
+   */
+  keyring?: string;
+  secretRef?: SecretReference;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+}
+
+export interface ScaleIoSource {
+  gateway: string;
+  system: string;
+  secretRef?: LocalObjectReference;
+  /**
+   * @default false
+   */
+  sslEnabled?: boolean;
+  protectionDomain?: string;
+  storagePool?: string;
+  /**
+   * @default "ThinProvisioned"
+   */
+  storageMode?: "ThickProvisioned" | "ThinProvisioned";
+  volumeName: string;
+  /**
+   * @default "xfs"
+   */
+  fsType?: string;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+}
+
+export interface SecretSource {
+  secretName: string;
+  items?: {
+    key: string;
+    path: string;
+    mode?: number;
+  }[];
+  defaultMode?: number;
+  optional?: boolean;
+}
+
+export interface StorageOsSource {
+  volumeName: string;
+  /**
+   * @default Pod.metadata.namespace
+   */
+  volumeNamespace?: string;
+  /**
+   * @default "ext4"
+   */
+  fsType?: string;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+  secretRef?: LocalObjectReference;
+}
+
+export interface VsphereVolumeSource {
+  volumePath: string;
+  /**
+   * @default "ext4"
+   */
+  fsType?: string;
+  storagePolicyName?: string;
+  storagePolicyID?: string;
+}
+
+export interface ContainerStorageInterfaceSource {
+  driver: string;
+  /**
+   * @default false
+   */
+  readOnly?: boolean;
+  /**
+   * @default "ext4"
+   */
+  fsType?: string;
+  volumeAttributes?: Record<string, string>;
+  controllerPublishSecretRef?: SecretReference;
+  nodeStageSecretRef?: SecretReference;
+  nodePublishSecretRef?: SecretReference;
+  controllerExpandSecretRef?: SecretReference;
+}
+
+export interface PodVolumeVariants {
+  awsElasticBlockStore: AwsElasticBlockStoreSource;
+  azureDisk: AzureDiskSource;
+  azureFile: AzureFileSource;
+  cephfs: CephfsSource;
+  cinder: CinderSource;
+  configMap: ConfigMapSource;
+  downwardAPI: DownwardApiSource;
+  ephemeral: EphemeralSource;
+  emptyDir: EmptyDirSource;
+  fc: FiberChannelSource;
+  flocker: FlokerSource;
+  flexVolume: FlexVolumeSource;
+  gcePersistentDisk: GcePersistentDiskSource;
+  gitRepo: GitRepoSource;
+  glusterfs: GlusterFsSource;
+  hostPath: HostPathSource;
+  iscsi: IscsiSource;
+  local: LocalSource;
+  nfs: NetworkFsSource;
+  persistentVolumeClaim: PVCSource;
+  photonPersistentDisk: PhotonPersistentDiskSource;
+  portworxVolume: PortworxVolumeSource;
+  projected: ProjectedSource;
+  quobyte: QuobyteSource;
+  rbd: RbdSource;
+  scaleIO: ScaleIoSource;
+  secret: SecretSource;
+  storageos: StorageOsSource;
+  vsphereVolume: VsphereVolumeSource;
+  csi: ContainerStorageInterfaceSource;
 }
 
 /**
