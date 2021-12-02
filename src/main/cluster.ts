@@ -20,7 +20,7 @@
  */
 
 import { ipcMain } from "electron";
-import { action, comparer, computed, makeObservable, observable, reaction, when } from "mobx";
+import { action, comparer, computed, makeObservable, observable, reaction, runInAction, when } from "mobx";
 import { broadcastMessage, ClusterListNamespaceForbiddenChannel } from "../common/ipc";
 import { ContextHandler } from "./context-handler";
 import { AuthorizationV1Api, CoreV1Api, HttpError, KubeConfig, V1ResourceAttributes } from "@kubernetes/client-node";
@@ -291,7 +291,7 @@ export class Cluster implements ClusterModel, ClusterState {
    * @internal
    */
   protected bindEvents() {
-    logger.info(`[CLUSTER]: bind events`, this.getMeta());
+    logger.info(`[CLUSTER]: bind events`, this.getMeta(true));
     const refreshTimer = setInterval(() => !this.disconnected && this.refresh(), 30000); // every 30s
     const refreshMetadataTimer = setInterval(() => !this.disconnected && this.refreshMetadata(), 900000); // every 15 minutes
 
@@ -328,34 +328,38 @@ export class Cluster implements ClusterModel, ClusterState {
    */
   @action
   async activate(force = false) {
-    if (this.activated && !force) {
-      return this.pushState();
+    try {
+      logger.info(`[CLUSTER]: activating`, this.getMeta(true));
+
+      if (this.activated && !force) {
+        return this.pushState();
+      }
+
+      if (!this.eventsDisposer.length) {
+        this.bindEvents();
+      }
+
+      if (this.disconnected || !this.accessible) {
+        await this.reconnect();
+      }
+
+      this.broadcastConnectUpdate("Refreshing connection status ...");
+      await this.refreshConnectionStatus();
+
+      if (this.accessible) {
+        this.broadcastConnectUpdate("Refreshing cluster accessibility ...");
+        await this.refreshAccessibility();
+        // download kubectl in background, so it's not blocking dashboard
+        this.ensureKubectl()
+          .catch(error => logger.warn(`[CLUSTER]: failed to download kubectl for clusterId=${this.id}`, error));
+        this.broadcastConnectUpdate("Connected, waiting for view to load ...");
+      }
+
+      this.activated = true;
+      this.pushState();
+    } finally {
+      logger.info(`[CLUSTER]: activation finished`, this.getMeta());
     }
-
-    logger.info(`[CLUSTER]: activate`, this.getMeta());
-
-    if (!this.eventsDisposer.length) {
-      this.bindEvents();
-    }
-
-    if (this.disconnected || !this.accessible) {
-      await this.reconnect();
-    }
-
-    this.broadcastConnectUpdate("Refreshing connection status ...");
-    await this.refreshConnectionStatus();
-
-    if (this.accessible) {
-      this.broadcastConnectUpdate("Refreshing cluster accessibility ...");
-      await this.refreshAccessibility();
-      // download kubectl in background, so it's not blocking dashboard
-      this.ensureKubectl()
-        .catch(error => logger.warn(`[CLUSTER]: failed to download kubectl for clusterId=${this.id}`, error));
-      this.broadcastConnectUpdate("Connected, waiting for view to load ...");
-    }
-
-    this.activated = true;
-    this.pushState();
   }
 
   /**
@@ -372,19 +376,18 @@ export class Cluster implements ClusterModel, ClusterState {
   /**
    * @internal
    */
-  @action
   async reconnect() {
-    logger.info(`[CLUSTER]: reconnect`, this.getMeta());
+    runInAction(() => this.disconnected = false);
     this.contextHandler?.stopServer();
+    logger.info(`[CLUSTER]: starting proxy server`, this.getMeta(true));
     await this.contextHandler?.ensureServer();
-    this.disconnected = false;
   }
 
   /**
    * @internal
    */
   @action disconnect() {
-    logger.info(`[CLUSTER]: disconnecting`, { id: this.id });
+    logger.info(`[CLUSTER]: disconnecting`, this.getMeta(true));
     this.eventsDisposer();
     this.contextHandler?.stopServer();
     this.disconnected = true;
@@ -395,7 +398,7 @@ export class Cluster implements ClusterModel, ClusterState {
     this.allowedNamespaces = [];
     this.resourceAccessStatuses.clear();
     this.pushState();
-    logger.info(`[CLUSTER]: disconnected`, { id: this.id });
+    logger.info(`[CLUSTER]: disconnected`, this.getMeta(true));
   }
 
   /**
@@ -404,7 +407,7 @@ export class Cluster implements ClusterModel, ClusterState {
    */
   @action
   async refresh(opts: ClusterRefreshOptions = {}) {
-    logger.info(`[CLUSTER]: refresh`, this.getMeta());
+    logger.info(`[CLUSTER]: refresh`, this.getMeta(true));
     await this.refreshConnectionStatus();
 
     if (this.accessible) {
@@ -608,15 +611,23 @@ export class Cluster implements ClusterModel, ClusterState {
   }
 
   // get cluster system meta, e.g. use in "logger"
-  getMeta() {
-    return {
+  getMeta(basic = false) {
+    const meta = {
       id: this.id,
       name: this.contextName,
-      ready: this.ready,
-      online: this.online,
-      accessible: this.accessible,
-      disconnected: this.disconnected,
+      kubeconfigPath: this.kubeConfigPath,
     };
+
+    if (!basic) {
+      Object.assign(meta, {
+        ready: this.ready,
+        online: this.online,
+        accessible: this.accessible,
+        disconnected: this.disconnected,
+      });
+    }
+
+    return meta;
   }
 
   /**
