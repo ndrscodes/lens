@@ -383,13 +383,9 @@ export class Cluster implements ClusterModel, ClusterState {
   /**
    * @internal
    */
-  @action disconnect() {
+  @action
+  disconnect(force = false) {
     logger.info(`[CLUSTER]: disconnecting cluster`, { id: this.id });
-
-    ipcMain.once(`cluster:${this.id}:frame-removed`, () => {
-      this.contextHandler?.stopServer();
-    });
-
     this.eventsDisposer();
     this.disconnected = true;
     this.online = false;
@@ -400,6 +396,17 @@ export class Cluster implements ClusterModel, ClusterState {
     this.resourceAccessStatuses.clear();
     this.pushState();
     logger.info(`[CLUSTER]: disconnected`, { id: this.id });
+
+    const stopServer = () => {
+      logger.info(`[CLUSTER]: stopping server`, { id: this.id });
+      this.contextHandler?.stopServer();
+    };
+
+    if (force) {
+      stopServer();
+    } else {
+      ipcMain.once(`cluster:${this.id}:frame-removed`, stopServer);
+    }
   }
 
   /**

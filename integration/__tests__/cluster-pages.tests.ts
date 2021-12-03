@@ -325,13 +325,11 @@ utils.describeIf(minikubeReady(TEST_NAMESPACE))("Minikube based tests", () => {
     await utils.clickWelcomeButton(window);
 
     frame = await utils.lauchMinikubeClusterFromCatalog(window);
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 
   afterEach(async () => {
-    await frame.click(`[data-testid="sidebar-cluster-dropdown"]`);
-    await frame.click(`.Menu >> text="Disconnect"`);
     await cleanup();
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 
   it("shows cluster context menu in sidebar", async () => {
     await frame.click(`[data-testid="sidebar-cluster-dropdown"]`);
@@ -371,7 +369,7 @@ utils.describeIf(minikubeReady(TEST_NAMESPACE))("Minikube based tests", () => {
       await frame.click(selectors.expandSubMenu);
       await frame.waitForSelector(mainPageSelector, { state: "hidden" });
     }
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 
 
 
@@ -412,13 +410,13 @@ utils.describeIf(minikubeReady(TEST_NAMESPACE))("Minikube based tests", () => {
     const showPreviousButton = await frame.waitForSelector(".LogControls .show-previous");
 
     await showPreviousButton.click();
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 
   it("should show the default namespaces", async () => {
     await frame.click('a[href="/namespaces"]');
     await frame.waitForSelector("div.TableCell >> text='default'");
     await frame.waitForSelector("div.TableCell >> text='kube-system'");
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 
   it(`should create the ${TEST_NAMESPACE} and a pod in the namespace`, async () => {
     await frame.click('a[href="/namespaces"]');
@@ -487,5 +485,5 @@ utils.describeIf(minikubeReady(TEST_NAMESPACE))("Minikube based tests", () => {
 
     await frame.click(".Dock .Button >> text='Create'");
     await frame.waitForSelector(`.TableCell >> text=${testPodName}`);
-  }, 10*60*1000);
+  }, 10 * 60 * 1000);
 });

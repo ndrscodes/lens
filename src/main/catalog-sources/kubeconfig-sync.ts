@@ -192,7 +192,7 @@ export function computeDiff(contents: string, source: RootSource, filePath: stri
           // remove from the deleting set, so that if a new context of the same name is added, it isn't marked as deleting
           ClusterManager.getInstance().deleting.delete(value[0].id);
 
-          value[0].disconnect();
+          value[0].disconnect(true);
           source.delete(contextName);
           logger.debug(`${logPrefix} Removed old cluster from sync`, { filePath, contextName });
           continue;

@@ -250,9 +250,9 @@ export class ClusterManager extends Singleton {
   };
 
   stop() {
-    this.store.clusters.forEach((cluster: Cluster) => {
-      cluster.disconnect();
-    });
+    for (const cluster of this.store.clustersList) {
+      cluster.disconnect(true);
+    }
   }
 
   getClusterForRequest(req: http.IncomingMessage): Cluster {
