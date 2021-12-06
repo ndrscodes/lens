@@ -32,7 +32,7 @@ import logger from "./logger";
 import { VersionDetector } from "./cluster-detectors/version-detector";
 import { DetectorRegistry } from "./cluster-detectors/detector-registry";
 import plimit from "p-limit";
-import type { ClusterState, ClusterRefreshOptions, ClusterMetricsResourceType, ClusterId, ClusterMetadata, ClusterModel, ClusterPreferences, ClusterPrometheusPreferences, UpdateClusterModel, KubeAuthUpdate } from "../common/cluster-types";
+import { ClusterState, ClusterRefreshOptions, ClusterMetricsResourceType, ClusterId, ClusterMetadata, ClusterModel, ClusterPreferences, ClusterPrometheusPreferences, UpdateClusterModel, KubeAuthUpdate, updateClusterModelChecker, clusterModelIdChecker } from "../common/cluster-types";
 import { ClusterMetadataKey, initialNodeShellImage, ClusterStatus } from "../common/cluster-types";
 import { disposer, storedKubeConfigFolder, toJS } from "../common/utils";
 import type { Response } from "request";
@@ -221,9 +221,16 @@ export class Cluster implements ClusterModel, ClusterState {
     return this.preferences.defaultNamespace;
   }
 
-  constructor(model: ClusterModel) {
+  constructor({ id, ...model }: ClusterModel) {
     makeObservable(this);
-    this.id = model.id;
+
+    const { error } = clusterModelIdChecker.validate({ id });
+
+    if (error) {
+      throw error;
+    }
+
+    this.id = id;
     this.updateModel(model);
 
     const { config } = loadConfigFromFileSync(this.kubeConfigPath);
@@ -256,7 +263,14 @@ export class Cluster implements ClusterModel, ClusterState {
   @action updateModel(model: UpdateClusterModel) {
     // Note: do not assign ID as that should never be updated
 
+    const { error } = updateClusterModelChecker.validate(model);
+
+    if (error) {
+      throw error;
+    }
+
     this.kubeConfigPath = model.kubeConfigPath;
+    this.contextName = model.contextName;
 
     if (model.workspace) {
       this.workspace = model.workspace;
@@ -264,10 +278,6 @@ export class Cluster implements ClusterModel, ClusterState {
 
     if (model.workspaces) {
       this.workspaces = model.workspaces;
-    }
-
-    if (model.contextName) {
-      this.contextName = model.contextName;
     }
 
     if (model.preferences) {
