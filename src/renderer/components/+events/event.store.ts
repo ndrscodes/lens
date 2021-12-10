@@ -22,12 +22,11 @@
 import groupBy from "lodash/groupBy";
 import compact from "lodash/compact";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 import { eventApi, KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Pod } from "../../../common/k8s-api/endpoints/pods.api";
 import { podsStore } from "../+workloads-pods/pods.store";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 
 export class EventStore extends KubeObjectStore<KubeEvent> {
   api = eventApi;
@@ -83,5 +82,9 @@ export class EventStore extends KubeObjectStore<KubeEvent> {
   }
 }
 
-export const eventStore = new EventStore();
-apiManager.registerStore(eventStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const eventStore = isClusterPageContext()
+  ? new EventStore()
+  : undefined;

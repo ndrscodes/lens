@@ -145,14 +145,11 @@ export class NetworkPolicy extends KubeObject {
   }
 }
 
-let networkPolicyApi: KubeApi<NetworkPolicy>;
-
-if (isClusterPageContext()) {
-  networkPolicyApi = new KubeApi<NetworkPolicy>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const networkPolicyApi = isClusterPageContext()
+  ? new KubeApi<NetworkPolicy>({
     objectConstructor: NetworkPolicy,
-  });
-}
-
-export {
-  networkPolicyApi,
-};
+  })
+  : undefined;

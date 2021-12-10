@@ -102,14 +102,11 @@ export class PersistentVolume extends KubeObject {
   }
 }
 
-let persistentVolumeApi: KubeApi<PersistentVolume>;
-
-if (isClusterPageContext()) {
-  persistentVolumeApi = new KubeApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const persistentVolumeApi = isClusterPageContext()
+  ? new KubeApi<PersistentVolume>({
     objectConstructor: PersistentVolume,
-  });
-}
-
-export {
-  persistentVolumeApi,
-};
+  })
+  : undefined;

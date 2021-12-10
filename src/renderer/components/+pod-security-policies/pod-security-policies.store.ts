@@ -21,11 +21,15 @@
 
 import { PodSecurityPolicy, pspApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import { isClusterPageContext } from "../../utils";
 
 export class PodSecurityPoliciesStore extends KubeObjectStore<PodSecurityPolicy> {
   api = pspApi;
 }
 
-export const podSecurityPoliciesStore = new PodSecurityPoliciesStore();
-apiManager.registerStore(podSecurityPoliciesStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const podSecurityPoliciesStore = isClusterPageContext()
+  ? new PodSecurityPoliciesStore()
+  : undefined;

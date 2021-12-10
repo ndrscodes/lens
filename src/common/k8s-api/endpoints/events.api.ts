@@ -78,14 +78,11 @@ export class KubeEvent extends KubeObject {
   }
 }
 
-let eventApi: KubeApi<KubeEvent>;
-
-if (isClusterPageContext()) {
-  eventApi = new KubeApi<KubeEvent>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const eventApi = isClusterPageContext()
+  ? new KubeApi<KubeEvent>({
     objectConstructor: KubeEvent,
-  });
-}
-
-export {
-  eventApi,
-};
+  })
+  : undefined;

@@ -21,10 +21,9 @@
 import { makeObservable } from "mobx";
 
 import { podsStore } from "../+workloads-pods/pods.store";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 import { DaemonSet, daemonSetApi, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 
 export class DaemonSetStore extends KubeObjectStore<DaemonSet> {
   api = daemonSetApi;
@@ -61,5 +60,9 @@ export class DaemonSetStore extends KubeObjectStore<DaemonSet> {
   }
 }
 
-export const daemonSetStore = new DaemonSetStore();
-apiManager.registerStore(daemonSetStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const daemonSetStore = isClusterPageContext()
+  ? new DaemonSetStore()
+  : undefined;

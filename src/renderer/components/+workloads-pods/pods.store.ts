@@ -22,9 +22,8 @@
 import countBy from "lodash/countBy";
 import { observable, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, cpuUnitsToNumber, unitsToBytes } from "../../utils";
+import { autoBind, cpuUnitsToNumber, isClusterPageContext, unitsToBytes } from "../../utils";
 import { Pod, PodMetrics, podMetricsApi, podsApi } from "../../../common/k8s-api/endpoints";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 import type { WorkloadKubeObject } from "../../../common/k8s-api/workload-kube-object";
 
 export class PodsStore extends KubeObjectStore<Pod> {
@@ -103,5 +102,9 @@ export class PodsStore extends KubeObjectStore<Pod> {
   }
 }
 
-export const podsStore = new PodsStore();
-apiManager.registerStore(podsStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const podsStore = isClusterPageContext()
+  ? new PodsStore()
+  : undefined;

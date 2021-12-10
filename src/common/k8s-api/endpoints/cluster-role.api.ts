@@ -45,14 +45,8 @@ export class ClusterRole extends KubeObject {
 /**
  * Only available within kubernetes cluster pages
  */
-let clusterRoleApi: KubeApi<ClusterRole>;
-
-if (isClusterPageContext()) { // initialize automatically only when within a cluster iframe/context
-  clusterRoleApi = new KubeApi({
+export const clusterRoleApi = isClusterPageContext()
+  ? new KubeApi<ClusterRole>({
     objectConstructor: ClusterRole,
-  });
-}
-
-export {
-  clusterRoleApi,
-};
+  })
+  : undefined;

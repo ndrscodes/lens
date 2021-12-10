@@ -21,11 +21,15 @@
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { Endpoint, endpointApi } from "../../../common/k8s-api/endpoints/endpoint.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import { isClusterPageContext } from "../../utils";
 
 export class EndpointStore extends KubeObjectStore<Endpoint> {
   api = endpointApi;
 }
 
-export const endpointStore = new EndpointStore();
-apiManager.registerStore(endpointStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const endpointStore = isClusterPageContext()
+  ? new EndpointStore()
+  : undefined;

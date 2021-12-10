@@ -63,14 +63,11 @@ export class StorageClass extends KubeObject {
   }
 }
 
-let storageClassApi: KubeApi<StorageClass>;
-
-if (isClusterPageContext()) {
-  storageClassApi = new KubeApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const storageClassApi = isClusterPageContext()
+  ? new KubeApi<StorageClass>({
     objectConstructor: StorageClass,
-  });
-}
-
-export {
-  storageClassApi,
-};
+  })
+  : undefined;

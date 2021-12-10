@@ -20,10 +20,9 @@
  */
 
 import { action, comparer, computed, IReactionDisposer, makeObservable, reaction } from "mobx";
-import { autoBind, createStorage, noop, ToggleSet } from "../../utils";
+import { autoBind, createStorage, isClusterPageContext, noop, ToggleSet } from "../../utils";
 import { KubeObjectStore, KubeObjectStoreLoadingParams } from "../../../common/k8s-api/kube-object.store";
 import { Namespace, namespacesApi } from "../../../common/k8s-api/endpoints/namespaces.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 
 export class NamespaceStore extends KubeObjectStore<Namespace> {
   api = namespacesApi;
@@ -247,8 +246,12 @@ export class NamespaceStore extends KubeObjectStore<Namespace> {
   }
 }
 
-export const namespaceStore = new NamespaceStore();
-apiManager.registerStore(namespaceStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const namespaceStore = isClusterPageContext()
+  ? new NamespaceStore()
+  : undefined;
 
 export function getDummyNamespace(name: string) {
   return new Namespace({

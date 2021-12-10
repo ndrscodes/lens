@@ -21,10 +21,9 @@
 import { makeObservable } from "mobx";
 
 import { podsStore } from "../+workloads-pods/pods.store";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 import { Deployment, deploymentApi, PodStatus } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 
 export class DeploymentStore extends KubeObjectStore<Deployment> {
   api = deploymentApi;
@@ -69,5 +68,9 @@ export class DeploymentStore extends KubeObjectStore<Deployment> {
   }
 }
 
-export const deploymentStore = new DeploymentStore();
-apiManager.registerStore(deploymentStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const deploymentStore = isClusterPageContext()
+  ? new DeploymentStore()
+  : undefined;

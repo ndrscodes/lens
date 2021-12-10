@@ -20,9 +20,8 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 import { PersistentVolume, persistentVolumeApi } from "../../../common/k8s-api/endpoints/persistent-volume.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 import type { StorageClass } from "../../../common/k8s-api/endpoints/storage-class.api";
 
 export class PersistentVolumesStore extends KubeObjectStore<PersistentVolume> {
@@ -40,5 +39,9 @@ export class PersistentVolumesStore extends KubeObjectStore<PersistentVolume> {
   }
 }
 
-export const volumesStore = new PersistentVolumesStore();
-apiManager.registerStore(volumesStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const volumesStore = isClusterPageContext()
+  ? new PersistentVolumesStore()
+  : undefined;

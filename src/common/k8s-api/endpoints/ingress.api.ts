@@ -210,17 +210,14 @@ export class Ingress extends KubeObject {
   }
 }
 
-let ingressApi: IngressApi;
-
-if (isClusterPageContext()) {
-  ingressApi = new IngressApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const ingressApi = isClusterPageContext()
+  ? new IngressApi({
     objectConstructor: Ingress,
     // Add fallback for Kubernetes <1.19
     checkPreferredVersion: true,
     fallbackApiBases: ["/apis/extensions/v1beta1/ingresses"],
-  });
-}
-
-export {
-  ingressApi,
-};
+  })
+  : undefined;

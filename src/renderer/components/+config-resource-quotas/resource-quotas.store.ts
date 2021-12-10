@@ -21,11 +21,15 @@
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { ResourceQuota, resourceQuotaApi } from "../../../common/k8s-api/endpoints/resource-quota.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import { isClusterPageContext } from "../../utils";
 
 export class ResourceQuotasStore extends KubeObjectStore<ResourceQuota> {
   api = resourceQuotaApi;
 }
 
-export const resourceQuotaStore = new ResourceQuotasStore();
-apiManager.registerStore(resourceQuotaStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const resourceQuotaStore = isClusterPageContext()
+  ? new ResourceQuotasStore()
+  : undefined;

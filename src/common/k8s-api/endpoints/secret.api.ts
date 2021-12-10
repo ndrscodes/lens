@@ -70,14 +70,11 @@ export class Secret extends KubeObject {
   }
 }
 
-let secretsApi: KubeApi<Secret>;
-
-if (isClusterPageContext()) {
-  secretsApi = new KubeApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const secretsApi = isClusterPageContext()
+  ? new KubeApi<Secret>({
     objectConstructor: Secret,
-  });
-}
-
-export {
-  secretsApi,
-};
+  })
+  : undefined;

@@ -75,6 +75,8 @@ import { DeleteClusterDialog } from "./components/delete-cluster-dialog";
 import { WorkloadsOverview } from "./components/+workloads-overview/overview";
 import { KubeObjectListLayout } from "./components/kube-object-list-layout";
 import type { KubernetesCluster } from "../common/catalog-entities";
+import { apiManager } from "../common/k8s-api/api-manager";
+import { initApiManager } from "../common/initializers/init-api-manager";
 
 @observer
 export class ClusterFrame extends React.Component {
@@ -142,6 +144,8 @@ export class ClusterFrame extends React.Component {
       = KubeObjectListLayout.clusterContext
       = KubeWatchApi.context
       = clusterContext;
+
+    initApiManager(apiManager);
   }
 
   componentDidMount() {

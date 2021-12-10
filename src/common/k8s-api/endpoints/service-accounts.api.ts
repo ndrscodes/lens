@@ -53,14 +53,11 @@ export class ServiceAccount extends KubeObject {
   }
 }
 
-let serviceAccountsApi: KubeApi<ServiceAccount>;
-
-if (isClusterPageContext()) {
-  serviceAccountsApi = new KubeApi<ServiceAccount>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const serviceAccountsApi = isClusterPageContext()
+  ? new KubeApi<ServiceAccount>({
     objectConstructor: ServiceAccount,
-  });
-}
-
-export {
-  serviceAccountsApi,
-};
+  })
+  : undefined;

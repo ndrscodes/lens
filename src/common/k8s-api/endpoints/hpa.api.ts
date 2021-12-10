@@ -164,14 +164,11 @@ export class HorizontalPodAutoscaler extends KubeObject {
   }
 }
 
-let hpaApi: KubeApi<HorizontalPodAutoscaler>;
-
-if (isClusterPageContext()) {
-  hpaApi = new KubeApi<HorizontalPodAutoscaler>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const hpaApi = isClusterPageContext()
+  ? new KubeApi<HorizontalPodAutoscaler>({
     objectConstructor: HorizontalPodAutoscaler,
-  });
-}
-
-export {
-  hpaApi,
-};
+  })
+  : undefined;

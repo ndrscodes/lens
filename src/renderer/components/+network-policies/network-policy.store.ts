@@ -21,11 +21,15 @@
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { NetworkPolicy, networkPolicyApi } from "../../../common/k8s-api/endpoints/network-policy.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import { isClusterPageContext } from "../../utils";
 
 export class NetworkPolicyStore extends KubeObjectStore<NetworkPolicy> {
   api = networkPolicyApi;
 }
 
-export const networkPolicyStore = new NetworkPolicyStore();
-apiManager.registerStore(networkPolicyStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const networkPolicyStore = isClusterPageContext()
+  ? new NetworkPolicyStore()
+  : undefined;

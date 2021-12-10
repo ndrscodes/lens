@@ -19,10 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { apiManager } from "../../../../common/k8s-api/api-manager";
 import { RoleBinding, roleBindingApi, RoleBindingSubject } from "../../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { HashSet } from "../../../utils";
+import { HashSet, isClusterPageContext } from "../../../utils";
 import { hashRoleBindingSubject } from "./hashers";
 
 export class RoleBindingsStore extends KubeObjectStore<RoleBinding> {
@@ -57,6 +56,9 @@ export class RoleBindingsStore extends KubeObjectStore<RoleBinding> {
   }
 }
 
-export const roleBindingsStore = new RoleBindingsStore();
-
-apiManager.registerStore(roleBindingsStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const roleBindingsStore = isClusterPageContext()
+  ? new RoleBindingsStore()
+  : undefined;

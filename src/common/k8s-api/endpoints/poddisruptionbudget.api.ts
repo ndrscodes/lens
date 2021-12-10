@@ -73,14 +73,11 @@ export class PodDisruptionBudget extends KubeObject {
 
 }
 
-let pdbApi: KubeApi<PodDisruptionBudget>;
-
-if (isClusterPageContext()) {
-  pdbApi = new KubeApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const pdbApi = isClusterPageContext()
+  ? new KubeApi<PodDisruptionBudget>({
     objectConstructor: PodDisruptionBudget,
-  });
-}
-
-export {
-  pdbApi,
-};
+  })
+  : undefined;

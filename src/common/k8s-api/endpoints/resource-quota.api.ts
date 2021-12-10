@@ -81,14 +81,11 @@ export class ResourceQuota extends KubeObject {
   }
 }
 
-let resourceQuotaApi: KubeApi<ResourceQuota>;
-
-if (isClusterPageContext()) {
-  resourceQuotaApi = new KubeApi<ResourceQuota>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const resourceQuotaApi = isClusterPageContext()
+  ? new KubeApi<ResourceQuota>({
     objectConstructor: ResourceQuota,
-  });
-}
-
-export {
-  resourceQuotaApi,
-};
+  })
+  : undefined;

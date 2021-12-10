@@ -19,10 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { apiManager } from "../../../../common/k8s-api/api-manager";
 import { ServiceAccount, serviceAccountsApi } from "../../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../../utils";
+import { autoBind, isClusterPageContext } from "../../../utils";
 
 export class ServiceAccountsStore extends KubeObjectStore<ServiceAccount> {
   api = serviceAccountsApi;
@@ -39,5 +38,9 @@ export class ServiceAccountsStore extends KubeObjectStore<ServiceAccount> {
   }
 }
 
-export const serviceAccountsStore = new ServiceAccountsStore();
-apiManager.registerStore(serviceAccountsStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const serviceAccountsStore = isClusterPageContext()
+  ? new ServiceAccountsStore()
+  : undefined;

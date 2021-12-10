@@ -51,14 +51,8 @@ export class ConfigMap extends KubeObject {
 /**
  * Only available within kubernetes cluster pages
  */
-let configMapApi: KubeApi<ConfigMap>;
-
-if (isClusterPageContext()) {
-  configMapApi = new KubeApi({
+export const configMapApi = isClusterPageContext()
+  ? new KubeApi<ConfigMap>({
     objectConstructor: ConfigMap,
-  });
-}
-
-export {
-  configMapApi,
-};
+  })
+  : undefined;

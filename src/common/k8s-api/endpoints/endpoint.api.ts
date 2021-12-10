@@ -150,14 +150,11 @@ export class Endpoint extends KubeObject {
 
 }
 
-let endpointApi: KubeApi<Endpoint>;
-
-if (isClusterPageContext()) {
-  endpointApi = new KubeApi<Endpoint>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const endpointApi = isClusterPageContext()
+  ? new KubeApi<Endpoint>({
     objectConstructor: Endpoint,
-  });
-}
-
-export {
-  endpointApi,
-};
+  })
+  : undefined;

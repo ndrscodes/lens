@@ -227,15 +227,9 @@ export class CustomResourceDefinition extends KubeObject {
 /**
  * Only available within kubernetes cluster pages
  */
-let crdApi: KubeApi<CustomResourceDefinition>;
-
-if (isClusterPageContext()) {
-  crdApi = new KubeApi<CustomResourceDefinition>({
+export const crdApi = isClusterPageContext()
+  ? new KubeApi<CustomResourceDefinition>({
     objectConstructor: CustomResourceDefinition,
     checkPreferredVersion: true,
-  });
-}
-
-export {
-  crdApi,
-};
+  })
+  : undefined;

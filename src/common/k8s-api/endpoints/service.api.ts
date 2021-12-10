@@ -148,14 +148,11 @@ export class Service extends KubeObject {
   }
 }
 
-let serviceApi: KubeApi<Service>;
-
-if (isClusterPageContext()) {
-  serviceApi = new KubeApi<Service>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const serviceApi = isClusterPageContext()
+  ? new KubeApi<Service>({
     objectConstructor: Service,
-  });
-}
-
-export {
-  serviceApi,
-};
+  })
+  : undefined;

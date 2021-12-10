@@ -21,7 +21,7 @@
 
 import { computed, reaction, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 import { crdApi, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
 import { apiManager } from "../../../common/k8s-api/api-manager";
 import { KubeApi } from "../../../common/k8s-api/kube-api";
@@ -37,6 +37,10 @@ function initStore(crd: CustomResourceDefinition) {
 
   const api = apiManager.getApi(objectConstructor.apiBase)
     ?? new KubeApi({ objectConstructor });
+
+  if (!apiManager.hasApi(api)) {
+    apiManager.registerApi(api);
+  }
 
   if (!apiManager.getStore(api)) {
     apiManager.registerStore(new CRDResourceStore(api));
@@ -94,6 +98,9 @@ export class CRDStore extends KubeObjectStore<CustomResourceDefinition> {
   }
 }
 
-export const crdStore = new CRDStore();
-
-apiManager.registerStore(crdStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const crdStore = isClusterPageContext()
+  ? new CRDStore()
+  : undefined;

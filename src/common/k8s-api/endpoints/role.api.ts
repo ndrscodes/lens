@@ -42,14 +42,11 @@ export class Role extends KubeObject {
   }
 }
 
-let roleApi: KubeApi<Role>;
-
-if (isClusterPageContext()) {
-  roleApi = new KubeApi<Role>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const roleApi = isClusterPageContext()
+  ? new KubeApi<Role>({
     objectConstructor: Role,
-  });
-}
-
-export{
-  roleApi,
-};
+  })
+  : undefined;

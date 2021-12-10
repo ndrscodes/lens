@@ -20,9 +20,8 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { autoBind, isClusterPageContext } from "../../utils";
 import { StorageClass, storageClassApi } from "../../../common/k8s-api/endpoints/storage-class.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
 import { volumesStore } from "../+storage-volumes/volumes.store";
 
 export class StorageClassStore extends KubeObjectStore<StorageClass> {
@@ -38,5 +37,9 @@ export class StorageClassStore extends KubeObjectStore<StorageClass> {
   }
 }
 
-export const storageClassStore = new StorageClassStore();
-apiManager.registerStore(storageClassStore);
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const storageClassStore = isClusterPageContext()
+  ? new StorageClassStore()
+  : undefined;

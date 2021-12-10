@@ -517,14 +517,11 @@ export class Pod extends WorkloadKubeObject {
   }
 }
 
-let podsApi: PodsApi;
-
-if (isClusterPageContext()) {
-  podsApi = new PodsApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const podsApi = isClusterPageContext()
+  ? new PodsApi({
     objectConstructor: Pod,
-  });
-}
-
-export {
-  podsApi,
-};
+  })
+  : undefined;

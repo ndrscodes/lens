@@ -21,19 +21,41 @@
 
 import type { KubeObjectStore } from "./kube-object.store";
 
-import { action, observable, makeObservable } from "mobx";
+import { action, observable, makeObservable, computed } from "mobx";
 import { autoBind, iter } from "../utils";
 import type { KubeApi } from "./kube-api";
 import type { KubeObject } from "./kube-object";
 import { IKubeObjectRef, parseKubeApi, createKubeApiURL } from "./kube-api-parse";
 
 export class ApiManager {
-  private apis = observable.map<string, KubeApi<KubeObject>>();
-  private stores = observable.map<string, KubeObjectStore<KubeObject>>();
+  private apiSet = observable.set<KubeApi<KubeObject>>();
+  private stores = observable.map<KubeApi<KubeObject>, KubeObjectStore<KubeObject>>();
 
   constructor() {
     makeObservable(this);
     autoBind(this);
+  }
+
+  @computed private get apis() {
+    const res = new Map<string, KubeApi<KubeObject>>();
+
+    for (const api of this.apiSet) {
+      if (typeof api.apiBase !== "string" || !api.apiBase) {
+        throw new TypeError("KubeApi.apiBase must be a non-empty string");
+      }
+
+      if (res.has(api.apiBase)) {
+        throw new Error("KubeApi.apiBase must be unique");
+      }
+
+      res.set(api.apiBase, api);
+    }
+
+    return res;
+  }
+
+  hasApi(api: KubeApi<KubeObject>): boolean {
+    return this.apiSet.has(api);
   }
 
   getApi(pathOrCallback: string | ((api: KubeApi<KubeObject>) => boolean)) {
@@ -48,17 +70,21 @@ export class ApiManager {
     return iter.find(this.apis.values(), api => api.kind === kind && api.apiVersionWithGroup === apiVersion);
   }
 
-  registerApi(apiBase: string, api: KubeApi<KubeObject>) {
-    if (!api.apiBase) return;
+  registerApi(api: KubeApi<KubeObject>): void;
+  /**
+   * @deprecated Just provide the `api` instance
+   */
+  registerApi(apiOrBase: string, api: KubeApi<KubeObject>): void
+  @action
+  registerApi(apiOrBase: string | KubeApi<KubeObject>, api?: KubeApi<KubeObject>): void {
+    api = typeof apiOrBase === "string"
+      ? api
+      : apiOrBase;
 
-    if (!this.apis.has(apiBase)) {
-      this.stores.forEach((store) => {
-        if (store.api === api) {
-          this.stores.set(apiBase, store);
-        }
-      });
-
-      this.apis.set(apiBase, api);
+    if (this.apiSet.has(api)) {
+      throw new Error("Cannot register the same api twice");
+    } else {
+      this.apiSet.add(api);
     }
   }
 
@@ -74,25 +100,29 @@ export class ApiManager {
     return api;
   }
 
-  unregisterApi(api: string | KubeApi<KubeObject>) {
-    if (typeof api === "string") this.apis.delete(api);
-    else {
-      const apis = Array.from(this.apis.entries());
-      const entry = apis.find(entry => entry[1] === api);
-
-      if (entry) this.unregisterApi(entry[0]);
-    }
+  /**
+   * Removes `api` from the set of registered apis
+   * @param api The instance to de-register
+   * @returns `true` if the instance was previously registered
+   */
+  @action
+  unregisterApi(api: KubeApi<KubeObject>) {
+    return this.apiSet.delete(api);
   }
 
   @action
   registerStore(store: KubeObjectStore<KubeObject>, apis: KubeApi<KubeObject>[] = [store.api]) {
-    apis.filter(Boolean).forEach(api => {
-      if (api.apiBase) this.stores.set(api.apiBase, store);
-    });
+    for (const api of apis) {
+      if (this.stores.has(api)) {
+        throw new Error(`Each api instance can only have one store associated with it. Attempt to register a duplicate store for the ${api.apiBase} api`);
+      } else {
+        this.stores.set(api, store);
+      }
+    }
   }
 
   getStore<S extends KubeObjectStore<KubeObject>>(api: string | KubeApi<KubeObject>): S | undefined {
-    return this.stores.get(this.resolveApi(api)?.apiBase) as S;
+    return this.stores.get(this.resolveApi(api)) as S;
   }
 
   lookupApiLink(ref: IKubeObjectRef, parentObject?: KubeObject): string {

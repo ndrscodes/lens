@@ -62,14 +62,11 @@ export class RoleBinding extends KubeObject {
   }
 }
 
-let roleBindingApi: KubeApi<RoleBinding>;
-
-if (isClusterPageContext()) {
-  roleBindingApi = new KubeApi({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const roleBindingApi = isClusterPageContext()
+  ? new KubeApi<RoleBinding>({
     objectConstructor: RoleBinding,
-  });
-}
-
-export {
-  roleBindingApi,
-};
+  })
+  : undefined;

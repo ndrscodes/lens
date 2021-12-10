@@ -81,14 +81,11 @@ export class LimitRange extends KubeObject {
   }
 }
 
-let limitRangeApi: KubeApi<LimitRange>;
-
-if (isClusterPageContext()) {
-  limitRangeApi = new KubeApi<LimitRange>({
+/**
+ * Only available within kubernetes cluster pages
+ */
+export const limitRangeApi = isClusterPageContext()
+  ? new KubeApi<LimitRange>({
     objectConstructor: LimitRange,
-  });
-}
-
-export {
-  limitRangeApi,
-};
+  })
+  : undefined;
