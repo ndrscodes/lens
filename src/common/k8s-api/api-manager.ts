@@ -36,6 +36,10 @@ export class ApiManager {
     autoBind(this);
   }
 
+  /**
+   * The private `apiBase` mapping of api instances. This is computed so that
+   * it can react to changes in the instances' apiBase fields.
+   */
   @computed private get apis() {
     const res = new Map<string, KubeApi<KubeObject>>();
 
@@ -45,7 +49,7 @@ export class ApiManager {
       }
 
       if (res.has(api.apiBase)) {
-        throw new Error("KubeApi.apiBase must be unique");
+        throw new Error(`Multiple api instances for ${api.apiBase}`);
       }
 
       res.set(api.apiBase, api);
@@ -54,22 +58,47 @@ export class ApiManager {
     return res;
   }
 
+  /**
+   * @param api The instance to check if it has been registered
+   * @returns Returns `true` if the api instance has been registered
+   */
   hasApi(api: KubeApi<KubeObject>): boolean {
     return this.apiSet.has(api);
   }
 
-  getApi(pathOrCallback: string | ((api: KubeApi<KubeObject>) => boolean)) {
+  /**
+   * Get a registered api, if a callback is provided then the registered
+   * instances are iterated until it returns `true`
+   * @param pathOrCallback Either the `apiBase` of an instance, a resource path for the kind of the api, or a callback function
+   * @returns The kube api instance that was registered
+   */
+  getApi(pathOrCallback: string | ((api: KubeApi<KubeObject>) => boolean)): KubeApi<KubeObject> | undefined {
     if (typeof pathOrCallback === "string") {
       return this.apis.get(pathOrCallback) || this.apis.get(parseKubeApi(pathOrCallback).apiBase);
     }
 
-    return iter.find(this.apis.values(), pathOrCallback ?? (() => true));
+    return iter.find(this.apis.values(), pathOrCallback);
   }
 
+  /**
+   * Get the registered api instance by the kube object kind and version
+   * @param kind The kind of resource that the api is for
+   * @param apiVersion The version of the resource that the api is for
+   * @returns The kube api instance that was registered
+   */
   getApiByKind(kind: string, apiVersion: string) {
     return iter.find(this.apis.values(), api => api.kind === kind && api.apiVersionWithGroup === apiVersion);
   }
 
+  /**
+   * Registeres `api` so that it can be retreived in the future.
+   *
+   * Notes:
+   * - Changes to the instance's `apiBase` field are reacted to for the `getApi()` method
+   * @param api The instance to register
+   * @throws if `api.apiBase` is not a non-empty string
+   * @throws if there is already an instance with the same `apiBase` registered
+   */
   registerApi(api: KubeApi<KubeObject>): void;
   /**
    * @deprecated Just provide the `api` instance
@@ -81,9 +110,15 @@ export class ApiManager {
       ? api
       : apiOrBase;
 
-    if (this.apiSet.has(api)) {
-      throw new Error("Cannot register the same api twice");
-    } else {
+    if (!this.apiSet.has(api)) {
+      if (typeof api.apiBase !== "string" || !api.apiBase) {
+        throw new TypeError("api.apiBase but be defined");
+      }
+
+      if (this.apis.has(api.apiBase)) {
+        throw new Error(`Cannot register second api for ${api.apiBase}`);
+      }
+
       this.apiSet.add(api);
     }
   }
@@ -110,21 +145,51 @@ export class ApiManager {
     return this.apiSet.delete(api);
   }
 
+  /**
+   * Registeres a `KubeObjectStore` instance that can be retrieved by the `apiBase` its api is for
+   * @param store The store to register
+   */
+  registerStore(store: KubeObjectStore<KubeObject>): void;
+  /**
+   * @deprecated stores should only be registered for the single api that the store is for.
+   */
+  registerStore(store: KubeObjectStore<KubeObject>, apis: KubeApi<KubeObject>[]): void;
   @action
-  registerStore(store: KubeObjectStore<KubeObject>, apis: KubeApi<KubeObject>[] = [store.api]) {
+  registerStore(store: KubeObjectStore<KubeObject>, apis?: KubeApi<KubeObject>[]) {
+    apis ??= [store.api];
+
     for (const api of apis) {
+      if (!this.apiSet.has(api)) {
+        throw new Error(`Cannot register store under ${api.apiBase} api, as that api is not registered`);
+      }
+
       if (this.stores.has(api)) {
         throw new Error(`Each api instance can only have one store associated with it. Attempt to register a duplicate store for the ${api.apiBase} api`);
-      } else {
-        this.stores.set(api, store);
       }
+
+      this.stores.set(api, store);
     }
   }
 
-  getStore<S extends KubeObjectStore<KubeObject>>(api: string | KubeApi<KubeObject>): S | undefined {
-    return this.stores.get(this.resolveApi(api)) as S;
+  /**
+   *
+   * @param apiOrBase The `apiBase`, resource descriptor, or `KubeApi` instance that the store is for.
+   * @returns The registered store whose api has also been registered
+   */
+  getStore(apiOrBase: string | KubeApi<KubeObject>): KubeObjectStore<KubeObject> | undefined;
+  /**
+   * @deprecated Should use a cast instead as this is an unchecked type param.
+   */
+  getStore<S extends KubeObjectStore<KubeObject>>(apiOrBase: string | KubeApi<KubeObject>): S | undefined {
+    return this.stores.get(this.resolveApi(apiOrBase)) as S;
   }
 
+  /**
+   * Get a URL pathname for a specific kube resource instance
+   * @param ref The kube object reference
+   * @param parentObject If provided then the namespace of this will be used if the `ref` does not provided it
+   * @returns A kube resource string
+   */
   lookupApiLink(ref: IKubeObjectRef, parentObject?: KubeObject): string {
     const {
       kind, apiVersion, name,
