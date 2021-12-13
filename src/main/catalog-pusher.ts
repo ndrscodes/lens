@@ -19,25 +19,36 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { reaction } from "mobx";
+import { computed, reaction } from "mobx";
 import { broadcastMessage, ipcMainOn } from "../common/ipc";
 import type { CatalogEntityRegistry } from "./catalog";
 import "../common/catalog-entities/kubernetes-cluster";
 import { disposer, toJS } from "../common/utils";
 import { debounce } from "lodash";
-import type { CatalogEntity } from "../common/catalog";
+import type { CatalogEntity, CatalogEntityData, CatalogEntityKindData } from "../common/catalog";
+import { EntityPreferencesStore } from "../common/entity-preferences-store";
 import { CatalogIpcEvents } from "../common/ipc/catalog";
 
-const broadcaster = debounce((items: CatalogEntity[]) => {
+function changesDueToPreferences({ metadata, spec, status, kind, apiVersion }: CatalogEntity): CatalogEntityData & CatalogEntityKindData {
+  const preferences = EntityPreferencesStore.getInstance().preferences.get(metadata.uid) ?? {};
+
+  if (preferences.shortName) {
+    metadata.shortName ||= preferences.shortName;
+  }
+
+  return { metadata, spec, status, kind, apiVersion };
+}
+
+const broadcaster = debounce((items: (CatalogEntityData & CatalogEntityKindData)[]) => {
   broadcastMessage(CatalogIpcEvents.ITEMS, items);
 }, 1_000, { leading: true, trailing: true });
 
 export function pushCatalogToRenderer(catalog: CatalogEntityRegistry) {
+  const entityData = computed(() => toJS(catalog.items.map(changesDueToPreferences)));
+
   return disposer(
-    ipcMainOn(CatalogIpcEvents.INIT, () => broadcaster(toJS(catalog.items))),
-    reaction(() => toJS(catalog.items), (items) => {
-      broadcaster(items);
-    }, {
+    ipcMainOn(CatalogIpcEvents.INIT, () => broadcaster(entityData.get())),
+    reaction(() => entityData.get(), broadcaster, {
       fireImmediately: true,
     }),
   );

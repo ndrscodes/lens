@@ -64,6 +64,7 @@ import { initTray } from "./tray/tray";
 import { kubeApiRequest, shellApiRequest, ShellRequestAuthenticator } from "./proxy-functions";
 import { AppPaths } from "../common/app-paths";
 import { ShellSession } from "./shell-session/shell-session";
+import { EntityPreferencesStore } from "../common/entity-preferences-store";
 import { getDi } from "./getDi";
 import electronMenuItemsInjectable from "./menu/electron-menu-items.injectable";
 import extensionLoaderInjectable from "../extensions/extension-loader/extension-loader.injectable";
@@ -167,6 +168,8 @@ app.on("ready", async () => {
 
   // ClusterStore depends on: UserStore
   ClusterStore.createInstance().provideInitialFromMain();
+
+  EntityPreferencesStore.createInstance();
 
   // HotbarStore depends on: ClusterStore
   HotbarStore.createInstance();

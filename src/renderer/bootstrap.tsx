@@ -54,12 +54,11 @@ import { DiContextProvider } from "@ogre-tools/injectable-react";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import extensionLoaderInjectable from "../extensions/extension-loader/extension-loader.injectable";
 import type { ExtensionLoader } from "../extensions/extension-loader";
-import bindProtocolAddRouteHandlersInjectable
-  from "./protocol-handler/bind-protocol-add-route-handlers/bind-protocol-add-route-handlers.injectable";
+import bindProtocolAddRouteHandlersInjectable from "./protocol-handler/bind-protocol-add-route-handlers/bind-protocol-add-route-handlers.injectable";
 import type { LensProtocolRouterRenderer } from "./protocol-handler";
-import lensProtocolRouterRendererInjectable
-  from "./protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
+import lensProtocolRouterRendererInjectable from "./protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
 import commandOverlayInjectable from "./components/command-palette/command-overlay.injectable";
+import { EntityPreferencesStore } from "../common/entity-preferences-store";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -142,6 +141,8 @@ export async function bootstrap(comp: () => Promise<AppComponent>, di: Dependenc
   const clusterStore = ClusterStore.createInstance();
 
   await clusterStore.loadInitialOnRenderer();
+
+  EntityPreferencesStore.createInstance();
 
   // HotbarStore depends on: ClusterStore
   HotbarStore.createInstance();

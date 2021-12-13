@@ -133,7 +133,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(
@@ -169,7 +169,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(
@@ -203,7 +203,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(
@@ -238,7 +238,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(
@@ -268,7 +268,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(
@@ -305,7 +305,7 @@ describe("<Catalog />", () => {
 
     // mock as if there is a selected item > the detail panel opens
     jest
-      .spyOn(catalogEntityStore, "selectedItem", "get")
+      .spyOn(catalogEntityStore, "selectedEntity", "get")
       .mockImplementation(() => catalogEntityItem);
 
     catalogEntityRegistry.addOnBeforeRun(

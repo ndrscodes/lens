@@ -44,6 +44,8 @@ import { RenderDelay } from "../render-delay/render-delay";
 import { Icon } from "../icon";
 import { HotbarToggleMenuItem } from "./hotbar-toggle-menu-item";
 import { Avatar } from "../avatar";
+import { getIconColourHash } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 import { KubeObject } from "../../../common/k8s-api/kube-object";
 import { getLabelBadges } from "./helpers";
 
@@ -215,14 +217,12 @@ export class Catalog extends React.Component<Props> {
     return (
       <>
         <Avatar
-          title={entity.getName()}
-          colorHash={`${entity.getName()}-${entity.getSource()}`}
-          src={entity.spec.icon?.src}
+          colorHash={getIconColourHash(entity)}
           background={entity.spec.icon?.background}
           className={styles.catalogAvatar}
           size={24}
         >
-          {entity.spec.icon?.material && <Icon material={entity.spec.icon?.material} small/>}
+          <EntityIcon entity={entity}/>
         </Avatar>
         <span>{entity.getName()}</span>
         <Icon
@@ -296,7 +296,7 @@ export class Catalog extends React.Component<Props> {
       return null;
     }
 
-    const selectedEntity = this.catalogEntityStore.selectedItem;
+    const { selectedEntity } = this.catalogEntityStore;
 
     return (
       <MainLayout sidebar={this.renderNavigation()}>

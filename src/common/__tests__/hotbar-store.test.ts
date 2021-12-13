@@ -428,6 +428,7 @@ describe("HotbarStore", () => {
         entity: {
           name: "mycluster",
           source: "local",
+          shortName: "my",
           uid: "1dfa26e2ebab15780a3547e9c7fa785c",
         },
       });
@@ -436,6 +437,7 @@ describe("HotbarStore", () => {
         entity: {
           name: "my_shiny_cluster",
           source: "remote",
+          shortName: "msc",
           uid: "55b42c3c7ba3b04193416cda405269a5",
         },
       });

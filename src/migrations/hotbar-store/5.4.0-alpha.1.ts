@@ -19,38 +19,23 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import styles from "./avatar.module.scss";
+import { computeDefaultShortName } from "../../common/catalog/helpers";
+import type { Hotbar } from "../../common/hotbar-types";
+import type { MigrationDeclaration } from "../helpers";
 
-import React, { HTMLAttributes } from "react";
-import randomColor from "randomcolor";
-import { cssNames } from "../../utils";
+export default {
+  version: "5.4.0-alpha.1",
+  run(store) {
+    const hotbars: Hotbar[] = store.get("hotbars") ?? [];
 
-export interface AvatarProps extends HTMLAttributes<HTMLElement> {
-  colorHash?: string;
-  size?: number;
-  background?: string;
-  variant?: "circle" | "rounded" | "square";
-  disabled?: boolean;
-}
+    for (const hotbar of hotbars) {
+      for (const item of hotbar.items) {
+        if (item) {
+          item.entity.shortName ??= computeDefaultShortName(item.entity.name);
+        }
+      }
+    }
 
-export function Avatar(props: AvatarProps) {
-  const { variant = "rounded", size = 32, colorHash, children, background, className, disabled, ...rest } = props;
-
-  return (
-    <div
-      className={cssNames(styles.Avatar, {
-        [styles.circle]: variant == "circle",
-        [styles.rounded]: variant == "rounded",
-        [styles.disabled]: disabled,
-      }, className)}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundColor: background || randomColor({ seed: colorHash, luminosity: "dark" }),
-      }}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
+    store.set("hotbars", hotbars);
+  },
+} as MigrationDeclaration;

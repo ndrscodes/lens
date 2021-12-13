@@ -44,7 +44,7 @@ export class CatalogEntityStore extends ItemStore<CatalogEntity> {
     return this.registry.getItemsForCategory(this.activeCategory, { filtered: true });
   }
 
-  @computed get selectedItem() {
+  @computed get selectedEntity() {
     return this.entities.find(e => e.getId() === this.selectedItemId);
   }
 

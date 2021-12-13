@@ -19,38 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import styles from "./avatar.module.scss";
+import React from "react";
+import { Icon } from "../icon";
+import type { CatalogEntity } from "../../../common/catalog";
+import { GeneralEntity, KubernetesCluster } from "../../../common/catalog-entities";
+import { getShortName } from "../../../common/catalog/helpers";
 
-import React, { HTMLAttributes } from "react";
-import randomColor from "randomcolor";
-import { cssNames } from "../../utils";
+export function EntityIcon({ entity }: { entity?: CatalogEntity }): JSX.Element {
+  if (!entity) {
+    return null;
+  }
 
-export interface AvatarProps extends HTMLAttributes<HTMLElement> {
-  colorHash?: string;
-  size?: number;
-  background?: string;
-  variant?: "circle" | "rounded" | "square";
-  disabled?: boolean;
-}
+  if (entity instanceof KubernetesCluster || entity instanceof GeneralEntity) {
+    if (entity.spec.icon?.material) {
+      return <Icon material={entity.spec.icon.material} />;
+    }
+  }
 
-export function Avatar(props: AvatarProps) {
-  const { variant = "rounded", size = 32, colorHash, children, background, className, disabled, ...rest } = props;
+  if (entity instanceof KubernetesCluster) {
+    if (entity.spec.icon?.src) {
+      return <img src={entity.spec.icon.src} alt={entity.getName()} />;
+    }
+  }
 
-  return (
-    <div
-      className={cssNames(styles.Avatar, {
-        [styles.circle]: variant == "circle",
-        [styles.rounded]: variant == "rounded",
-        [styles.disabled]: disabled,
-      }, className)}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        backgroundColor: background || randomColor({ seed: colorHash, luminosity: "dark" }),
-      }}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
+  return <>{getShortName(entity)}</>;
 }
