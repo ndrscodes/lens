@@ -32,10 +32,6 @@ import logger from "./logger";
 import { isMac, productName } from "../common/vars";
 import { LensProxy } from "./lens-proxy";
 
-export const enum IpcMainWindowEvents {
-  OPEN_CONTEXT_MENU = "window:open-context-menu",
-}
-
 function isHideable(window: BrowserWindow | null): boolean {
   return Boolean(window && !window.isDestroyed());
 }
@@ -91,7 +87,6 @@ export class WindowManager extends Singleton {
         webPreferences: {
           nodeIntegration: true,
           nodeIntegrationInSubFrames: true,
-          enableRemoteModule: true,
           webviewTag: true,
           contextIsolation: false,
         },
@@ -265,7 +260,6 @@ export class WindowManager extends Singleton {
         show: false,
         webPreferences: {
           nodeIntegration: true,
-          enableRemoteModule: true,
           contextIsolation: false,
           nodeIntegrationInSubFrames: true,
         },

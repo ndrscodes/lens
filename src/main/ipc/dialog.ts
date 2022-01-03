@@ -19,12 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { reaction } from "mobx";
-import { IpcMainWindowEvents, requestMain } from "../../common/ipc";
-import { navigation } from "../navigation";
+import { BrowserWindow, dialog, OpenDialogOptions } from "electron";
 
-export function watchHistoryState() {
-  return reaction(() => navigation.location, (location) => {
-    requestMain(IpcMainWindowEvents.LOCATION_CHANGED, location);
-  });
+export async function showOpenDialog(dialogOptions: OpenDialogOptions) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), dialogOptions);
+
+  return { canceled, filePaths };
 }

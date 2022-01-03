@@ -22,7 +22,6 @@
 // Main process
 
 import { injectSystemCAs } from "../common/system-ca";
-import { initialize as initializeRemote } from "@electron/remote/main";
 import * as Mobx from "mobx";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
 import * as LensExtensionsMainApi from "../extensions/main-api";
@@ -40,7 +39,7 @@ import { InstalledExtension, ExtensionDiscovery } from "../extensions/extension-
 import type { LensExtensionId } from "../extensions/lens-extension";
 import { installDeveloperTools } from "./developer-tools";
 import { disposer, getAppVersion, getAppVersionFromProxyServer, storedKubeConfigFolder } from "../common/utils";
-import { bindBroadcastHandlers, ipcMainOn } from "../common/ipc";
+import { ipcMainOn } from "../common/ipc";
 import { startUpdateChecking } from "./app-updater";
 import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
 import { pushCatalogToRenderer } from "./catalog-pusher";
@@ -94,9 +93,6 @@ if (process.env.LENS_DISABLE_GPU) {
   app.disableHardwareAcceleration();
 }
 
-logger.debug("[APP-MAIN] initializing remote");
-initializeRemote();
-
 logger.debug("[APP-MAIN] configuring packages");
 configurePackages();
 
@@ -143,8 +139,6 @@ app.on("ready", async () => {
   logger.info(`🚀 Starting ${productName} from "${AppPaths.get("exe")}"`);
   logger.info("🐚 Syncing shell environment");
   await shellSync();
-
-  bindBroadcastHandlers();
 
   powerMonitor.on("shutdown", () => app.exit());
 

@@ -19,12 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { reaction } from "mobx";
-import { IpcMainWindowEvents, requestMain } from "../../common/ipc";
-import { navigation } from "../navigation";
-
-export function watchHistoryState() {
-  return reaction(() => navigation.location, (location) => {
-    requestMain(IpcMainWindowEvents.LOCATION_CHANGED, location);
-  });
+export const enum IpcMainDialogEvents {
+  SHOW_OPEN = "dialog:show-open",
 }
