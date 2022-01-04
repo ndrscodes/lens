@@ -28,6 +28,7 @@ import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injec
 import { DiRender, renderFor } from "../../test-utils/renderFor";
 import topBarItemsInjectable from "./top-bar-items/top-bar-items.injectable";
 import { computed } from "mobx";
+import { IpcMainWindowEvents } from "../../../../common/ipc";
 
 jest.mock("../../../../common/vars", () => {
   const SemVer = require("semver").SemVer;
@@ -39,6 +40,9 @@ jest.mock("../../../../common/vars", () => {
     appSemVer: versionStub,
   };
 });
+
+const goBack = jest.fn();
+const goForward = jest.fn();
 
 jest.mock(
   "electron",
@@ -55,6 +59,25 @@ jest.mock(
           }
         },
       ),
+      invoke: jest.fn(
+        (channel: string, action: string) => {
+          console.log("channel", channel, action);
+
+          if (channel !== IpcMainWindowEvents.WINDOW_ACTION) return;
+
+          switch(action) {
+            case "back": {
+              goBack();
+              break;
+            }
+
+            case "forward": {
+              goForward();
+              break;
+            }
+          }
+        },
+      ),
     },
     app: {
       getPath: () => "tmp",
@@ -65,24 +88,6 @@ jest.mock(
 jest.mock("../../+catalog", () => ({
   previousActiveTab: jest.fn(),
 }));
-
-const goBack = jest.fn();
-const goForward = jest.fn();
-
-jest.mock("@electron/remote", () => {
-  return {
-    webContents: {
-      getAllWebContents: () => {
-        return [{
-          getType: () => "window",
-          goBack,
-          goForward,
-        }];
-      },
-    },
-    getCurrentWindow: () => jest.fn(),
-  };
-});
 
 describe("<TopBar/>", () => {
   let di: ConfigurableDependencyInjectionContainer;
