@@ -30,7 +30,7 @@ import clusterNameInjectable from "./dependencies/cluster-name.injectable";
 import editResourceTabInjectable from "./dependencies/edit-resource-tab.injectable";
 import hideDetailsInjectable from "./dependencies/hide-details.injectable";
 import kubeObjectMenuItemsInjectable from "./dependencies/kube-object-menu-items/kube-object-menu-items.injectable";
-import apiManagerInjectable from "./dependencies/api-manager.injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
 export interface KubeObjectMenuProps<TKubeObject extends KubeObject> extends MenuActionsProps {
   object: TKubeObject | null | undefined;
@@ -47,7 +47,6 @@ interface Dependencies {
 }
 
 class NonInjectedKubeObjectMenu<TKubeObject extends KubeObject> extends React.Component<KubeObjectMenuProps<TKubeObject> & Dependencies> {
-
   get store() {
     const { object } = this.props;
 

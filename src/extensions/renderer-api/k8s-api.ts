@@ -19,9 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import type { ApiManager } from "../../common/k8s-api/api-manager";
+import apiManagerInjectable from "../../common/k8s-api/api-manager.injectable";
+import { getLegacyGlobalDiForExtensionApi } from "../as-legacy-global-function-for-extension-api/legacy-global-di-for-extension-api";
+
 export { isAllowedResource } from "../../common/utils/allowed-resource";
 export { ResourceStack } from "../../common/k8s/resource-stack";
-export { apiManager } from "../../common/k8s-api/api-manager";
 export { KubeObjectStore } from "../../common/k8s-api/kube-object.store";
 export { KubeApi, forCluster, forRemoteCluster } from "../../common/k8s-api/kube-api";
 export { KubeObject, KubeStatus } from "../../common/k8s-api/kube-object";
@@ -92,3 +95,23 @@ export type { RolesStore } from "../../renderer/components/+user-management/+rol
 export type { RoleBindingsStore } from "../../renderer/components/+user-management/+role-bindings/store";
 export type { CRDStore } from "../../renderer/components/+custom-resources/crd.store";
 export type { CRDResourceStore } from "../../renderer/components/+custom-resources/crd-resource.store";
+
+export const apiManager = new Proxy({}, {
+  get(target, p) {
+    if (p === "$$typeof") {
+      return "ApiManager";
+    }
+
+    const di = getLegacyGlobalDiForExtensionApi();
+    const apiManager = di.inject(apiManagerInjectable);
+    const res = (apiManager as any)?.[p];
+
+    if (typeof res === "function") {
+      return function (...args: any[]) {
+        return res.apply(apiManager, args);
+      };
+    }
+
+    return res;
+  },
+}) as ApiManager;

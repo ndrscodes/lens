@@ -22,31 +22,33 @@
 import React from "react";
 import { KubeMetaField, KubeObject } from "../../../common/k8s-api/kube-object";
 import { DrawerItem, DrawerItemLabels } from "../drawer";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { Link } from "react-router-dom";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import { LocaleDate } from "../locale-date";
 import { getDetailsUrl } from "../kube-detail-params";
 import logger from "../../../common/logger";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import { observer } from "mobx-react";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
 export interface KubeObjectMetaProps {
   object: KubeObject;
   hideFields?: KubeMetaField[];
 }
 
-export class KubeObjectMeta extends React.Component<KubeObjectMetaProps> {
-  static defaultHiddenFields: KubeMetaField[] = [
-    "uid", "resourceVersion", "selfLink",
-  ];
+interface Dependencies {
+  apiManager: ApiManager;
+}
 
-  isHidden(field: KubeMetaField): boolean {
-    const { hideFields = KubeObjectMeta.defaultHiddenFields } = this.props;
+const defaultHiddenFields : KubeMetaField[] = [
+  "uid",
+  "resourceVersion",
+  "selfLink",
+];
 
-    return hideFields.includes(field);
-  }
-
-  render() {
-    const { object } = this.props;
+const NonInjectedKubeObjectMeta = observer(({ apiManager, object, hideFields = defaultHiddenFields }: Dependencies & KubeObjectMetaProps) => {
+  const hiddenFields = new Set(hideFields);
 
     if (!object) {
       return null;
@@ -66,42 +68,42 @@ export class KubeObjectMeta extends React.Component<KubeObjectMetaProps> {
 
     return (
       <>
-        <DrawerItem name="Created" hidden={this.isHidden("creationTimestamp")}>
+        <DrawerItem name="Created" hidden={hiddenFields.has("creationTimestamp")}>
           {getAge(true, false)} ago ({<LocaleDate date={creationTimestamp} />})
         </DrawerItem>
-        <DrawerItem name="Name" hidden={this.isHidden("name")}>
+        <DrawerItem name="Name" hidden={hiddenFields.has("name")}>
           {getName()}
           <KubeObjectStatusIcon key="icon" object={object} />
         </DrawerItem>
-        <DrawerItem name="Namespace" hidden={this.isHidden("namespace") || !getNs()}>
+        <DrawerItem name="Namespace" hidden={hiddenFields.has("namespace") || !getNs()}>
           {getNs()}
         </DrawerItem>
-        <DrawerItem name="UID" hidden={this.isHidden("uid")}>
+        <DrawerItem name="UID" hidden={hiddenFields.has("uid")}>
           {getId()}
         </DrawerItem>
-        <DrawerItem name="Link" hidden={this.isHidden("selfLink")}>
+        <DrawerItem name="Link" hidden={hiddenFields.has("selfLink")}>
           {selfLink}
         </DrawerItem>
-        <DrawerItem name="Resource Version" hidden={this.isHidden("resourceVersion")}>
+        <DrawerItem name="Resource Version" hidden={hiddenFields.has("resourceVersion")}>
           {getResourceVersion()}
         </DrawerItem>
         <DrawerItemLabels
           name="Labels"
           labels={getLabels()}
-          hidden={this.isHidden("labels")}
+          hidden={hiddenFields.has("labels")}
         />
         <DrawerItemLabels
           name="Annotations"
           labels={getAnnotations()}
-          hidden={this.isHidden("annotations")}
+          hidden={hiddenFields.has("annotations")}
         />
         <DrawerItemLabels
           name="Finalizers"
           labels={getFinalizers()}
-          hidden={this.isHidden("finalizers")}
+          hidden={hiddenFields.has("finalizers")}
         />
         {ownerRefs?.length > 0 &&
-        <DrawerItem name="Controlled By" hidden={this.isHidden("ownerReferences")}>
+        <DrawerItem name="Controlled By" hidden={hiddenFields.has("ownerReferences")}>
           {
             ownerRefs.map(ref => {
               const { name, kind } = ref;
@@ -118,5 +120,11 @@ export class KubeObjectMeta extends React.Component<KubeObjectMetaProps> {
         }
       </>
     );
-  }
-}
+});
+
+export const KubeObjectMeta = withInjectables<Dependencies>(NonInjectedKubeObjectMeta, {
+  getProps: (di, props) => ({
+    apiManager: di.inject(apiManagerInjectable),
+    ...props,
+  }),
+});

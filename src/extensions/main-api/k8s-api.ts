@@ -20,6 +20,8 @@
  */
 
 import type { ApiManager } from "../../common/k8s-api/api-manager";
+import apiManagerInjectable from "../../common/k8s-api/api-manager.injectable";
+import { getLegacyGlobalDiForExtensionApi } from "../as-legacy-global-function-for-extension-api/legacy-global-di-for-extension-api";
 
 export { isAllowedResource } from "../../common/utils/allowed-resource";
 export { ResourceStack } from "../../common/k8s/resource-stack";
@@ -66,5 +68,17 @@ export const apiManager = new Proxy({}, {
     if (p === "$$typeof") {
       return "ApiManager";
     }
+
+    const di = getLegacyGlobalDiForExtensionApi();
+    const apiManager = di.inject(apiManagerInjectable);
+    const res = (apiManager as any)?.[p];
+
+    if (typeof res === "function") {
+      return function (...args: any[]) {
+        return res.apply(apiManager, args);
+      };
+    }
+
+    return res;
   },
 }) as ApiManager;
