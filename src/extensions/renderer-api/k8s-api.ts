@@ -99,9 +99,6 @@ export type { ServiceStore } from "../../renderer/components/+network-services/s
 export type { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/statefulset.store";
 export type { StorageClassStore } from "../../renderer/components/+storage-classes/storage-class.store";
 export type { VolumeClaimStore } from "../../renderer/components/+storage-volume-claims/volume-claim.store";
-export {
-  KubeObjectStore,
-} from "../../common/k8s-api/kube-object.store";
 export type {
   KubeObjectStoreLoadAllParams,
   KubeObjectStoreLoadingParams,
