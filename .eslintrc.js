@@ -32,6 +32,15 @@ module.exports = {
     react: {
       version: packageJson.devDependencies.react || "detect",
     },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"],
+    },
+    // the package eslint-import-resolver-typescript is required for this line which fixes errors when using .d.ts files
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+      },
+    },
   },
   overrides: [
     {
