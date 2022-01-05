@@ -41,7 +41,7 @@ function getNameParts(name: string): string[] {
 }
 
 export function computeDefaultShortName(name: string) {
-  if (!name) {
+  if (!name || typeof name !== "string") {
     return "??";
   }
 

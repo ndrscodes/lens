@@ -37,7 +37,7 @@ export interface EntityPreferencesStoreModel {
 }
 
 export class EntityPreferencesStore extends BaseStore<EntityPreferencesStoreModel> {
-  @observable preferences = observable.map<string, EntityPreferencesModel>();
+  @observable preferences = observable.map<string, PartialDeep<EntityPreferencesModel>>();
 
   constructor() {
     super({
@@ -50,11 +50,7 @@ export class EntityPreferencesStore extends BaseStore<EntityPreferencesStoreMode
 
   @action
   mergePreferences(entityId: string, preferences: PartialDeep<EntityPreferencesModel>): void {
-    if (!this.preferences.has(entityId)) {
-      this.preferences.set(entityId, preferences);
-    } else {
-      this.preferences.set(entityId, merge(this.preferences.get(entityId), preferences));
-    }
+    this.preferences.set(entityId, merge(this.preferences.get(entityId), preferences));
   }
 
   @action
