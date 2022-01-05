@@ -229,5 +229,3 @@ export class ApiManager {
     return createKubeApiURL({ apiVersion, name, namespace, resource });
   }
 }
-
-export const apiManager = new ApiManager();
