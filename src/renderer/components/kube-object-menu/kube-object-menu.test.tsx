@@ -29,7 +29,7 @@ import type { KubeObjectMenuRegistration } from "../../../extensions/registries"
 import { KubeObjectMenuRegistry } from "../../../extensions/registries";
 import { ConfirmDialog } from "../confirm-dialog";
 import asyncFn, { AsyncFnMock } from "@async-fn/jest";
-import { getDiForUnitTesting } from "../getDiForUnitTesting";
+import { getDiForUnitTesting } from "../../getDiForUnitTesting";
 
 import clusterInjectable from "./dependencies/cluster.injectable";
 import hideDetailsInjectable from "./dependencies/hide-details.injectable";

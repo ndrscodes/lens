@@ -29,7 +29,6 @@ export function initRegistries() {
   registries.CommandRegistry.createInstance();
   registries.EntitySettingRegistry.createInstance();
   registries.GlobalPageRegistry.createInstance();
-  registries.KubeObjectDetailRegistry.createInstance();
   registries.KubeObjectMenuRegistry.createInstance();
   registries.KubeObjectStatusRegistry.createInstance();
   registries.StatusBarRegistry.createInstance();
