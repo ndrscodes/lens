@@ -158,18 +158,6 @@ export class ApiManager {
       namespace = parentObject?.getNs(),
     } = ref;
 
-    if (!kind) {
-      throw new Error("IKubeObjectRef.kind must be non-empty string");
-    }
-
-    if (!apiVersion) {
-      throw new Error("IKubeObjectRef.apiVersion must be non-empty string");
-    }
-
-    if (!name) {
-      throw new Error("IKubeObjectRef.name must be non-empty string");
-    }
-
     // search in registered apis by 'kind' & 'apiVersion'
     const api = this.getApi(api => api.kind === kind && api.apiVersionWithGroup == apiVersion);
 
