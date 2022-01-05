@@ -36,3 +36,4 @@ export type { WorkloadsOverviewDetailRegistration, WorkloadsOverviewDetailCompon
 export type { TopBarRegistration, TopBarComponents } from "../../renderer/components/layout/top-bar/top-bar-registration";
 export type { WelcomeBannerRegistration } from "../../renderer/components/+welcome/welcome-banner-items/welcome-banner-registration";
 export type { WelcomeMenuRegistration } from "../../renderer/components/+welcome/welcome-menu-items/welcome-menu-registration";
+export type { TrayMenuRegistration } from "../../main/tray/tray-menu-registration";
