@@ -24,7 +24,7 @@ import * as routes from "../../common/routes";
 import { CommandRegistry } from "../../extensions/registries";
 import { getActiveClusterEntity } from "../api/catalog-entity-registry";
 import { CommandOverlay } from "../components/command-palette";
-import { createTerminalTab } from "../components/dock/terminal.store";
+import { createTerminalTab } from "../components/dock/terminal/store";
 import { HotbarAddCommand } from "../components/hotbar/hotbar-add-command";
 import { HotbarRemoveCommand } from "../components/hotbar/hotbar-remove-command";
 import { HotbarSwitchCommand } from "../components/hotbar/hotbar-switch-command";

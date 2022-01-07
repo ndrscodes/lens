@@ -25,8 +25,8 @@ import { render } from "@testing-library/react";
 import * as selectEvent from "react-select-event";
 
 import { Pod } from "../../../../common/k8s-api/endpoints";
-import { LogResourceSelector } from "../log-resource-selector";
-import type { LogTabData } from "../log-tab.store";
+import { LogResourceSelector } from "../logs/log-resource-selector";
+import type { LogTabData } from "../log-tab/store";
 import { dockerPod, deploymentPod1 } from "./pod.mock";
 import { ThemeStore } from "../../../theme.store";
 import { UserStore } from "../../../../common/user-store";

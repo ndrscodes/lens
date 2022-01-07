@@ -27,7 +27,6 @@ import * as MobxReact from "mobx-react";
 import * as ReactRouter from "react-router";
 import * as ReactRouterDom from "react-router-dom";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
-import * as LensExtensionsRendererApi from "../extensions/renderer-api";
 import { render } from "react-dom";
 import { delay } from "../common/utils";
 import { isMac, isDevelopment } from "../common/vars";
@@ -46,7 +45,6 @@ import { ExtensionsStore } from "../extensions/extensions-store";
 import { FilesystemProvisionerStore } from "../main/extension-filesystem";
 import { ThemeStore } from "./theme.store";
 import { SentryInit } from "../common/sentry";
-import { TerminalStore } from "./components/dock/terminal.store";
 import { AppPaths } from "../common/app-paths";
 import { registerCustomThemes } from "./components/monaco-editor";
 import { getDi } from "./components/getDi";
@@ -59,6 +57,7 @@ import bindProtocolAddRouteHandlersInjectable
 import type { LensProtocolRouterRenderer } from "./protocol-handler";
 import lensProtocolRouterRendererInjectable
   from "./protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
+import lensRendererExtensionsApiInjectable from "../extensions/renderer/api.injectable";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -147,9 +146,6 @@ export async function bootstrap(comp: () => Promise<AppComponent>, di: Dependenc
 
   // ThemeStore depends on: UserStore
   ThemeStore.createInstance();
-
-  // TerminalStore depends on: ThemeStore
-  TerminalStore.createInstance();
   WeblinkStore.createInstance();
 
   ExtensionInstallationStateStore.bindIpcListeners();
@@ -192,9 +188,9 @@ bootstrap(
  * All exporting names available in global runtime scope:
  * e.g. Devtools -> Console -> window.LensExtensions (renderer)
  */
-const LensExtensions = {
+export const LensExtensions = {
   Common: LensExtensionsCommonApi,
-  Renderer: LensExtensionsRendererApi,
+  Renderer: di.inject(lensRendererExtensionsApiInjectable),
 };
 
 export {
@@ -203,5 +199,4 @@ export {
   ReactRouterDom,
   Mobx,
   MobxReact,
-  LensExtensions,
 };

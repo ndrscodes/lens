@@ -21,7 +21,7 @@
 
 import "./dock.scss";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 
 import { cssNames, prevDefault } from "../../utils";
@@ -29,38 +29,37 @@ import { Icon } from "../icon";
 import { MenuItem } from "../menu";
 import { MenuActions } from "../menu/menu-actions";
 import { ResizeDirection, ResizingAnchor } from "../resizing-anchor";
-import { CreateResource } from "./create-resource";
-import { createResourceTab } from "./create-resource.store";
-import { DockTabs } from "./dock-tabs";
-import { dockStore, DockTab, TabKind } from "./dock.store";
-import { EditResource } from "./edit-resource";
-import { InstallChart } from "./install-chart";
-import { Logs } from "./logs";
-import { TerminalWindow } from "./terminal-window";
-import { createTerminalTab } from "./terminal.store";
-import { UpgradeChart } from "./upgrade-chart";
+import { CreateResource } from "./create-resource/create-resource";
+import { DockTabs } from "./dock-tab/dock-tabs";
+import { DockStore, DockTabData, DockTabCreateSpecific, TabKind } from "./store";
+import { EditResource } from "./edit-resource/edit-resource";
+import { InstallChart } from "./install-chart/install-chart";
+import { Logs } from "./logs/logs";
+import { TerminalWindow } from "./terminal/terminal-window";
+import { UpgradeChart } from "./upgrade-chart/upgrade-chart";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import newCreateResourceTabInjectable from "./create-resource/create-tab.injectable";
+import newTerminalTabInjectable from "./terminal/create-tab.injectable";
+import dockStoreInjectable from "./store.injectable";
 
-interface Props {
+export interface DockProps {
   className?: string;
 }
 
-@observer
-export class Dock extends React.Component<Props> {
-  private element = React.createRef<HTMLDivElement>();
+interface Dependencies {
+  newCreateResourceTab: (params?: DockTabCreateSpecific) => DockTabData,
+  newTerminalTab: (params?: DockTabCreateSpecific) => DockTabData,
+  dockStore: DockStore;
+}
 
-  componentDidMount() {
-    document.addEventListener("keydown", this.onKeyDown);
-  }
+const NonInjectedDock = observer(({ newCreateResourceTab, newTerminalTab, dockStore, className }: Dependencies & DockProps) => {
+  const element = useRef<HTMLDivElement>();
 
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.onKeyDown);
-  }
-
-  onKeyDown = (evt: KeyboardEvent) => {
+  const onKeyDown = (evt: KeyboardEvent) => {
     const { close, selectedTab, closeTab } = dockStore;
     const { code, ctrlKey, metaKey, shiftKey } = evt;
     // Determine if user working inside <Dock/> or using any other areas in app
-    const dockIsFocused = this.element?.current.contains(document.activeElement);
+    const dockIsFocused = element.current?.contains(document.activeElement);
 
     if (!selectedTab || !dockIsFocused) return;
 
@@ -70,19 +69,19 @@ export class Dock extends React.Component<Props> {
 
     if ((ctrlKey && code === "KeyW") || (metaKey && code === "KeyW")) {
       closeTab(selectedTab.id);
-      this.element?.current.focus();  // Avoid loosing focus when closing tab
+      element.current?.focus();  // Avoid loosing focus when closing tab
     }
   };
 
-  onChangeTab = (tab: DockTab) => {
+  const onChangeTab = (tab: DockTabData) => {
     const { open, selectTab } = dockStore;
 
     open();
     selectTab(tab.id);
-    this.element?.current.focus();
+    element.current?.focus();
   };
 
-  renderTab(tab: DockTab) {
+  const renderTab = (tab: DockTabData) => {
     switch (tab.kind) {
       case TabKind.CREATE_RESOURCE:
         return <CreateResource tab={tab} />;
@@ -95,81 +94,93 @@ export class Dock extends React.Component<Props> {
       case TabKind.POD_LOGS:
         return <Logs tab={tab} />;
       case TabKind.TERMINAL:
-        return <TerminalWindow tab={tab} />;
+        return <TerminalWindow />;
     }
-  }
+  };
 
-  renderTabContent() {
+  const renderTabContent = () => {
     const { isOpen, height, selectedTab } = dockStore;
 
     if (!isOpen || !selectedTab) return null;
 
     return (
       <div className="tab-content" style={{ flexBasis: height }}>
-        {this.renderTab(selectedTab)}
+        {renderTab(selectedTab)}
       </div>
     );
-  }
+  };
 
-  render() {
-    const { className } = this.props;
-    const { isOpen, toggle, tabs, toggleFillSize, selectedTab, hasTabs, fullSize } = dockStore;
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
 
-    return (
-      <div
-        className={cssNames("Dock", className, { isOpen, fullSize })}
-        ref={this.element}
-        tabIndex={-1}
-      >
-        <ResizingAnchor
-          disabled={!hasTabs()}
-          getCurrentExtent={() => dockStore.height}
-          minExtent={dockStore.minHeight}
-          maxExtent={dockStore.maxHeight}
-          direction={ResizeDirection.VERTICAL}
-          onStart={dockStore.open}
-          onMinExtentSubceed={dockStore.close}
-          onMinExtentExceed={dockStore.open}
-          onDrag={extent => dockStore.height = extent}
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const { isOpen, toggle, tabs, toggleFillSize, selectedTab, hasTabs, fullSize } = dockStore;
+
+  return (
+    <div
+      className={cssNames("Dock", className, { isOpen, fullSize })}
+      ref={element}
+      tabIndex={-1}
+    >
+      <ResizingAnchor
+        disabled={!hasTabs()}
+        getCurrentExtent={() => dockStore.height}
+        minExtent={dockStore.minHeight}
+        maxExtent={dockStore.maxHeight}
+        direction={ResizeDirection.VERTICAL}
+        onStart={dockStore.open}
+        onMinExtentSubceed={dockStore.close}
+        onMinExtentExceed={dockStore.open}
+        onDrag={extent => dockStore.height = extent}
+      />
+      <div className="tabs-container flex align-center" onDoubleClick={prevDefault(toggle)}>
+        <DockTabs
+          tabs={tabs}
+          selectedTab={selectedTab}
+          autoFocus={isOpen}
+          onChangeTab={onChangeTab}
         />
-        <div className="tabs-container flex align-center" onDoubleClick={prevDefault(toggle)}>
-          <DockTabs
-            tabs={tabs}
-            selectedTab={selectedTab}
-            autoFocus={isOpen}
-            onChangeTab={this.onChangeTab}
-          />
-          <div className="toolbar flex gaps align-center box grow">
-            <div className="dock-menu box grow">
-              <MenuActions usePortal triggerIcon={{ material: "add", className: "new-dock-tab", tooltip: "New tab" }} closeOnScroll={false}>
-                <MenuItem className="create-terminal-tab" onClick={() => createTerminalTab()}>
-                  <Icon small svg="terminal" size={15} />
-                  Terminal session
-                </MenuItem>
-                <MenuItem className="create-resource-tab" onClick={() => createResourceTab()}>
-                  <Icon small material="create" />
-                  Create resource
-                </MenuItem>
-              </MenuActions>
-            </div>
-            {hasTabs() && (
-              <>
-                <Icon
-                  material={fullSize ? "fullscreen_exit" : "fullscreen"}
-                  tooltip={fullSize ? "Exit full size mode" : "Fit to window"}
-                  onClick={toggleFillSize}
-                />
-                <Icon
-                  material={`keyboard_arrow_${isOpen ? "down" : "up"}`}
-                  tooltip={isOpen ? "Minimize" : "Open"}
-                  onClick={toggle}
-                />
-              </>
-            )}
+        <div className="toolbar flex gaps align-center box grow">
+          <div className="dock-menu box grow">
+            <MenuActions usePortal triggerIcon={{ material: "add", className: "new-dock-tab", tooltip: "New tab" }} closeOnScroll={false}>
+              <MenuItem className="create-terminal-tab" onClick={newTerminalTab}>
+                <Icon small svg="terminal" size={15} />
+                Terminal session
+              </MenuItem>
+              <MenuItem className="create-resource-tab" onClick={newCreateResourceTab}>
+                <Icon small material="create" />
+                Create resource
+              </MenuItem>
+            </MenuActions>
           </div>
+          {hasTabs() && (
+            <>
+              <Icon
+                material={fullSize ? "fullscreen_exit" : "fullscreen"}
+                tooltip={fullSize ? "Exit full size mode" : "Fit to window"}
+                onClick={toggleFillSize}
+              />
+              <Icon
+                material={`keyboard_arrow_${isOpen ? "down" : "up"}`}
+                tooltip={isOpen ? "Minimize" : "Open"}
+                onClick={toggle}
+              />
+            </>
+          )}
         </div>
-        {this.renderTabContent()}
       </div>
-    );
-  }
-}
+      {renderTabContent()}
+    </div>
+  );
+});
+
+export const Dock = withInjectables<Dependencies, DockProps>(NonInjectedDock, {
+  getProps: (di, props) => ({
+    newCreateResourceTab: di.inject(newCreateResourceTabInjectable),
+    newTerminalTab: di.inject(newTerminalTabInjectable),
+    dockStore: di.inject(dockStoreInjectable),
+    ...props,
+  }),
+});

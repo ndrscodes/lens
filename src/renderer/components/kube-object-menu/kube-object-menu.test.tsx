@@ -33,14 +33,14 @@ import { getDiForUnitTesting } from "../../getDiForUnitTesting";
 
 import clusterInjectable from "./dependencies/cluster.injectable";
 import hideDetailsInjectable from "./dependencies/hide-details.injectable";
-import editResourceTabInjectable from "./dependencies/edit-resource-tab.injectable";
-import { TabKind } from "../dock/dock.store";
+import { TabKind } from "../dock/dock/store";
 import kubeObjectMenuRegistryInjectable from "./dependencies/kube-object-menu-items/kube-object-menu-registry.injectable";
 import { DiRender, renderFor } from "../test-utils/renderFor";
 import type { Cluster } from "../../../main/cluster";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
-import apiManagerInjectable from "./dependencies/api-manager.injectable";
 import { KubeObjectMenu } from "./index";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import newEditResourceTabInjectable from "../dock/edit-resource/create-tab.injectable";
 
 describe("kube-object-menu", () => {
   let di: ConfigurableDependencyInjectionContainer;
@@ -64,9 +64,9 @@ describe("kube-object-menu", () => {
       getStore: api => undefined,
     }) as ApiManager);
 
-    di.override(hideDetailsInjectable, () => () => {});
+    di.override(hideDetailsInjectable, () => () => { });
 
-    di.override(editResourceTabInjectable, () => () => ({
+    di.override(newEditResourceTabInjectable, () => () => ({
       id: "irrelevant",
       kind: TabKind.TERMINAL,
       pinned: false,
@@ -208,7 +208,7 @@ describe("kube-object-menu", () => {
           <KubeObjectMenu
             object={objectStub}
             toolbar={true}
-            removeAction={() => {}}
+            removeAction={() => { }}
           />
         </div>,
       ));
@@ -245,7 +245,7 @@ describe("kube-object-menu", () => {
           <KubeObjectMenu
             object={objectStub}
             toolbar={true}
-            removeAction={() => {}}
+            removeAction={() => { }}
           />
         </div>,
       ));

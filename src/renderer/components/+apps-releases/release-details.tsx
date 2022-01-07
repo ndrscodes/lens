@@ -38,7 +38,7 @@ import { Table, TableCell, TableHead, TableRow } from "../table";
 import { Button } from "../button";
 import { releaseStore } from "./release.store";
 import { Notifications } from "../notifications";
-import { createUpgradeChartTab } from "../dock/upgrade-chart.store";
+import { createUpgradeChartTab } from "../dock/upgrade-chart/store";
 import { ThemeStore } from "../../theme.store";
 import { apiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";

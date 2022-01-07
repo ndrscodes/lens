@@ -53,10 +53,10 @@ import { MainLayout } from "./components/layout/main-layout";
 import { Notifications } from "./components/notifications";
 import { KubeObjectDetails } from "./components/kube-object-details";
 import { KubeConfigDialog } from "./components/kubeconfig-dialog";
-import { Terminal } from "./components/dock/terminal";
+import { Terminal } from "./components/dock/terminal/terminal";
 import { namespaceStore } from "./components/+namespaces/namespace.store";
 import { Sidebar } from "./components/layout/sidebar";
-import { Dock } from "./components/dock";
+import { Dock } from "./components/dock/dock";
 import { Apps } from "./components/+apps";
 import { Namespaces } from "./components/+namespaces";
 import { Network } from "./components/+network";
@@ -187,14 +187,14 @@ export class ClusterFrame extends React.Component {
       const tabRoutes = this.getTabLayoutRoutes(menu);
 
       if (tabRoutes.length > 0) {
-        const pageComponent = () => <TabLayout tabs={tabRoutes}/>;
+        const pageComponent = () => <TabLayout tabs={tabRoutes} />;
 
-        return <Route key={`extension-tab-layout-route-${index}`} component={pageComponent} path={tabRoutes.map((tab) => tab.routePath)}/>;
+        return <Route key={`extension-tab-layout-route-${index}`} component={pageComponent} path={tabRoutes.map((tab) => tab.routePath)} />;
       } else {
         const page = ClusterPageRegistry.getInstance().getByPageTarget(menu.target);
 
         if (page) {
-          return <Route key={`extension-tab-layout-route-${index}`} path={page.url} component={page.components.Page}/>;
+          return <Route key={`extension-tab-layout-route-${index}`} path={page.url} component={page.components.Page} />;
         }
       }
 
@@ -207,7 +207,7 @@ export class ClusterFrame extends React.Component {
       const menu = ClusterPageMenuRegistry.getInstance().getByPage(page);
 
       if (!menu) {
-        return <Route key={`extension-route-${index}`} path={page.url} component={page.components.Page}/>;
+        return <Route key={`extension-route-${index}`} path={page.url} component={page.components.Page} />;
       }
 
       return null;
@@ -218,36 +218,36 @@ export class ClusterFrame extends React.Component {
     return (
       <Router history={history}>
         <ErrorBoundary>
-          <MainLayout sidebar={<Sidebar/>} footer={<Dock/>}>
+          <MainLayout sidebar={<Sidebar />} footer={<Dock />}>
             <Switch>
-              <Route component={ClusterOverview} {...routes.clusterRoute}/>
-              <Route component={Nodes} {...routes.nodesRoute}/>
-              <Route component={Workloads} {...routes.workloadsRoute}/>
-              <Route component={Config} {...routes.configRoute}/>
-              <Route component={Network} {...routes.networkRoute}/>
-              <Route component={Storage} {...routes.storageRoute}/>
-              <Route component={Namespaces} {...routes.namespacesRoute}/>
-              <Route component={Events} {...routes.eventRoute}/>
-              <Route component={CustomResources} {...routes.crdRoute}/>
-              <Route component={UserManagement} {...routes.usersManagementRoute}/>
-              <Route component={Apps} {...routes.appsRoute}/>
+              <Route component={ClusterOverview} {...routes.clusterRoute} />
+              <Route component={Nodes} {...routes.nodesRoute} />
+              <Route component={Workloads} {...routes.workloadsRoute} />
+              <Route component={Config} {...routes.configRoute} />
+              <Route component={Network} {...routes.networkRoute} />
+              <Route component={Storage} {...routes.storageRoute} />
+              <Route component={Namespaces} {...routes.namespacesRoute} />
+              <Route component={Events} {...routes.eventRoute} />
+              <Route component={CustomResources} {...routes.crdRoute} />
+              <Route component={UserManagement} {...routes.usersManagementRoute} />
+              <Route component={Apps} {...routes.appsRoute} />
               {this.renderExtensionTabLayoutRoutes()}
               {this.renderExtensionRoutes()}
-              <Redirect exact from="/" to={this.startUrl}/>
-              <Route component={NotFound}/>
+              <Redirect exact from="/" to={this.startUrl} />
+              <Route component={NotFound} />
             </Switch>
           </MainLayout>
-          <Notifications/>
-          <ConfirmDialog/>
-          <KubeObjectDetails/>
-          <KubeConfigDialog/>
-          <DeploymentScaleDialog/>
-          <StatefulSetScaleDialog/>
-          <ReplicaSetScaleDialog/>
-          <CronJobTriggerDialog/>
-          <PortForwardDialog/>
-          <DeleteClusterDialog/>
-          <CommandContainer clusterId={ClusterFrame.clusterId}/>
+          <Notifications />
+          <ConfirmDialog />
+          <KubeObjectDetails />
+          <KubeConfigDialog />
+          <DeploymentScaleDialog />
+          <StatefulSetScaleDialog />
+          <ReplicaSetScaleDialog />
+          <CronJobTriggerDialog />
+          <PortForwardDialog />
+          <DeleteClusterDialog />
+          <CommandContainer clusterId={ClusterFrame.clusterId} />
         </ErrorBoundary>
       </Router>
     );

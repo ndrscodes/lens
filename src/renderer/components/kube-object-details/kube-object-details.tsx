@@ -27,7 +27,7 @@ import { reaction, IComputedValue } from "mobx";
 import { Drawer } from "../drawer";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Spinner } from "../spinner";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { crdStore } from "../+custom-resources/crd.store";
 import { KubeObjectMenu } from "../kube-object-menu";
 import { CrdResourceDetails } from "../+custom-resources";
@@ -36,7 +36,7 @@ import { hideDetails, kubeDetailsUrlParam } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import type { KubeObjectDetailComponents } from "./kube-details-items/kube-detail-items";
 import kubeDetailItemsInjectable from "./kube-details-items/kube-details.injectable";
-
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
 export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
   className?: string;
@@ -45,23 +45,22 @@ export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
 
 interface Dependencies {
   kubeDetailItems: IComputedValue<Map<string, Map<string, KubeObjectDetailComponents<KubeObject>[]>>>;
+  apiManager: ApiManager;
 }
 
-function getKubeObjectByPath(path: string): KubeObject | undefined {
-  try {
-    return apiManager
-      .getStore(path)
-      ?.getByPath(path);
-  } catch (error) {
-    console.error(`[KUBE-OBJECT-DETAILS]: failed to get store or object: ${error}`, { path });
-
-    return undefined;
-  }
-}
-
-const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems }: Dependencies) => {
+const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems, apiManager }: Dependencies) => {
   const [loading, setLoading] = useState(false);
   const [loadingError, setLoadingError] = useState<ReactNode>("");
+
+  const getKubeObjectByPath = (path: string): KubeObject | undefined => {
+    try {
+      return apiManager
+        .getStore(path)
+        ?.getByPath(path);
+    } catch (error) {
+      return void console.error(`[KUBE-OBJECT-DETAILS]: failed to get store or object: ${error}`, { path });
+    }
+  };
 
   useEffect(() => reaction(
     () => [
@@ -140,10 +139,10 @@ const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems }: Dependencies
       className="KubeObjectDetails flex column"
       open={isOpen}
       title={title}
-      toolbar={<KubeObjectMenu object={kubeObject} toolbar={true}/>}
+      toolbar={<KubeObjectMenu object={kubeObject} toolbar={true} />}
       onClose={hideDetails}
     >
-      {loading && <Spinner center/>}
+      {loading && <Spinner center />}
       {loadingError && <div className="box center">{loadingError}</div>}
       {details}
     </Drawer>
@@ -153,6 +152,7 @@ const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems }: Dependencies
 export const KubeObjectDetails = withInjectables<Dependencies>(NonInjectedKubeObjectDetails, {
   getProps: (di, props) => ({
     kubeDetailItems: di.inject(kubeDetailItemsInjectable),
+    apiManager: di.inject(apiManagerInjectable),
     ...props,
   }),
 });

@@ -27,10 +27,10 @@ import identity from "lodash/identity";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import clusterNameInjectable from "./dependencies/cluster-name.injectable";
-import editResourceTabInjectable from "./dependencies/edit-resource-tab.injectable";
 import hideDetailsInjectable from "./dependencies/hide-details.injectable";
 import kubeObjectMenuItemsInjectable from "./dependencies/kube-object-menu-items/kube-object-menu-items.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import newEditResourceTabInjectable from "../dock/edit-resource/create-tab.injectable";
 
 export interface KubeObjectMenuProps<TKubeObject extends KubeObject> extends MenuActionsProps {
   object: TKubeObject | null | undefined;
@@ -132,7 +132,7 @@ export function KubeObjectMenu<T extends KubeObject>(
       getProps: (di, props) => ({
         clusterName: di.inject(clusterNameInjectable),
         apiManager: di.inject(apiManagerInjectable),
-        editResourceTab: di.inject(editResourceTabInjectable),
+        editResourceTab: di.inject(newEditResourceTabInjectable),
         hideDetails: di.inject(hideDetailsInjectable),
 
         kubeObjectMenuItems: di.inject(kubeObjectMenuItemsInjectable, {

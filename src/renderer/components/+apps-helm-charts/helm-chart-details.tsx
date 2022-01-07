@@ -31,7 +31,7 @@ import { MarkdownViewer } from "../markdown-viewer";
 import { Spinner } from "../spinner";
 import { Button } from "../button";
 import { Select, SelectOption } from "../select";
-import { createInstallChartTab } from "../dock/install-chart.store";
+import { createInstallChartTab } from "../dock/install-chart/store";
 import { Badge } from "../badge";
 import { Tooltip, withStyles } from "@material-ui/core";
 
@@ -95,8 +95,8 @@ export class HelmChartDetails extends Component<Props> {
     try {
       this.abortController?.abort();
       this.abortController = new AbortController();
-      const { chart: { name, repo }} = this.props;
-      const { readme } = await getChartDetails(repo, name, { version: chart.version, reqInit: { signal: this.abortController.signal }});
+      const { chart: { name, repo } } = this.props;
+      const { readme } = await getChartDetails(repo, name, { version: chart.version, reqInit: { signal: this.abortController.signal } });
 
       this.readme = readme;
     } catch (error) {

@@ -41,7 +41,7 @@ interface Dependencies {
   apiManager: ApiManager;
 }
 
-const defaultHiddenFields : KubeMetaField[] = [
+const defaultHiddenFields: KubeMetaField[] = [
   "uid",
   "resourceVersion",
   "selfLink",
@@ -50,59 +50,59 @@ const defaultHiddenFields : KubeMetaField[] = [
 const NonInjectedKubeObjectMeta = observer(({ apiManager, object, hideFields = defaultHiddenFields }: Dependencies & KubeObjectMetaProps) => {
   const hiddenFields = new Set(hideFields);
 
-    if (!object) {
-      return null;
-    }
+  if (!object) {
+    return null;
+  }
 
-    if (!(object instanceof KubeObject)) {
-      logger.error("[KubeObjectMeta]: passed object that is not an instanceof KubeObject", object);
+  if (!(object instanceof KubeObject)) {
+    logger.error("[KubeObjectMeta]: passed object that is not an instanceof KubeObject", object);
 
-      return null;
-    }
+    return null;
+  }
 
-    const {
-      getNs, getLabels, getResourceVersion, selfLink, getAnnotations,
-      getFinalizers, getId, getAge, getName, metadata: { creationTimestamp },
-    } = object;
-    const ownerRefs = object.getOwnerRefs();
+  const {
+    getNs, getLabels, getResourceVersion, selfLink, getAnnotations,
+    getFinalizers, getId, getAge, getName, metadata: { creationTimestamp },
+  } = object;
+  const ownerRefs = object.getOwnerRefs();
 
-    return (
-      <>
-        <DrawerItem name="Created" hidden={hiddenFields.has("creationTimestamp")}>
-          {getAge(true, false)} ago ({<LocaleDate date={creationTimestamp} />})
-        </DrawerItem>
-        <DrawerItem name="Name" hidden={hiddenFields.has("name")}>
-          {getName()}
-          <KubeObjectStatusIcon key="icon" object={object} />
-        </DrawerItem>
-        <DrawerItem name="Namespace" hidden={hiddenFields.has("namespace") || !getNs()}>
-          {getNs()}
-        </DrawerItem>
-        <DrawerItem name="UID" hidden={hiddenFields.has("uid")}>
-          {getId()}
-        </DrawerItem>
-        <DrawerItem name="Link" hidden={hiddenFields.has("selfLink")}>
-          {selfLink}
-        </DrawerItem>
-        <DrawerItem name="Resource Version" hidden={hiddenFields.has("resourceVersion")}>
-          {getResourceVersion()}
-        </DrawerItem>
-        <DrawerItemLabels
-          name="Labels"
-          labels={getLabels()}
-          hidden={hiddenFields.has("labels")}
-        />
-        <DrawerItemLabels
-          name="Annotations"
-          labels={getAnnotations()}
-          hidden={hiddenFields.has("annotations")}
-        />
-        <DrawerItemLabels
-          name="Finalizers"
-          labels={getFinalizers()}
-          hidden={hiddenFields.has("finalizers")}
-        />
-        {ownerRefs?.length > 0 &&
+  return (
+    <>
+      <DrawerItem name="Created" hidden={hiddenFields.has("creationTimestamp")}>
+        {getAge(true, false)} ago ({<LocaleDate date={creationTimestamp} />})
+      </DrawerItem>
+      <DrawerItem name="Name" hidden={hiddenFields.has("name")}>
+        {getName()}
+        <KubeObjectStatusIcon key="icon" object={object} />
+      </DrawerItem>
+      <DrawerItem name="Namespace" hidden={hiddenFields.has("namespace") || !getNs()}>
+        {getNs()}
+      </DrawerItem>
+      <DrawerItem name="UID" hidden={hiddenFields.has("uid")}>
+        {getId()}
+      </DrawerItem>
+      <DrawerItem name="Link" hidden={hiddenFields.has("selfLink")}>
+        {selfLink}
+      </DrawerItem>
+      <DrawerItem name="Resource Version" hidden={hiddenFields.has("resourceVersion")}>
+        {getResourceVersion()}
+      </DrawerItem>
+      <DrawerItemLabels
+        name="Labels"
+        labels={getLabels()}
+        hidden={hiddenFields.has("labels")}
+      />
+      <DrawerItemLabels
+        name="Annotations"
+        labels={getAnnotations()}
+        hidden={hiddenFields.has("annotations")}
+      />
+      <DrawerItemLabels
+        name="Finalizers"
+        labels={getFinalizers()}
+        hidden={hiddenFields.has("finalizers")}
+      />
+      {ownerRefs?.length > 0 &&
         <DrawerItem name="Controlled By" hidden={hiddenFields.has("ownerReferences")}>
           {
             ownerRefs.map(ref => {
@@ -117,12 +117,12 @@ const NonInjectedKubeObjectMeta = observer(({ apiManager, object, hideFields = d
             })
           }
         </DrawerItem>
-        }
-      </>
-    );
+      }
+    </>
+  );
 });
 
-export const KubeObjectMeta = withInjectables<Dependencies>(NonInjectedKubeObjectMeta, {
+export const KubeObjectMeta = withInjectables<Dependencies, KubeObjectMetaProps>(NonInjectedKubeObjectMeta, {
   getProps: (di, props) => ({
     apiManager: di.inject(apiManagerInjectable),
     ...props,

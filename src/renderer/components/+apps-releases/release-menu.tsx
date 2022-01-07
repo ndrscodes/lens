@@ -27,7 +27,7 @@ import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Icon } from "../icon";
 import { ReleaseRollbackDialog } from "./release-rollback-dialog";
-import { createUpgradeChartTab } from "../dock/upgrade-chart.store";
+import { createUpgradeChartTab } from "../dock/upgrade-chart/store";
 
 interface Props extends MenuActionsProps {
   release: HelmRelease;

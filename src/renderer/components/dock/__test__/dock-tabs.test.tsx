@@ -20,16 +20,20 @@
  */
 
 import React from "react";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import fse from "fs-extra";
 import { DockTabs } from "../dock-tabs";
-import { dockStore, DockTab, TabKind } from "../dock.store";
+import { DockStore, DockTabData, TabKind } from "../dock/store";
 import { noop } from "../../../utils";
 import { ThemeStore } from "../../../theme.store";
-import { TerminalStore } from "../terminal.store";
 import { UserStore } from "../../../../common/user-store";
 import { AppPaths } from "../../../../common/app-paths";
+import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injectable";
+import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
+import { type DiRender, renderFor } from "../../test-utils/renderFor";
+import { getStorageLayerMock } from "../../../utils/__mocks__/storage-helper";
+import { cloneDeep } from "lodash";
 
 jest.mock("electron", () => ({
   app: {
@@ -48,7 +52,7 @@ jest.mock("electron", () => ({
 }));
 AppPaths.init();
 
-const initialTabs: DockTab[] = [
+const initialTabs: DockTabData[] = [
   { id: "terminal", kind: TabKind.TERMINAL, title: "Terminal", pinned: false },
   { id: "create", kind: TabKind.CREATE_RESOURCE, title: "Create resource", pinned: false },
   { id: "edit", kind: TabKind.EDIT_RESOURCE, title: "Edit resource", pinned: false },
@@ -56,30 +60,40 @@ const initialTabs: DockTab[] = [
   { id: "logs", kind: TabKind.POD_LOGS, title: "Logs", pinned: false },
 ];
 
-const getComponent = () => (
-  <DockTabs
-    tabs={dockStore.tabs}
-    selectedTab={dockStore.selectedTab}
-    autoFocus={true}
-    onChangeTab={noop}
-  />
-);
-
-const renderTabs = () => render(getComponent());
-const getTabKinds = () => dockStore.tabs.map(tab => tab.kind);
-
 describe("<DockTabs />", () => {
+  let render: DiRender;
+  let di: ConfigurableDependencyInjectionContainer;
+  let dockStore: DockStore;
+
+  const getComponent = () => (
+    <DockTabs
+      tabs={dockStore.tabs}
+      selectedTab={dockStore.selectedTab}
+      autoFocus={true}
+      onChangeTab={noop}
+    />
+  );
+  const renderTabs = () => render(getComponent());
+  const getTabKinds = () => dockStore.tabs.map(tab => tab.kind);
+
   beforeEach(async () => {
+    di = getDiForUnitTesting();
+    render = renderFor(di);
+
     UserStore.createInstance();
     ThemeStore.createInstance();
-    TerminalStore.createInstance();
-    await dockStore.whenReady;
-    dockStore.tabs = initialTabs;
+
+    dockStore = new DockStore({
+      storage: getStorageLayerMock({
+        height: 300,
+        tabs: [],
+      }),
+    });
+    dockStore.tabs = cloneDeep(initialTabs);
   });
 
   afterEach(() => {
     ThemeStore.resetInstance();
-    TerminalStore.resetInstance();
     UserStore.resetInstance();
     fse.remove("tmp");
   });

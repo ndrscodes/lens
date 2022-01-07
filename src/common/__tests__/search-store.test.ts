@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { SearchStore } from "../search-store";
+import { LogSearchStore } from "../../renderer/components/dock/log-search/store";
 import { Console } from "console";
 import { stdout, stderr } from "process";
 
@@ -89,7 +89,7 @@ describe("search store tests", () => {
   });
 
   it("escapes string for using in regex", () => {
-    const regex = SearchStore.escapeRegex("some.interesting-query\\#?()[]");
+    const regex = LogSearchStore.escapeRegex("some.interesting-query\\#?()[]");
 
     expect(regex).toBe("some\\.interesting\\-query\\\\\\#\\?\\(\\)\\[\\]");
   });

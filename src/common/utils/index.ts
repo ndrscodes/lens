@@ -41,6 +41,7 @@ export * from "./downloadFile";
 export * from "./escapeRegExp";
 export * from "./extended-map";
 export * from "./formatDuration";
+export * from "./function-bind";
 export * from "./getRandId";
 export * from "./hash-set";
 export * from "./local-kubeconfig";
