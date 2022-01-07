@@ -27,10 +27,10 @@ import { cssNames } from "../../../utils";
 import { Button } from "../../button";
 import { Icon } from "../../icon";
 import { Spinner } from "../../spinner";
-import type { DockStore, TabId } from "../dock/store";
+import type { DockStore, TabId } from "../store";
 import { Notifications } from "../../notifications";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 export interface InfoPanelProps<ShowNotifications extends boolean = boolean> {
   tabId: TabId;

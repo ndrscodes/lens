@@ -22,7 +22,7 @@
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-releases.api";
 import { DockTabStore } from "../dock-tab/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const releaseDetailsManagerInjectable = getInjectable({
   instantiate: (di) => new DockTabStore<IReleaseUpdateDetails>({}, {

@@ -23,7 +23,7 @@ import "./install-chart.scss";
 
 import React, { useState } from "react";
 import { observer } from "mobx-react";
-import type { DockTabData, TabId } from "../dock/store";
+import type { DockTabData, TabId } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { Badge } from "../../badge";
 import { NamespaceSelect } from "../../+namespaces/namespace-select";
@@ -42,7 +42,7 @@ import { releaseURL } from "../../../../common/routes";
 import type { DockTabStorageLayer } from "../dock-tab/store";
 import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-releases.api";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 import installChartManagerInjectable from "./store.injectable";
 import chartVersionManagerInjectable from "./chart-version-manager.injectable";
 import releaseDetailsManagerInjectable from "./release-details-manager.injectable";

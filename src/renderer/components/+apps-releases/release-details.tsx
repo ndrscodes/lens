@@ -21,116 +21,96 @@
 
 import "./release-details.scss";
 
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import groupBy from "lodash/groupBy";
 import isEqual from "lodash/isEqual";
-import { makeObservable, observable, reaction } from "mobx";
+import { reaction } from "mobx";
 import { Link } from "react-router-dom";
 import kebabCase from "lodash/kebabCase";
 import { getRelease, getReleaseValues, HelmRelease, IReleaseDetails } from "../../../common/k8s-api/endpoints/helm-releases.api";
 import { HelmReleaseMenu } from "./release-menu";
 import { Drawer, DrawerItem, DrawerTitle } from "../drawer";
 import { Badge } from "../badge";
-import { cssNames, stopPropagation } from "../../utils";
-import { disposeOnUnmount, observer } from "mobx-react";
+import { cssNames, disposer, stopPropagation } from "../../utils";
+import { observer } from "mobx-react";
 import { Spinner } from "../spinner";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import { Button } from "../button";
 import { releaseStore } from "./release.store";
 import { Notifications } from "../notifications";
-import { createUpgradeChartTab } from "../dock/upgrade-chart/store";
 import { ThemeStore } from "../../theme.store";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";
-import { secretsStore } from "../+config-secrets/secrets.store";
-import { Secret } from "../../../common/k8s-api/endpoints";
+import { secretsStore, SecretsStore } from "../+config-secrets/secrets.store";
+import type { Secret } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
 import { Checkbox } from "../checkbox";
 import { MonacoEditor } from "../monaco-editor";
+import type { DockTabCreateSpecific, DockTabData } from "../dock/store";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
-interface Props {
+export interface ReleaseDetailsProps {
   release: HelmRelease;
   hideDetails(): void;
 }
 
-@observer
-export class ReleaseDetails extends Component<Props> {
-  @observable details: IReleaseDetails | null = null;
-  @observable values = "";
-  @observable valuesLoading = false;
-  @observable showOnlyUserSuppliedValues = true;
-  @observable saving = false;
-  @observable releaseSecret: Secret;
-  @observable error?: string = undefined;
+interface Dependencies {
+  newUpgradeChartTab: (release: HelmRelease, data?: DockTabCreateSpecific) => DockTabData;
+  apiManager: ApiManager;
+  secretsStore: SecretsStore;
+}
 
-  componentDidMount() {
-    disposeOnUnmount(this, [
-      reaction(() => this.props.release, release => {
-        if (!release) return;
-        this.loadDetails();
-        this.loadValues();
-        this.releaseSecret = null;
-      }),
-      reaction(() => secretsStore.getItems(), () => {
-        if (!this.props.release) return;
-        const { getReleaseSecret } = releaseStore;
-        const { release } = this.props;
-        const secret = getReleaseSecret(release);
+const NonInjectedReleaseDetails = observer(({
+  release,
+  hideDetails,
+  newUpgradeChartTab,
+  apiManager,
+  secretsStore,
+}: Dependencies & ReleaseDetailsProps) => {
+  const [details, setDetails] = useState<IReleaseDetails | null>(null);
+  const [values, setValues] = useState("");
+  const [valuesLoading, setValuesLoading] = useState(false);
+  const [showOnlyUserSuppliedValues, setShowOnlyUserSuppliedValues] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [releaseSecret, setReleaseSecret] = useState<Secret | undefined>(undefined);
+  const [error, setError] = useState("");
 
-        if (this.releaseSecret) {
-          if (isEqual(this.releaseSecret.getLabels(), secret.getLabels())) return;
-          this.loadDetails();
-        }
-        this.releaseSecret = secret;
-      }),
-      reaction(() => this.showOnlyUserSuppliedValues, () => {
-        this.loadValues();
-      }),
-    ]);
-  }
-
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
-
-  async loadDetails() {
-    const { release } = this.props;
+  const loadDetails = async () =>{
+    setDetails(null);
 
     try {
-      this.details = null;
-      this.details = await getRelease(release.getName(), release.getNs());
+      setDetails(await getRelease(release.getName(), release.getNs()));
     } catch (error) {
-      this.error = `Failed to get release details: ${error}`;
+      setError(`Failed to get release details: ${error}`);
     }
-  }
+  };
 
-  async loadValues() {
-    const { release } = this.props;
+  const loadValues = async () => {
+    setValuesLoading(true);
 
     try {
-      this.valuesLoading = true;
-      this.values = (await getReleaseValues(release.getName(), release.getNs(), !this.showOnlyUserSuppliedValues)) ?? "";
+      setValues(await getReleaseValues(release.getName(), release.getNs(), !showOnlyUserSuppliedValues) ?? "");
     } catch (error) {
       Notifications.error(`Failed to load values for ${release.getName()}: ${error}`);
-      this.values = "";
+      setValues("");
     } finally {
-      this.valuesLoading = false;
+      setValuesLoading(false);
     }
-  }
+  };
 
-  updateValues = async () => {
-    const { release } = this.props;
+  const updateValues = async () => {
+    setSaving(true);
+
     const name = release.getName();
     const namespace = release.getNs();
     const data = {
       chart: release.getChart(),
       repo: await release.getRepo(),
       version: release.getVersion(),
-      values: this.values,
+      values,
     };
-
-    this.saving = true;
 
     try {
       await releaseStore.update(name, namespace, data);
@@ -140,65 +120,95 @@ export class ReleaseDetails extends Component<Props> {
     } catch (err) {
       Notifications.error(err);
     }
-    this.saving = false;
+    setSaving(false);
   };
 
-  upgradeVersion = () => {
-    const { release, hideDetails } = this.props;
-
-    createUpgradeChartTab(release);
+  const upgradeVersion = () => {
+    newUpgradeChartTab(release);
     hideDetails();
   };
 
-  renderValues() {
-    const { values, valuesLoading, saving } = this;
+  useEffect(() => disposer(
+    reaction(() => release, release => {
+      if (!release) return;
+      loadDetails();
+      loadValues();
+      setReleaseSecret(undefined);
+    }),
+    reaction(() => secretsStore.getItems(), () => {
+      if (!release) return;
+      const { getReleaseSecret } = releaseStore;
+      const secret = getReleaseSecret(release);
+
+      if (releaseSecret) {
+        if (!isEqual(releaseSecret.getLabels(), secret.getLabels())) {
+          loadDetails();
+        }
+
+        setReleaseSecret(secret);
+      }
+    }),
+    reaction(() => showOnlyUserSuppliedValues, () => loadValues()),
+  ), []);
+
+  if (!release) {
+    return null;
+  }
+
+  const renderValues = () => (
+    <div className="values">
+      <DrawerTitle title="Values"/>
+      <div className="flex column gaps">
+        <Checkbox
+          label="User-supplied values only"
+          value={showOnlyUserSuppliedValues}
+          onChange={setShowOnlyUserSuppliedValues}
+          disabled={valuesLoading}
+        />
+        <MonacoEditor
+          readOnly={valuesLoading}
+          className={cssNames({ loading: valuesLoading })}
+          style={{ minHeight: 300 }}
+          value={values}
+          onChange={setValues}
+        >
+          {valuesLoading && <Spinner center/>}
+        </MonacoEditor>
+        <Button
+          primary
+          label="Save"
+          waiting={saving}
+          disabled={valuesLoading}
+          onClick={updateValues}
+        />
+      </div>
+    </div>
+  );
+
+  const renderNotes = () => {
+    const { info } = details;
+
+    if (!info?.notes) {
+      return null;
+    }
 
     return (
-      <div className="values">
-        <DrawerTitle title="Values"/>
-        <div className="flex column gaps">
-          <Checkbox
-            label="User-supplied values only"
-            value={this.showOnlyUserSuppliedValues}
-            onChange={value => this.showOnlyUserSuppliedValues = value}
-            disabled={valuesLoading}
-          />
-          <MonacoEditor
-            readOnly={valuesLoading}
-            className={cssNames({ loading: valuesLoading })}
-            style={{ minHeight: 300 }}
-            value={values}
-            onChange={text => this.values = text}
-          >
-            {valuesLoading && <Spinner center/>}
-          </MonacoEditor>
-          <Button
-            primary
-            label="Save"
-            waiting={saving}
-            disabled={valuesLoading}
-            onClick={this.updateValues}
-          />
+      <>
+        <DrawerTitle title="Notes"/>
+        <div className="notes">
+          {info.notes}
         </div>
-      </div>
+      </>
     );
-  }
+  };
 
-  renderNotes() {
-    if (!this.details.info?.notes) return null;
-    const { notes } = this.details.info;
+  const renderResources = () => {
+    const { resources } = details;
 
-    return (
-      <div className="notes">
-        {notes}
-      </div>
-    );
-  }
+    if (!resources) {
+      return null;
+    }
 
-  renderResources() {
-    const { resources } = this.details;
-
-    if (!resources) return null;
     const groups = groupBy(resources, item => item.kind);
     const tables = Object.entries(groups).map(([kind, items]) => {
       return (
@@ -232,26 +242,25 @@ export class ReleaseDetails extends Component<Props> {
     });
 
     return (
-      <div className="resources">
-        {tables}
-      </div>
+      <>
+        <DrawerTitle title="Resources"/>
+        <div className="resources">
+          {tables}
+        </div>
+      </>
     );
-  }
+  };
 
-  renderContent() {
-    const { release } = this.props;
-
-    if (!release) return null;
-
-    if (this.error) {
+  const renderContent = () => {
+    if (error) {
       return (
         <div className="loading-error">
-          {this.error}
+          {error}
         </div>
       );
     }
 
-    if (!this.details) {
+    if (!details) {
       return <Spinner center/>;
     }
 
@@ -264,7 +273,7 @@ export class ReleaseDetails extends Component<Props> {
               primary
               label="Upgrade"
               className="box right upgrade"
-              onClick={this.upgradeVersion}
+              onClick={upgradeVersion}
             />
           </div>
         </DrawerItem>
@@ -287,31 +296,38 @@ export class ReleaseDetails extends Component<Props> {
             className={kebabCase(release.getStatus())}
           />
         </DrawerItem>
-        {this.renderValues()}
-        <DrawerTitle title="Notes"/>
-        {this.renderNotes()}
-        <DrawerTitle title="Resources"/>
-        {this.renderResources()}
+        {renderValues()}
+        {renderNotes()}
+        {renderResources()}
       </div>
     );
-  }
+  };
 
-  render() {
-    const { release, hideDetails } = this.props;
-    const title = release ? `Release: ${release.getName()}` : "";
-    const toolbar = <HelmReleaseMenu release={release} toolbar hideDetails={hideDetails}/>;
+  return (
+    <Drawer
+      className={cssNames("ReleaseDetails", ThemeStore.getInstance().activeTheme.type)}
+      usePortal={true}
+      open
+      title={`Release: ${release.getName()}`}
+      onClose={hideDetails}
+      toolbar={
+        <HelmReleaseMenu
+          release={release}
+          toolbar
+          hideDetails={hideDetails}
+        />
+      }
+    >
+      {renderContent()}
+    </Drawer>
+  );
+});
 
-    return (
-      <Drawer
-        className={cssNames("ReleaseDetails", ThemeStore.getInstance().activeTheme.type)}
-        usePortal={true}
-        open={!!release}
-        title={title}
-        onClose={hideDetails}
-        toolbar={toolbar}
-      >
-        {this.renderContent()}
-      </Drawer>
-    );
-  }
-}
+export const ReleaseDetails = withInjectables<Dependencies, ReleaseDetailsProps>(NonInjectedReleaseDetails, {
+  getProps: (di, props) => ({
+    newUpgradeChartTab: di.inject(newUpgradeChartTabInjectable),
+    apiManager: di.inject(apiManagerInjectable),
+    secretsStore,
+    ...props,
+  }),
+});

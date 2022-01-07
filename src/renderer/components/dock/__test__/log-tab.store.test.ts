@@ -27,8 +27,14 @@ import { deploymentPod1, deploymentPod2, deploymentPod3, dockerPod } from "./pod
 import fse from "fs-extra";
 import { mockWindow } from "../../../../../__mocks__/windowMock";
 import { AppPaths } from "../../../../common/app-paths";
-import { LogTabStore } from "../log-tab/store";
-import { DockStore } from "../dock/store";
+import type { LogTabStore } from "../log-tab/store";
+import type { DockStore } from "../store";
+import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injectable";
+import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
+import createStorageInjectable from "../../../utils/createStorage.injectable";
+import { getStorageLayerMock } from "../../../utils/__mocks__/storage-helper";
+import dockStoreInjectable from "../store.injectable";
+import logTabStoreInjectable from "../log-tab/store.injectable";
 
 mockWindow();
 
@@ -55,9 +61,18 @@ podsStore.items.push(new Pod(deploymentPod1));
 podsStore.items.push(new Pod(deploymentPod2));
 
 describe("log tab store", () => {
-  beforeEach(() => {
+  let di: ConfigurableDependencyInjectionContainer;
+  let dockStore: DockStore;
+  let logTabStore: LogTabStore;
+
+  beforeEach(async () => {
+    di = getDiForUnitTesting();
     UserStore.createInstance();
     ThemeStore.createInstance();
+
+    di.override(createStorageInjectable, () => getStorageLayerMock);
+    dockStore = di.inject(dockStoreInjectable);
+    logTabStore = di.inject(logTabStoreInjectable);
   });
 
   afterEach(() => {
@@ -69,8 +84,6 @@ describe("log tab store", () => {
   it("creates log tab without sibling pods", () => {
     const selectedPod = new Pod(dockerPod);
     const selectedContainer = selectedPod.getAllContainers()[0];
-    const dockStore = new DockStore();
-    const logTabStore = new LogTabStore({ dockStore });
 
     logTabStore.createPodTab({
       selectedPod,
@@ -90,8 +103,6 @@ describe("log tab store", () => {
     const selectedPod = new Pod(deploymentPod1);
     const siblingPod = new Pod(deploymentPod2);
     const selectedContainer = selectedPod.getInitContainers()[0];
-    const dockStore = new DockStore();
-    const logTabStore = new LogTabStore({ dockStore });
 
     logTabStore.createPodTab({
       selectedPod,
@@ -110,8 +121,6 @@ describe("log tab store", () => {
   it("removes item from pods list if pod deleted from store", () => {
     const selectedPod = new Pod(deploymentPod1);
     const selectedContainer = selectedPod.getInitContainers()[0];
-    const dockStore = new DockStore();
-    const logTabStore = new LogTabStore({ dockStore });
 
     logTabStore.createPodTab({
       selectedPod,
@@ -132,8 +141,6 @@ describe("log tab store", () => {
   it("adds item into pods list if new sibling pod added to store", () => {
     const selectedPod = new Pod(deploymentPod1);
     const selectedContainer = selectedPod.getInitContainers()[0];
-    const dockStore = new DockStore();
-    const logTabStore = new LogTabStore({ dockStore });
 
     logTabStore.createPodTab({
       selectedPod,
@@ -155,8 +162,6 @@ describe("log tab store", () => {
   it.only("closes tab if no pods left in store", async () => {
     const selectedPod = new Pod(deploymentPod1);
     const selectedContainer = selectedPod.getInitContainers()[0];
-    const dockStore = new DockStore();
-    const logTabStore = new LogTabStore({ dockStore });
 
     const id = logTabStore.createPodTab({
       selectedPod,

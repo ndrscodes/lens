@@ -22,7 +22,7 @@
 import { autoBind, noop } from "../../../utils";
 import { DockTabStore, DockTabStoreDependencies } from "../dock-tab/store";
 import { autorun, IReactionDisposer } from "mobx";
-import type { DockStore, DockTabData, TabId } from "../dock/store";
+import type { DockStore, DockTabData, TabId } from "../store";
 import type { KubeObject } from "../../../../common/k8s-api/kube-object";
 import type { ApiManager } from "../../../../common/k8s-api/api-manager";
 import type { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";

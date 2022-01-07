@@ -20,14 +20,12 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import dockStoreInjectable from "../store.injectable";
-import { LogTabStore } from "./store";
+import { createStorage } from "./createStorage";
+import type { StorageLayer } from "./storageHelper";
 
-const logTabStoreInjectable = getInjectable({
-  instantiate: (di) => new LogTabStore({
-    dockStore: di.inject(dockStoreInjectable),
-  }),
+const createStorageInjectable = getInjectable({
+  instantiate: () => <T>(key: string, defaultValue: T): StorageLayer<T> => createStorage(key, defaultValue),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default logTabStoreInjectable;
+export default createStorageInjectable;

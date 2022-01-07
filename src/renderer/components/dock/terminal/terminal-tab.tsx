@@ -27,10 +27,10 @@ import { cssNames } from "../../../utils";
 import { DockTab, DockTabProps } from "../dock-tab/dock-tab";
 import { Icon } from "../../icon";
 import type { TerminalStore } from "./store";
-import type { DockStore } from "../dock/store";
+import type { DockStore } from "../store";
 import { reaction } from "mobx";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 import terminalStoreInjectable from "./store.injectable";
 
 export interface TerminalTabProps extends DockTabProps {

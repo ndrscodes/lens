@@ -23,8 +23,8 @@ import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { HelmChart } from "../../../../common/k8s-api/endpoints/helm-charts.api";
 import { bind } from "../../../utils";
 import type { DockTabStorageLayer } from "../dock-tab/store";
-import { type DockTabCreateSpecific, TabKind, DockTabCreator } from "../dock/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import { type DockTabCreateSpecific, TabKind, DockTabCreator } from "../store";
+import dockStoreInjectable from "../store.injectable";
 import type { IChartInstallData } from "./store";
 import installChartManagerInjectable from "./store.injectable";
 

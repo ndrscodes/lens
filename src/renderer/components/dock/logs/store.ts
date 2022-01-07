@@ -23,7 +23,7 @@ import { autorun, computed, observable, makeObservable } from "mobx";
 
 import { IPodLogsQuery, Pod, podsApi } from "../../../../common/k8s-api/endpoints";
 import { autoBind, interval } from "../../../utils";
-import { DockStore, TabId, TabKind } from "../dock/store";
+import { DockStore, TabId, TabKind } from "../store";
 import type { LogTabStore } from "../log-tab/store";
 
 type PodLogLine = string;

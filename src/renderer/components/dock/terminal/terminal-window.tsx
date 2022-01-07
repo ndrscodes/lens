@@ -27,9 +27,9 @@ import { cssNames, disposer } from "../../../utils";
 import type { Terminal } from "./terminal";
 import type { TerminalStore } from "./store";
 import { ThemeStore } from "../../../theme.store";
-import { TabKind, TabId, DockStore } from "../dock/store";
+import { TabKind, TabId, DockStore } from "../store";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 import terminalStoreInjectable from "./store.injectable";
 
 interface Dependencies {

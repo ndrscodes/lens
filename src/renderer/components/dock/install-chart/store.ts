@@ -20,7 +20,7 @@
  */
 
 import { action, autorun, makeObservable } from "mobx";
-import { TabId, TabKind } from "../dock/store";
+import { TabId, TabKind } from "../store";
 import { DockTabStorageLayer, DockTabStore, DockTabStoreDependencies } from "../dock-tab/store";
 import { getChartDetails, getChartValues } from "../../../../common/k8s-api/endpoints/helm-charts.api";
 import { Notifications } from "../../notifications";

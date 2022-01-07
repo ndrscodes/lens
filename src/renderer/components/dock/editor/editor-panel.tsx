@@ -26,8 +26,8 @@ import { observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 import { cssNames, disposer } from "../../../utils";
 import { MonacoEditor, MonacoEditorProps } from "../../monaco-editor";
-import type { DockStore, TabId } from "../dock/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import type { DockStore, TabId } from "../store";
+import dockStoreInjectable from "../store.injectable";
 import styles from "./editor-panel.module.scss";
 
 export interface EditorPanelProps {

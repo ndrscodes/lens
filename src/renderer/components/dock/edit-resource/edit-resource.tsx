@@ -24,7 +24,7 @@ import "./edit-resource.scss";
 import React, { useState } from "react";
 import { observer } from "mobx-react";
 import yaml from "js-yaml";
-import type { DockTabData } from "../dock/store";
+import type { DockTabData } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { Badge } from "../../badge";
 import { EditorPanel } from "../editor/editor-panel";

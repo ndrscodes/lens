@@ -25,7 +25,7 @@ import { observer } from "mobx-react";
 
 import type { LogSearchStore } from "../log-search/store";
 import { cssNames } from "../../../utils";
-import type { DockTabData } from "../dock/store";
+import type { DockTabData } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { LogResourceSelector } from "./log-resource-selector";
 import { LogList } from "./log-list";

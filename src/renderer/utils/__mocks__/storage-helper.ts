@@ -22,8 +22,9 @@
 import { deepEqual } from "mobx/dist/internal";
 import type { StorageLayer } from "../storageHelper";
 
-export function getStorageLayerMock<T>(defaultValue: T): StorageLayer<T> {
+export function getStorageLayerMock<T>(key: string, defaultValue: T): StorageLayer<T> {
   return {
+    key,
     whenReady: Promise.resolve(),
     defaultValue,
     isDefaultValue: jest.fn().mockImplementation(val => deepEqual(val, defaultValue)),

@@ -27,8 +27,8 @@ import { cssNames, isMiddleClick, prevDefault } from "../../../utils";
 import { Icon } from "../../icon";
 import { Menu, MenuItem } from "../../menu";
 import { Tab, TabProps } from "../../tabs";
-import type { DockStore, DockTabData } from "../dock/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import type { DockStore, DockTabData } from "../store";
+import dockStoreInjectable from "../store.injectable";
 import "./dock-tab.scss";
 
 export interface DockTabProps extends TabProps<DockTabData> {

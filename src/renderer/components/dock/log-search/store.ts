@@ -20,7 +20,7 @@
  */
 
 import { action, computed, observable, reaction, makeObservable } from "mobx";
-import type { DockStore } from "../dock/store";
+import type { DockStore } from "../store";
 import { boundMethod } from "../../../utils";
 
 interface Dependencies {

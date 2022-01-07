@@ -29,7 +29,7 @@ import { Badge } from "../../badge";
 import { Select, SelectOption } from "../../select";
 import type { LogTabData, LogTabStore } from "../log-tab/store";
 import { podsStore } from "../../+workloads-pods/pods.store";
-import type { TabId } from "../dock/store";
+import type { TabId } from "../store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import logTabStoreInjectable from "../log-tab/store.injectable";
 

@@ -22,8 +22,8 @@
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { KubeObject } from "../../../../common/k8s-api/kube-object";
 import { bind } from "../../../utils";
-import { DockStore, DockTabCreateSpecific, TabKind } from "../dock/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import { DockStore, DockTabCreateSpecific, TabKind } from "../store";
+import dockStoreInjectable from "../store.injectable";
 import type { EditResourceStore } from "./store";
 import editResourceStoreInjectable from "./store.injectable";
 

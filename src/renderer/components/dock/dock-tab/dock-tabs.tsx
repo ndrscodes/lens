@@ -22,8 +22,8 @@
 import React, { Fragment } from "react";
 import { Icon } from "../../icon";
 import { Tabs } from "../../tabs/tabs";
-import type { DockTabData as DockTabModel } from "../dock/store";
-import { TabKind } from "../dock/store";
+import type { DockTabData as DockTabModel } from "../store";
+import { TabKind } from "../store";
 import { TerminalTab } from "../terminal/terminal-tab";
 import { DockTab } from "./dock-tab";
 

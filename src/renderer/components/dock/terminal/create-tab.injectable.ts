@@ -21,8 +21,8 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "../../../utils";
-import { DockTabCreateSpecific, DockTabCreator, TabKind } from "../dock/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import { DockTabCreateSpecific, DockTabCreator, TabKind } from "../store";
+import dockStoreInjectable from "../store.injectable";
 
 interface Dependencies {
   dockManager: DockTabCreator;

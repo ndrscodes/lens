@@ -21,7 +21,7 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../../../../common/k8s-api/api-manager.injectable";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 import { EditResourceStore } from "./store";
 
 const editResourceStoreInjectable = getInjectable({

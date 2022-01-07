@@ -23,7 +23,7 @@ import { autorun, observable, when } from "mobx";
 import { autoBind, noop } from "../../../utils";
 import { Terminal } from "./terminal";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
-import { DockStore, DockTabData, DockTabCreateSpecific, TabId, TabKind } from "../dock/store";
+import { DockStore, DockTabData, DockTabCreateSpecific, TabId, TabKind } from "../store";
 import { WebSocketApiState } from "../../../api/websocket-api";
 import { Notifications } from "../../notifications";
 

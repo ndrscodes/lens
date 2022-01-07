@@ -43,6 +43,7 @@ export interface StorageHelperOptions<T> {
 }
 
 export interface StorageLayer<T> {
+  key: string;
   whenReady: Promise<void>;
   defaultValue: T;
   isDefaultValue(value: T): boolean;

@@ -20,7 +20,7 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 import newTerminalTabInjectable from "./create-tab.injectable";
 import { TerminalStore } from "./store";
 

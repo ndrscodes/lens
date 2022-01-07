@@ -21,7 +21,7 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { DockTabStore } from "../dock-tab/store";
-import dockStoreInjectable from "../dock/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const chartVersionManagerInjectable = getInjectable({
   instantiate: (di) => new DockTabStore<string[]>({}, {

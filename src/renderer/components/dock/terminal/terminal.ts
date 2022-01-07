@@ -23,7 +23,7 @@ import debounce from "lodash/debounce";
 import { reaction } from "mobx";
 import { Terminal as XTerm } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
-import type { DockStore, TabId } from "../dock/store";
+import type { DockStore, TabId } from "../store";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
 import { ThemeStore } from "../../../theme.store";
 import { boundMethod, disposer } from "../../../utils";

@@ -23,8 +23,8 @@ import React from "react";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import fse from "fs-extra";
-import { DockTabs } from "../dock-tabs";
-import { DockStore, DockTabData, TabKind } from "../dock/store";
+import { DockTabs } from "../dock-tab/dock-tabs";
+import { DockStore, DockTabData, TabKind } from "../store";
 import { noop } from "../../../utils";
 import { ThemeStore } from "../../../theme.store";
 import { UserStore } from "../../../../common/user-store";
@@ -34,6 +34,8 @@ import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
 import { type DiRender, renderFor } from "../../test-utils/renderFor";
 import { getStorageLayerMock } from "../../../utils/__mocks__/storage-helper";
 import { cloneDeep } from "lodash";
+import createStorageInjectable from "../../../utils/createStorage.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 jest.mock("electron", () => ({
   app: {
@@ -83,12 +85,8 @@ describe("<DockTabs />", () => {
     UserStore.createInstance();
     ThemeStore.createInstance();
 
-    dockStore = new DockStore({
-      storage: getStorageLayerMock({
-        height: 300,
-        tabs: [],
-      }),
-    });
+    di.override(createStorageInjectable, () => getStorageLayerMock);
+    dockStore = di.inject(dockStoreInjectable);
     dockStore.tabs = cloneDeep(initialTabs);
   });
 

@@ -25,7 +25,7 @@ import React, { useEffect, useState } from "react";
 import { computed, observable, reaction } from "mobx";
 import { observer } from "mobx-react";
 import { cssNames } from "../../../utils";
-import type { DockTabData } from "../dock/store";
+import type { DockTabData } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { Spinner } from "../../spinner";
 import { releaseStore } from "../../+apps-releases/release.store";
