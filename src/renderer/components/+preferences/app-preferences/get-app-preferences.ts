@@ -18,31 +18,32 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { computed, IComputedValue } from "mobx";
+import type { LensRendererExtension } from "../../../../extensions/lens-renderer-extension";
+import type { AppPreferenceRegistration } from "./app-preference-registration";
 
-import type React from "react";
-import { BaseRegistry } from "./base-registry";
-
-export interface AppPreferenceComponents {
-  Hint: React.ComponentType<any>;
-  Input: React.ComponentType<any>;
+interface Dependencies {
+  extensions: IComputedValue<LensRendererExtension[]>;
 }
 
-export interface AppPreferenceRegistration {
-  title: string;
-  id?: string;
-  showInPreferencesTab?: string;
-  components: AppPreferenceComponents;
-}
-
-export interface RegisteredAppPreference extends AppPreferenceRegistration {
+interface RegisteredAppPreference extends AppPreferenceRegistration {
   id: string;
 }
 
-export class AppPreferenceRegistry extends BaseRegistry<AppPreferenceRegistration, RegisteredAppPreference> {
-  getRegisteredItem(item: AppPreferenceRegistration): RegisteredAppPreference {
-    return {
-      id: item.id || item.title.toLowerCase().replace(/[^0-9a-zA-Z]+/g, "-"),
-      ...item,
-    };
-  }
+function  getRegisteredItem(item: AppPreferenceRegistration): RegisteredAppPreference {
+  return {
+    id: item.id || item.title.toLowerCase().replace(/[^0-9a-zA-Z]+/g, "-"),
+    ...item,
+  };
 }
+
+
+export const getAppPreferences = ({ extensions }: Dependencies) => {
+  return computed(() => {
+    return [
+      ...extensions.get()
+        .flatMap((extension) => extension.appPreferences)
+        .map(pref => getRegisteredItem(pref)),
+    ];},
+  );
+};

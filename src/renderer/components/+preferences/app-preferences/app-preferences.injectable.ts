@@ -18,16 +18,17 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import rendererExtensionsInjectable from "../../../../extensions/renderer-extensions.injectable";
+import { getAppPreferences } from "./get-app-preferences";
 
-// All registries managed by extensions api
+const appPreferencesInjectable = getInjectable({
+  instantiate: (di) =>
+    getAppPreferences({
+      extensions: di.inject(rendererExtensionsInjectable),
+    }),
 
-export * from "./page-registry";
-export * from "./page-menu-registry";
-export * from "./status-bar-registry";
-export * from "./kube-object-detail-registry";
-export * from "./kube-object-menu-registry";
-export * from "./kube-object-status-registry";
-export * from "./entity-setting-registry";
-export * from "./catalog-entity-detail-registry";
-export * from "./workloads-overview-detail-registry";
-export * from "./protocol-handler";
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default appPreferencesInjectable;

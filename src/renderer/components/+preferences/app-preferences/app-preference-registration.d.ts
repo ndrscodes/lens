@@ -19,15 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// All registries managed by extensions api
+import type React from "react";
 
-export * from "./page-registry";
-export * from "./page-menu-registry";
-export * from "./status-bar-registry";
-export * from "./kube-object-detail-registry";
-export * from "./kube-object-menu-registry";
-export * from "./kube-object-status-registry";
-export * from "./entity-setting-registry";
-export * from "./catalog-entity-detail-registry";
-export * from "./workloads-overview-detail-registry";
-export * from "./protocol-handler";
+export interface AppPreferenceComponents {
+  Hint: React.ComponentType<any>;
+  Input: React.ComponentType<any>;
+}
+
+export interface AppPreferenceRegistration {
+  title: string;
+  id?: string;
+  showInPreferencesTab?: string;
+  components: AppPreferenceComponents;
+}

@@ -30,10 +30,12 @@ import { isWindows } from "../../../common/vars";
 import { Switch } from "../switch";
 import moment from "moment-timezone";
 import { CONSTANTS, defaultExtensionRegistryUrl, ExtensionRegistryLocation } from "../../../common/user-store/preferences-helpers";
-import { action } from "mobx";
+import { action, IComputedValue } from "mobx";
 import { isUrl } from "../input/input_validators";
-import { AppPreferenceRegistry } from "../../../extensions/registries";
 import { ExtensionSettings } from "./extension-settings";
+import type { AppPreferenceRegistration } from "./app-preferences/app-preference-registration";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import appPreferencesInjectable from "./app-preferences/app-preferences.injectable";
 
 const timezoneOptions: SelectOption<string>[] = moment.tz.names().map(zone => ({
   label: zone,
@@ -44,7 +46,11 @@ const updateChannelOptions: SelectOption<string>[] = Array.from(
   ([value, { label }]) => ({ value, label }),
 );
 
-export const Application = observer(() => {
+interface Dependencies {
+  appPreferenceItems: IComputedValue<AppPreferenceRegistration[]>
+}
+
+const NonInjectedApplication: React.FC<Dependencies> = ({ appPreferenceItems }) => {
   const userStore = UserStore.getInstance();
   const defaultShell = process.env.SHELL
     || process.env.PTYSHELL
@@ -56,7 +62,7 @@ export const Application = observer(() => {
 
   const [customUrl, setCustomUrl] = React.useState(userStore.extensionRegistryUrl.customUrl || "");
   const [shell, setShell] = React.useState(userStore.shell || "");
-  const extensionSettings = AppPreferenceRegistry.getInstance().getItems().filter((preference) => preference.showInPreferencesTab === "application");
+  const extensionSettings = appPreferenceItems.get().filter((preference) => preference.showInPreferencesTab === "application");
 
   return (
     <section id="application">
@@ -165,4 +171,14 @@ export const Application = observer(() => {
       </section>
     </section>
   );
-});
+};
+
+export const Application = withInjectables<Dependencies>(
+  observer(NonInjectedApplication),
+
+  {
+    getProps: (di) => ({
+      appPreferenceItems: di.inject(appPreferencesInjectable),
+    }),
+  },
+);

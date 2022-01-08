@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export type { AppPreferenceRegistration, AppPreferenceComponents } from "../registries/app-preference-registry";
+export type { AppPreferenceRegistration, AppPreferenceComponents } from "../../renderer/components/+preferences/app-preferences/app-preference-registration";
 export type { KubeObjectDetailRegistration, KubeObjectDetailComponents } from "../registries/kube-object-detail-registry";
 export type { KubeObjectMenuRegistration, KubeObjectMenuComponents } from "../registries/kube-object-menu-registry";
 export type { KubeObjectStatusRegistration } from "../registries/kube-object-status-registry";
