@@ -19,27 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { KubeObject, KubeObjectStatus } from "../renderer-api/k8s-api";
-import { BaseRegistry } from "./base-registry";
+// Extensions-api types bundle (main + renderer)
+// Available for lens-extensions via NPM-package "@k8slens/extensions"
 
-export interface KubeObjectStatusRegistration {
-  kind: string;
-  apiVersions: string[];
-  resolve: (object: KubeObject) => KubeObjectStatus;
-}
+import * as Common from "./common-api";
+import * as Renderer from "./renderer-api";
+import * as Main from "./main-api";
 
-export class KubeObjectStatusRegistry extends BaseRegistry<KubeObjectStatusRegistration> {
-  getItemsForKind(kind: string, apiVersion: string) {
-    return this.getItems()
-      .filter((item) => (
-        item.kind === kind
-        && item.apiVersions.includes(apiVersion)
-      ));
-  }
-
-  getItemsForObject(src: KubeObject) {
-    return this.getItemsForKind(src.kind, src.apiVersion)
-      .map(item => item.resolve(src))
-      .filter(Boolean);
-  }
-}
+export {
+  Common,
+  Renderer,
+  Main,
+};

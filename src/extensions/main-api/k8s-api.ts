@@ -19,12 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { ApiManager } from "../../common/k8s-api/api-manager";
-import apiManagerInjectable from "../../common/k8s-api/api-manager.injectable";
-import { getLegacyGlobalDiForExtensionApi } from "../as-legacy-global-function-for-extension-api/legacy-global-di-for-extension-api";
-
 export { isAllowedResource } from "../../common/utils/allowed-resource";
 export { ResourceStack } from "../../common/k8s/resource-stack";
+export { apiManager } from "../../common/k8s-api/api-manager";
 export { KubeApi, forCluster, forRemoteCluster } from "../../common/k8s-api/kube-api";
 export { KubeObject, KubeStatus } from "../../common/k8s-api/kube-object";
 export { KubeObjectStore } from "../../common/k8s-api/kube-object.store";
@@ -62,23 +59,3 @@ export { CustomResourceDefinition, crdApi } from "../../common/k8s-api/endpoints
 export type { ILocalKubeApiConfig, IRemoteKubeApiConfig, IKubeApiCluster } from "../../common/k8s-api/kube-api";
 export type { IPodContainer, IPodContainerStatus } from "../../common/k8s-api/endpoints/pods.api";
 export type { ISecretRef } from "../../common/k8s-api/endpoints/secret.api";
-
-export const apiManager = new Proxy({}, {
-  get(target, p) {
-    if (p === "$$typeof") {
-      return "ApiManager";
-    }
-
-    const di = getLegacyGlobalDiForExtensionApi();
-    const apiManager = di.inject(apiManagerInjectable);
-    const res = (apiManager as any)?.[p];
-
-    if (typeof res === "function") {
-      return function (...args: any[]) {
-        return res.apply(apiManager, args);
-      };
-    }
-
-    return res;
-  },
-}) as ApiManager;

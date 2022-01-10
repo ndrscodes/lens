@@ -19,27 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { KubeObject, KubeObjectStatus } from "../renderer-api/k8s-api";
+import type React from "react";
+import type { KubeObjectDetailsProps } from "../renderer-api/components";
+import type { KubeObject } from "../renderer-api/k8s-api";
 import { BaseRegistry } from "./base-registry";
 
-export interface KubeObjectStatusRegistration {
-  kind: string;
-  apiVersions: string[];
-  resolve: (object: KubeObject) => KubeObjectStatus;
+export interface KubeObjectDetailComponents<T extends KubeObject = KubeObject> {
+  Details: React.ComponentType<KubeObjectDetailsProps<T>>;
 }
 
-export class KubeObjectStatusRegistry extends BaseRegistry<KubeObjectStatusRegistration> {
-  getItemsForKind(kind: string, apiVersion: string) {
-    return this.getItems()
-      .filter((item) => (
-        item.kind === kind
-        && item.apiVersions.includes(apiVersion)
-      ));
-  }
+export interface KubeObjectDetailRegistration {
+  kind: string;
+  apiVersions: string[];
+  components: KubeObjectDetailComponents<KubeObject>;
+  priority?: number;
+}
 
-  getItemsForObject(src: KubeObject) {
-    return this.getItemsForKind(src.kind, src.apiVersion)
-      .map(item => item.resolve(src))
-      .filter(Boolean);
+export class KubeObjectDetailRegistry extends BaseRegistry<KubeObjectDetailRegistration> {
+  getItemsForKind(kind: string, apiVersion: string) {
+    const items = this.getItems().filter((item) => {
+      return item.kind === kind && item.apiVersions.includes(apiVersion);
+    });
+
+    return items.sort((a, b) => (b.priority ?? 50) - (a.priority ?? 50));
   }
 }

@@ -19,27 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { KubeObject, KubeObjectStatus } from "../renderer-api/k8s-api";
-import { BaseRegistry } from "./base-registry";
+import { navigation, PageParam, PageParamInit } from "../../renderer/navigation";
 
-export interface KubeObjectStatusRegistration {
-  kind: string;
-  apiVersions: string[];
-  resolve: (object: KubeObject) => KubeObjectStatus;
-}
+export type { PageParamInit, PageParam } from "../../renderer/navigation/page-param";
+export { navigate, isActiveRoute } from "../../renderer/navigation/helpers";
+export { hideDetails, showDetails, getDetailsUrl } from "../../renderer/components/kube-detail-params";
+export type { URLParams } from "../../common/utils/buildUrl";
 
-export class KubeObjectStatusRegistry extends BaseRegistry<KubeObjectStatusRegistration> {
-  getItemsForKind(kind: string, apiVersion: string) {
-    return this.getItems()
-      .filter((item) => (
-        item.kind === kind
-        && item.apiVersions.includes(apiVersion)
-      ));
-  }
-
-  getItemsForObject(src: KubeObject) {
-    return this.getItemsForKind(src.kind, src.apiVersion)
-      .map(item => item.resolve(src))
-      .filter(Boolean);
-  }
+export function createPageParam<V>(init: PageParamInit<V>) {
+  return new PageParam<V>(init, navigation);
 }
