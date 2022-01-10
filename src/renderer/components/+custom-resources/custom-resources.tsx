@@ -23,7 +23,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { Redirect, Route, Switch } from "react-router";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
-import { CrdList } from "./crd-list";
+import { CrdList } from "./crd-list/crd-list";
 import { CrdResources } from "./crd-resources";
 import { crdURL, crdDefinitionsRoute, crdResourcesRoute } from "../../../common/routes";
 

@@ -34,7 +34,7 @@ import { computed, makeObservable } from "mobx";
 import { getSorted } from "./sorting";
 
 export type TableSortBy = string;
-export type TableOrderBy = "asc" | "desc" | string;
+export type TableOrderBy = "asc" | "desc";
 export type TableSortParams = { sortBy: TableSortBy; orderBy: TableOrderBy };
 export type TableSortCallback<Item> = (data: Item) => string | number | (string | number)[];
 export type TableSortCallbacks<Item> = Record<string, TableSortCallback<Item>>;

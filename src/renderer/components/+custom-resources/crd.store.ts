@@ -21,43 +21,25 @@
 
 import { computed, reaction, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
+import { autoBind } from "../../utils";
 import { crdApi, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
-import { apiManager } from "../../../common/k8s-api/api-manager";
-import { KubeApi } from "../../../common/k8s-api/kube-api";
-import { CRDResourceStore } from "./crd-resource.store";
-import { KubeObject } from "../../../common/k8s-api/kube-object";
+import type { KubeObject } from "../../../common/k8s-api/kube-object";
 
-function initStore(crd: CustomResourceDefinition) {
-  const objectConstructor = class extends KubeObject {
-    static readonly kind = crd.getResourceKind();
-    static readonly namespaced = crd.isNamespaced();
-    static readonly apiBase = crd.getResourceApiBase();
-  };
-
-  const api = apiManager.getApi(objectConstructor.apiBase)
-    ?? new KubeApi({ objectConstructor });
-
-  if (!apiManager.hasApi(api)) {
-    apiManager.registerApi(api);
-  }
-
-  if (!apiManager.getStore(api)) {
-    apiManager.registerStore(new CRDResourceStore(api));
-  }
+interface Dependencies {
+  initCustomResourceStore: (crd: CustomResourceDefinition) => void;
 }
 
 export class CRDStore extends KubeObjectStore<CustomResourceDefinition> {
   api = crdApi;
 
-  constructor() {
+  constructor({ initCustomResourceStore }: Dependencies) {
     super();
 
     makeObservable(this);
     autoBind(this);
 
     // auto-init stores for crd-s
-    reaction(() => this.getItems(), items => items.forEach(initStore));
+    reaction(() => this.getItems(), items => items.forEach(initCustomResourceStore));
   }
 
   protected sortItems(items: CustomResourceDefinition[]) {
@@ -97,10 +79,3 @@ export class CRDStore extends KubeObjectStore<CustomResourceDefinition> {
     ));
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const crdStore = isClusterPageContext()
-  ? new CRDStore()
-  : undefined;

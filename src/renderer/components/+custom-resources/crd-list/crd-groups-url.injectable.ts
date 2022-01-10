@@ -19,7 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export * from "./crd-list/crd-list";
-export * from "./crd-details";
-export * from "./crd-resources";
-export * from "./crd-resource-details";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { createPageParam } from "../../../navigation";
+
+const crdGroupsUrlParamInjectable = getInjectable({
+  instantiate: () => createPageParam<string[]>({
+    name: "groups",
+    defaultValue: [],
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default crdGroupsUrlParamInjectable;

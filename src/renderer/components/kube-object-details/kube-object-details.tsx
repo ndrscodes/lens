@@ -28,7 +28,7 @@ import { Drawer } from "../drawer";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Spinner } from "../spinner";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
-import { crdStore } from "../+custom-resources/crd.store";
+import type { CRDStore } from "../+custom-resources/crd.store";
 import { KubeObjectMenu } from "../kube-object-menu";
 import { CrdResourceDetails } from "../+custom-resources";
 import { KubeObjectMeta } from "../kube-object-meta";
@@ -37,6 +37,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import type { KubeObjectDetailComponents } from "./kube-details-items/kube-detail-items";
 import kubeDetailItemsInjectable from "./kube-details-items/kube-details.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import crdStoreInjectable from "../+custom-resources/crd.store.injectable";
 
 export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
   className?: string;
@@ -46,9 +47,10 @@ export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
 interface Dependencies {
   kubeDetailItems: IComputedValue<Map<string, Map<string, KubeObjectDetailComponents<KubeObject>[]>>>;
   apiManager: ApiManager;
+  crdStore: CRDStore;
 }
 
-const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems, apiManager }: Dependencies) => {
+const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems, apiManager, crdStore }: Dependencies) => {
   const [loading, setLoading] = useState(false);
   const [loadingError, setLoadingError] = useState<ReactNode>("");
 
@@ -153,6 +155,7 @@ export const KubeObjectDetails = withInjectables<Dependencies>(NonInjectedKubeOb
   getProps: (di, props) => ({
     kubeDetailItems: di.inject(kubeDetailItemsInjectable),
     apiManager: di.inject(apiManagerInjectable),
+    crdStore: di.inject(crdStoreInjectable),
     ...props,
   }),
 });

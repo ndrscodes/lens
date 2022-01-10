@@ -28,7 +28,6 @@ import { ClusterManager } from "./components/cluster-manager";
 import { ErrorBoundary } from "./components/error-boundary";
 import { Notifications } from "./components/notifications";
 import { ConfirmDialog } from "./components/confirm-dialog";
-import type { ExtensionLoader } from "../extensions/extension-loader";
 import { broadcastMessage, BundledExtensionsLoaded } from "../common/ipc";
 import { CommandContainer } from "./components/command-palette/command-container";
 import { registerIpcListeners } from "./ipc";
@@ -38,8 +37,8 @@ import { catalogEntityRegistry } from "./api/catalog-entity-registry";
 import logger from "../common/logger";
 import { unmountComponentAtNode } from "react-dom";
 import { ClusterFrameHandler } from "./components/cluster-manager/lens-views";
-import type { LensProtocolRouterRenderer } from "./protocol-handler";
 import { delay } from "./utils";
+import type { AppComponentInitDeps } from "./bootstrap";
 
 injectSystemCAs();
 
@@ -48,12 +47,11 @@ export class RootFrame extends React.Component {
   static readonly logPrefix = "[ROOT-FRAME]:";
   static displayName = "RootFrame";
 
-  static async init(
-    rootElem: HTMLElement,
-    extensionLoader: ExtensionLoader,
-    bindProtocolAddRouteHandlers: () => void,
-    lensProtocolRouterRendererInjectable: LensProtocolRouterRenderer,
-  ) {
+  static async init(rootElem: HTMLElement, {
+    extensionLoader,
+    bindProtocolAddRouteHandlers,
+    lensProtocolRouterRenderer,
+  }: AppComponentInitDeps) {
     catalogEntityRegistry.init();
 
     try {
@@ -68,7 +66,7 @@ export class RootFrame extends React.Component {
     } finally {
       ipcRenderer.send(BundledExtensionsLoaded);
     }
-    lensProtocolRouterRendererInjectable.init();
+    lensProtocolRouterRenderer.init();
 
     bindProtocolAddRouteHandlers();
 

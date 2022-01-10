@@ -23,20 +23,21 @@ import styles from "./cluster-issues.module.scss";
 
 import React from "react";
 import { observer } from "mobx-react";
-import { computed, makeObservable } from "mobx";
 import { Icon } from "../icon";
 import { SubHeader } from "../layout/sub-header";
 import { Table, TableCell, TableHead, TableRow } from "../table";
-import { nodesStore } from "../+nodes/nodes.store";
-import { eventStore } from "../+events/event.store";
-import { boundMethod, cssNames, prevDefault } from "../../utils";
+import { NodesStore, nodesStore } from "../+nodes/nodes.store";
+import { EventStore, eventStore } from "../+events/event.store";
+import { cssNames, prevDefault } from "../../utils";
 import type { ItemObject } from "../../../common/item.store";
 import { Spinner } from "../spinner";
 import { ThemeStore } from "../../theme.store";
 import { kubeSelectedUrlParam, toggleDetails } from "../kube-detail-params";
-import { apiManager } from "../../../common/k8s-api/api-manager";
+import type { ApiManager } from "../../../common/k8s-api/api-manager";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
-interface Props {
+export interface ClusterIssuesProps {
   className?: string;
 }
 
@@ -54,63 +55,38 @@ enum sortBy {
   age = "age",
 }
 
-@observer
-export class ClusterIssues extends React.Component<Props> {
-  private sortCallbacks = {
-    [sortBy.type]: (warning: IWarning) => warning.kind,
-    [sortBy.object]: (warning: IWarning) => warning.getName(),
-    [sortBy.age]: (warning: IWarning) => warning.timeDiffFromNow,
-  };
+interface Dependencies {
+  apiManager: ApiManager;
+  nodesStore: NodesStore;
+  eventStore: EventStore;
+}
 
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
-
-  @computed get warnings() {
-    const warnings: IWarning[] = [];
-
-    // Node bad conditions
-    nodesStore.items.forEach(node => {
-      const { kind, selfLink, getId, getName, getAge, getTimeDiffFromNow } = node;
-
-      node.getWarningConditions().forEach(({ message }) => {
-        warnings.push({
-          age: getAge(),
-          getId,
-          getName,
-          timeDiffFromNow: getTimeDiffFromNow(),
-          kind,
+const NonInjectedClusterIssues = observer(({ apiManager, nodesStore, eventStore, className }: Dependencies & ClusterIssuesProps) => {
+  const warnings: IWarning[] = [
+    ...nodesStore.items.flatMap(node => (
+      node.getWarningConditions()
+        .map(({ message }) => ({
+          age: node.getAge(),
+          getId: () => node.getId(),
+          getName: () => node.getName(),
+          timeDiffFromNow: node.getTimeDiffFromNow(),
+          kind: node.kind,
           message,
-          selfLink,
-        });
-      });
-    });
+          selfLink: node.selfLink,
+        }))
+    )),
+    ...eventStore.getWarnings().map(warning => ({
+      getId: () => warning.involvedObject.uid,
+      getName: () => warning.involvedObject.name,
+      timeDiffFromNow: warning.getTimeDiffFromNow(),
+      age: warning.getAge(),
+      message: warning.message,
+      kind: warning.kind,
+      selfLink: apiManager.lookupApiLink(warning.involvedObject, warning),
+    })),
+  ];
 
-    // Warning events for Workloads
-    const events = eventStore.getWarnings();
-
-    events.forEach(error => {
-      const { message, involvedObject, getAge, getTimeDiffFromNow } = error;
-      const { uid, name, kind } = involvedObject;
-
-      warnings.push({
-        getId: () => uid,
-        getName: () => name,
-        timeDiffFromNow: getTimeDiffFromNow(),
-        age: getAge(),
-        message,
-        kind,
-        selfLink: apiManager.lookupApiLink(involvedObject, error),
-      });
-    });
-
-    return warnings;
-  }
-
-  @boundMethod
-  getTableRow(uid: string) {
-    const { warnings } = this;
+  const getTableRow = (uid: string) => {
     const warning = warnings.find(warn => warn.getId() == uid);
     const { getId, getName, message, kind, selfLink, age } = warning;
 
@@ -135,11 +111,9 @@ export class ClusterIssues extends React.Component<Props> {
         </TableCell>
       </TableRow>
     );
-  }
+  };
 
-  renderContent() {
-    const { warnings } = this;
-
+  const renderContent = () => {
     if (!eventStore.isLoaded) {
       return (
         <Spinner center/>
@@ -167,10 +141,14 @@ export class ClusterIssues extends React.Component<Props> {
           items={warnings}
           virtual
           selectable
-          sortable={this.sortCallbacks}
+          sortable={{
+            [sortBy.type]: (warning: IWarning) => warning.kind,
+            [sortBy.object]: (warning: IWarning) => warning.getName(),
+            [sortBy.age]: (warning: IWarning) => warning.timeDiffFromNow,
+          }}
           sortByDefault={{ sortBy: sortBy.object, orderBy: "asc" }}
           sortSyncWithUrl={false}
-          getTableRow={this.getTableRow}
+          getTableRow={getTableRow}
           className={cssNames("box grow", ThemeStore.getInstance().activeTheme.type)}
         >
           <TableHead nowrap>
@@ -182,13 +160,21 @@ export class ClusterIssues extends React.Component<Props> {
         </Table>
       </>
     );
-  }
+  };
 
-  render() {
-    return (
-      <div className={cssNames(styles.ClusterIssues, "flex column", this.props.className)}>
-        {this.renderContent()}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={cssNames(styles.ClusterIssues, "flex column", className)}>
+      {renderContent()}
+    </div>
+  );
+});
+
+export const ClusterIssues = withInjectables<Dependencies, ClusterIssuesProps>(NonInjectedClusterIssues, {
+  getProps: (di, props) => ({
+    apiManager: di.inject(apiManagerInjectable),
+    nodesStore,
+    eventStore,
+    ...props,
+  }),
+});
+

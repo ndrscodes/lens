@@ -58,6 +58,7 @@ import type { LensProtocolRouterRenderer } from "./protocol-handler";
 import lensProtocolRouterRendererInjectable
   from "./protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
 import lensRendererExtensionsApiInjectable from "../extensions/renderer/api.injectable";
+import initApisAndStoresInjectable from "./init-apis-stores.injectable";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -77,14 +78,19 @@ async function attachChromeDebugger() {
   }
 }
 
+export interface AppComponentInitDeps {
+  extensionLoader: ExtensionLoader;
+  bindProtocolAddRouteHandlers?: () => void;
+  lensProtocolRouterRenderer?: LensProtocolRouterRenderer;
+  initApisAndStores?: () => void;
+}
+
 type AppComponent = React.ComponentType & {
 
   // TODO: This static method is criminal as it has no direct relation with component
   init(
     rootElem: HTMLElement,
-    extensionLoader: ExtensionLoader,
-    bindProtocolAddRouteHandlers?: () => void,
-    lensProtocolRouterRendererInjectable?: LensProtocolRouterRenderer
+    deps: AppComponentInitDeps
   ): Promise<void>;
 };
 
@@ -159,8 +165,14 @@ export async function bootstrap(comp: () => Promise<AppComponent>, di: Dependenc
 
   const bindProtocolAddRouteHandlers = di.inject(bindProtocolAddRouteHandlersInjectable);
   const lensProtocolRouterRenderer = di.inject(lensProtocolRouterRendererInjectable);
+  const initApisAndStores = di.inject(initApisAndStoresInjectable);
 
-  await App.init(rootElem, extensionLoader, bindProtocolAddRouteHandlers, lensProtocolRouterRenderer);
+  await App.init(rootElem, {
+    extensionLoader,
+    bindProtocolAddRouteHandlers,
+    lensProtocolRouterRenderer,
+    initApisAndStores,
+  });
 
   render(
     <DiContextProvider value={{ di }}>

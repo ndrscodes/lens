@@ -19,7 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export * from "./crd-list/crd-list";
-export * from "./crd-details";
-export * from "./crd-resources";
-export * from "./crd-resource-details";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { isClusterPageContext } from "../../utils";
+import { CRDStore } from "./crd.store";
+import initCustomResourceStoreInjectable from "./init-custom-resource-store.injectable";
+
+const crdStoreInjectable = getInjectable({
+  instantiate: (di) => isClusterPageContext()
+    ? new CRDStore({
+      initCustomResourceStore: di.inject(initCustomResourceStoreInjectable),
+    })
+    : undefined,
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default crdStoreInjectable;

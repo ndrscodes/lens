@@ -19,12 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { KubeApi } from "../../../common/k8s-api/kube-api";
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import type { KubeObject } from "../../../common/k8s-api/kube-object";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { kubeWatchApi } from "./kube-watch-api";
 
-export class CRDResourceStore<K extends KubeObject> extends KubeObjectStore<K> {
-  constructor(api: KubeApi<K>) {
-    super(api);
-  }
-}
+const kubeWatchApiInjectable = getInjectable({
+  // TODO: create it here instead
+  instantiate: () => kubeWatchApi,
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default kubeWatchApiInjectable;
