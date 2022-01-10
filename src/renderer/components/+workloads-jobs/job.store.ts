@@ -20,15 +20,13 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
-import { Job, jobApi } from "../../../common/k8s-api/endpoints/job.api";
+import { autoBind } from "../../utils";
+import type { Job, JobApi } from "../../../common/k8s-api/endpoints/job.api";
 import { CronJob, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 
 export class JobStore extends KubeObjectStore<Job> {
-  api = jobApi;
-
-  constructor() {
+  constructor(public api: JobApi) {
     super();
     autoBind(this);
   }
@@ -67,10 +65,3 @@ export class JobStore extends KubeObjectStore<Job> {
     return status;
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const jobStore = isClusterPageContext()
-  ? new JobStore()
-  : undefined;

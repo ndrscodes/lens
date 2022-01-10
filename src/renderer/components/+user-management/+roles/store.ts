@@ -18,14 +18,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { Role, roleApi } from "../../../../common/k8s-api/endpoints";
+import type { Role, RoleApi } from "../../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../../utils";
+import { autoBind } from "../../../utils";
 
-export class RolesStore extends KubeObjectStore<Role> {
-  api = roleApi;
-
-  constructor() {
+export class RoleStore extends KubeObjectStore<Role> {
+  constructor(public api: RoleApi) {
     super();
     autoBind(this);
   }
@@ -38,13 +36,6 @@ export class RolesStore extends KubeObjectStore<Role> {
   }
 
   protected async createItem(params: { name: string; namespace?: string }, data?: Partial<Role>) {
-    return roleApi.create(params, data);
+    return this.api.create(params, data);
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const rolesStore = isClusterPageContext()
-  ? new RolesStore()
-  : undefined;

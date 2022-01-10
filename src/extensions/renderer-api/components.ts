@@ -19,6 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import logTabStoreInjectable from "../../renderer/components/dock/log-tab/store.injectable";
+import newTerminalTabInjectable from "../../renderer/components/dock/terminal/create-tab.injectable";
+import terminalStoreInjectable from "../../renderer/components/dock/terminal/store.injectable";
+import { asLegacyGlobalFunctionForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-function-for-extension-api";
+import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
+
 // layouts
 export * from "../../renderer/components/layout/main-layout";
 export * from "../../renderer/components/layout/setting-layout";
@@ -71,5 +77,19 @@ export * from "../../renderer/components/+events/kube-event-details";
 
 // specific exports
 export * from "../../renderer/components/status-brick";
-export { terminalStore, createTerminalTab, TerminalStore } from "../../renderer/components/dock/terminal.store";
-export { logTabStore } from "../../renderer/components/dock/log-tab.store";
+
+export const createTerminalTab = asLegacyGlobalFunctionForExtensionApi(newTerminalTabInjectable);
+export const terminalStore = asLegacyGlobalObjectForExtensionApi(terminalStoreInjectable);
+export const logTabStore = asLegacyGlobalObjectForExtensionApi(logTabStoreInjectable);
+
+export const TerminalStore = {
+  getInstance() {
+    return terminalStore;
+  },
+  createInstance() {
+    return terminalStore;
+  },
+  resetInstance() {
+    return;
+  },
+};

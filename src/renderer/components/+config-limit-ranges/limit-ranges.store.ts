@@ -20,16 +20,10 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { LimitRange, limitRangeApi } from "../../../common/k8s-api/endpoints/limit-range.api";
-import { isClusterPageContext } from "../../utils";
+import type { LimitRange, LimitRangeApi } from "../../../common/k8s-api/endpoints/limit-range.api";
 
-export class LimitRangesStore extends KubeObjectStore<LimitRange> {
-  api = limitRangeApi;
+export class LimitRangeStore extends KubeObjectStore<LimitRange> {
+  constructor(public api: LimitRangeApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const limitRangeStore = isClusterPageContext()
-  ? new LimitRangesStore()
-  : undefined;

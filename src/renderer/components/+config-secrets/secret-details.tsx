@@ -30,7 +30,7 @@ import { Button } from "../button";
 import { Notifications } from "../notifications";
 import { base64, ObservableToggleSet } from "../../utils";
 import { Icon } from "../icon";
-import { secretsStore } from "./secrets.store";
+import { secretsStore } from "./secret.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { Secret } from "../../../common/k8s-api/endpoints";
 import { KubeObjectMeta } from "../kube-object-meta";

@@ -19,17 +19,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { PodSecurityPolicy, pspApi } from "../../../common/k8s-api/endpoints";
+import type { PodSecurityPolicy, PodSecurityPolicyApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { isClusterPageContext } from "../../utils";
 
-export class PodSecurityPoliciesStore extends KubeObjectStore<PodSecurityPolicy> {
-  api = pspApi;
+export class PodSecurityPolicyStore extends KubeObjectStore<PodSecurityPolicy> {
+  constructor(public api: PodSecurityPolicyApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const podSecurityPoliciesStore = isClusterPageContext()
-  ? new PodSecurityPoliciesStore()
-  : undefined;

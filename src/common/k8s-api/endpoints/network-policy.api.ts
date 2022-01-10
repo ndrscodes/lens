@@ -21,9 +21,8 @@
 
 import { KubeObject, LabelSelector } from "../kube-object";
 import { autoBind } from "../../utils";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export interface IPolicyIpBlock {
   cidr: string;
@@ -145,11 +144,11 @@ export class NetworkPolicy extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const networkPolicyApi = isClusterPageContext()
-  ? new KubeApi<NetworkPolicy>({
-    objectConstructor: NetworkPolicy,
-  })
-  : undefined;
+export class NetworkPolicyApi extends KubeApi<NetworkPolicy> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: NetworkPolicy,
+    });
+  }
+}

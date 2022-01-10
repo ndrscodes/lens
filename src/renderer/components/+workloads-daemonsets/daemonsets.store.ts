@@ -20,15 +20,13 @@
  */
 import { makeObservable } from "mobx";
 
-import { podsStore } from "../+workloads-pods/pods.store";
-import { DaemonSet, daemonSetApi, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
+import { podsStore } from "../+workloads-pods/pod.store";
+import { DaemonSet, DaemonSetApi, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
+import { autoBind } from "../../utils";
 
 export class DaemonSetStore extends KubeObjectStore<DaemonSet> {
-  api = daemonSetApi;
-
-  constructor() {
+  constructor(public api: DaemonSetApi) {
     super();
 
     makeObservable(this);
@@ -59,10 +57,3 @@ export class DaemonSetStore extends KubeObjectStore<DaemonSet> {
     return status;
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const daemonSetStore = isClusterPageContext()
-  ? new DaemonSetStore()
-  : undefined;

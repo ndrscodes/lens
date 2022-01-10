@@ -22,17 +22,15 @@
 import { computed, reaction, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
-import { crdApi, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
+import type { CustomResourceDefinition, CustomResourceDefinitionApi } from "../../../common/k8s-api/endpoints/crd.api";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 
 interface Dependencies {
   initCustomResourceStore: (crd: CustomResourceDefinition) => void;
 }
 
-export class CRDStore extends KubeObjectStore<CustomResourceDefinition> {
-  api = crdApi;
-
-  constructor({ initCustomResourceStore }: Dependencies) {
+export class CustomResourceDefinitionStore extends KubeObjectStore<CustomResourceDefinition> {
+  constructor(public api: CustomResourceDefinitionApi, { initCustomResourceStore }: Dependencies) {
     super();
 
     makeObservable(this);

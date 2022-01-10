@@ -18,30 +18,40 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { sum } from "lodash";
-import { computed, makeObservable } from "mobx";
+import type { Injectable } from "@ogre-tools/injectable";
+import { getLegacyGlobalDiForExtensionApi } from "./legacy-global-di-for-extension-api";
 
-import type { Node, NodeApi } from "../../../common/k8s-api/endpoints";
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+type TentativeTuple<T> = T extends object ? [T] : [undefined?];
 
-export class NodeStore extends KubeObjectStore<Node> {
-  constructor(public api: NodeApi) {
-    super();
+export const asLegacyGlobalObjectForExtensionApi = <
+  TInjectable extends Injectable<unknown, unknown, TInstantiationParameter>,
+  TInstantiationParameter,
+>(
+    injectableKey: TInjectable,
+    ...instantiationParameter: TentativeTuple<TInstantiationParameter>
+  ) =>
+  new Proxy(
+    {},
+    {
+      get(target, propertyName) {
+        if (propertyName === "$$typeof") {
+          return undefined;
+        }
 
-    makeObservable(this);
-    autoBind(this);
-  }
+        const instance: any = getLegacyGlobalDiForExtensionApi().inject(
+          injectableKey,
+          ...instantiationParameter,
+        );
 
-  @computed get masterNodes() {
-    return this.items.filter(node => node.getRoleLabels().includes("master"));
-  }
+        const propertyValue = instance[propertyName];
 
-  @computed get workerNodes() {
-    return this.items.filter(node => !node.getRoleLabels().includes("master"));
-  }
+        if (typeof propertyValue === "function") {
+          return function (...args: any[]) {
+            return propertyValue.apply(instance, args);
+          };
+        }
 
-  getWarningsCount(): number {
-    return sum(this.items.map((node: Node) => node.getWarningConditions().length));
-  }
-}
+        return propertyValue;
+      },
+    },
+  ) as ReturnType<TInjectable["instantiate"]>;

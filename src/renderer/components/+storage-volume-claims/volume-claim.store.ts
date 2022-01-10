@@ -18,17 +18,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { PersistentVolumeClaim, pvcApi } from "../../../common/k8s-api/endpoints";
+import type { PersistentVolumeClaim, PersistentVolumeClaimApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { isClusterPageContext } from "../../utils";
 
-export class VolumeClaimStore extends KubeObjectStore<PersistentVolumeClaim> {
-  api = pvcApi;
+export class PersistentVolumeClaimStore extends KubeObjectStore<PersistentVolumeClaim> {
+  constructor(public api: PersistentVolumeClaimApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const volumeClaimStore = isClusterPageContext()
-  ? new VolumeClaimStore()
-  : undefined;

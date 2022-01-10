@@ -20,15 +20,13 @@
  */
 import { makeObservable } from "mobx";
 
-import { podsStore } from "../+workloads-pods/pods.store";
-import { Deployment, deploymentApi, PodStatus } from "../../../common/k8s-api/endpoints";
+import { podsStore } from "../+workloads-pods/pod.store";
+import { Deployment, DeploymentApi, PodStatus } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
+import { autoBind } from "../../utils";
 
 export class DeploymentStore extends KubeObjectStore<Deployment> {
-  api = deploymentApi;
-
-  constructor() {
+  constructor(public api: DeploymentApi) {
     super();
 
     makeObservable(this);
@@ -67,10 +65,3 @@ export class DeploymentStore extends KubeObjectStore<Deployment> {
       .filter(pod => pod.getNs() === deployment.getNs());
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const deploymentStore = isClusterPageContext()
-  ? new DeploymentStore()
-  : undefined;

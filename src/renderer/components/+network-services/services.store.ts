@@ -20,16 +20,10 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { Service, serviceApi } from "../../../common/k8s-api/endpoints/service.api";
-import { isClusterPageContext } from "../../utils";
+import type { Service, ServiceApi } from "../../../common/k8s-api/endpoints/service.api";
 
 export class ServiceStore extends KubeObjectStore<Service> {
-  api = serviceApi;
+  constructor(public api: ServiceApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const serviceStore = isClusterPageContext()
-  ? new ServiceStore()
-  : undefined;

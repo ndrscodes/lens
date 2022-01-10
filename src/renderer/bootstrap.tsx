@@ -27,6 +27,7 @@ import * as MobxReact from "mobx-react";
 import * as ReactRouter from "react-router";
 import * as ReactRouterDom from "react-router-dom";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
+import * as LensExtensionsRendererApi from "../extensions/renderer-api";
 import { render } from "react-dom";
 import { delay } from "../common/utils";
 import { isMac, isDevelopment } from "../common/vars";
@@ -47,7 +48,7 @@ import { ThemeStore } from "./theme.store";
 import { SentryInit } from "../common/sentry";
 import { AppPaths } from "../common/app-paths";
 import { registerCustomThemes } from "./components/monaco-editor";
-import { getDi } from "./components/getDi";
+import { getDi } from "./getDi";
 import { DiContextProvider } from "@ogre-tools/injectable-react";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import extensionLoaderInjectable from "../extensions/extension-loader/extension-loader.injectable";
@@ -57,8 +58,7 @@ import bindProtocolAddRouteHandlersInjectable
 import type { LensProtocolRouterRenderer } from "./protocol-handler";
 import lensProtocolRouterRendererInjectable
   from "./protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
-import lensRendererExtensionsApiInjectable from "../extensions/renderer/api.injectable";
-import initApisAndStoresInjectable from "./init-apis-stores.injectable";
+import newTerminalTabInjectable from "./components/dock/terminal/create-tab.injectable";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -108,7 +108,9 @@ export async function bootstrap(comp: () => Promise<AppComponent>, di: Dependenc
   initializers.initRegistries();
 
   logger.info(`${logPrefix} initializing CommandRegistry`);
-  initializers.initCommandRegistry();
+  initializers.initCommandRegistry({
+    newTerminalTab: di.inject(newTerminalTabInjectable),
+  });
 
   logger.info(`${logPrefix} initializing EntitySettingsRegistry`);
   initializers.initEntitySettingsRegistry();
@@ -165,13 +167,11 @@ export async function bootstrap(comp: () => Promise<AppComponent>, di: Dependenc
 
   const bindProtocolAddRouteHandlers = di.inject(bindProtocolAddRouteHandlersInjectable);
   const lensProtocolRouterRenderer = di.inject(lensProtocolRouterRendererInjectable);
-  const initApisAndStores = di.inject(initApisAndStoresInjectable);
 
   await App.init(rootElem, {
     extensionLoader,
     bindProtocolAddRouteHandlers,
     lensProtocolRouterRenderer,
-    initApisAndStores,
   });
 
   render(
@@ -202,7 +202,7 @@ bootstrap(
  */
 export const LensExtensions = {
   Common: LensExtensionsCommonApi,
-  Renderer: di.inject(lensRendererExtensionsApiInjectable),
+  Renderer: LensExtensionsRendererApi,
 };
 
 export {

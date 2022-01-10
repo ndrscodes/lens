@@ -21,9 +21,8 @@
 
 import { autoBind } from "../../../renderer/utils";
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export interface ServicePort {
   name?: string;
@@ -148,11 +147,11 @@ export class Service extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const serviceApi = isClusterPageContext()
-  ? new KubeApi<Service>({
-    objectConstructor: Service,
-  })
-  : undefined;
+export class ServiceApi extends KubeApi<Service> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Service,
+    });
+  }
+}

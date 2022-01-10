@@ -29,7 +29,7 @@ import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
 import { daemonSetStore } from "./daemonsets.store";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { DaemonSet, getMetricsForDaemonSets, IPodMetrics } from "../../../common/k8s-api/endpoints";
 import { ResourceMetrics, ResourceMetricsText } from "../resource-metrics";

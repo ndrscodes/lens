@@ -30,18 +30,18 @@ import { observer } from "mobx-react";
 import moment from "moment-timezone";
 import type { Align, ListOnScrollProps } from "react-window";
 
-import { LogSearchStore } from "./log-search/store";
-import { UserStore } from "../../../common/user-store";
-import { array, cssNames, disposer } from "../../utils";
-import { Spinner } from "../spinner";
-import { VirtualList } from "../virtual-list";
-import type { LogsStore } from "./logs/store";
-import type { LogTabStore } from "./log-tab/store";
+import { LogSearchStore } from "../log-search/store";
+import { UserStore } from "../../../../common/user-store";
+import { array, cssNames, disposer } from "../../../utils";
+import { Spinner } from "../../spinner";
+import { VirtualList } from "../../virtual-list";
+import type { LogsStore } from "./store";
+import type { LogTabStore } from "../log-tab/store";
 import { ToBottom } from "./to-bottom";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import logSearchStoreInjectable from "./log-search/store.injectable";
-import logTabStoreInjectable from "./log-tab/store.injectable";
-import logsStoreInjectable from "./logs/store.injectable";
+import logSearchStoreInjectable from "../log-search/store.injectable";
+import logTabStoreInjectable from "../log-tab/store.injectable";
+import logsStoreInjectable from "./store.injectable";
 
 export interface LogListProps {
   logs: string[]

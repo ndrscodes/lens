@@ -27,7 +27,7 @@ import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
-import type { CRDStore } from "./crd.store";
+import type { CustomResourceDefinitionStore } from "./crd.store";
 import type { TableSortCallbacks } from "../table";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { parseJsonPath } from "../../utils/jsonPath";
@@ -47,7 +47,7 @@ enum columnId {
 
 interface Dependencies {
   apiManager: ApiManager;
-  crdStore: CRDStore;
+  crdStore: CustomResourceDefinitionStore;
 }
 
 const NonInjectedCrdResources = observer(({ match, apiManager, crdStore }: Dependencies & CrdResourcesProps) => {

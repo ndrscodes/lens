@@ -28,7 +28,7 @@ import { disposeOnUnmount, observer } from "mobx-react";
 import { DrawerItem, DrawerItemLabels } from "../drawer";
 import { Badge } from "../badge";
 import { ResourceMetrics } from "../resource-metrics";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { formatNodeTaint, getMetricsByNodeNames, IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
 import { NodeCharts } from "./node-charts";

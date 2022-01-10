@@ -23,11 +23,11 @@ import "./pod-details-list.scss";
 
 import React from "react";
 import kebabCase from "lodash/kebabCase";
-import { reaction } from "mobx";
+import { observable, reaction } from "mobx";
 import { disposeOnUnmount, observer } from "mobx-react";
-import { podsStore } from "./pods.store";
-import type { Pod } from "../../../common/k8s-api/endpoints";
-import { boundMethod, bytesToUnits, cssNames, interval, prevDefault } from "../../utils";
+import { podsStore } from "./pod.store";
+import type { Pod, PodMetrics } from "../../../common/k8s-api/endpoints";
+import { boundMethod, bytesToUnits, cpuUnitsToNumber, cssNames, interval, prevDefault, unitsToBytes } from "../../utils";
 import { LineProgress } from "../line-progress";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Table, TableCell, TableHead, TableRow } from "../table";
@@ -55,8 +55,14 @@ interface OptionalProps {
 
 @observer
 export class PodDetailsList extends React.Component<Props> {
-  private metricsWatcher = interval(120, () => {
-    podsStore.loadKubeMetrics(this.props.owner.getNs());
+  @observable kubeMetrics = observable.array<PodMetrics>([]);
+
+  private metricsWatcher = interval(120, async () => {
+    try {
+      this.kubeMetrics.replace(await podMetricsApi.list({ namespace }));
+    } catch (error) {
+      console.warn("loadKubeMetrics failed", error);
+    }
   });
 
   componentDidMount() {
@@ -107,11 +113,38 @@ export class PodDetailsList extends React.Component<Props> {
     );
   }
 
+  getPodKubeMetrics(pod: Pod) {
+    const containers = pod.getContainers();
+    const empty = { cpu: 0, memory: 0 };
+    const metrics = this.kubeMetrics.find(metric => (
+      metric.getName() === pod.getName()
+      && metric.getNs() === pod.getNs()
+    ));
+
+    if (!metrics) return empty;
+
+    return containers.reduce((total, container) => {
+      const metric = metrics.containers.find(item => item.name == container.name);
+      let cpu = "0";
+      let memory = "0";
+
+      if (metric && metric.usage) {
+        cpu = metric.usage.cpu || "0";
+        memory = metric.usage.memory || "0";
+      }
+
+      return {
+        cpu: total.cpu + cpuUnitsToNumber(cpu),
+        memory: total.memory + unitsToBytes(memory),
+      };
+    }, empty);
+  }
+
   @boundMethod
   getTableRow(uid: string) {
     const { pods } = this.props;
     const pod = pods.find(pod => pod.getId() == uid);
-    const metrics = podsStore.getPodKubeMetrics(pod);
+    const metrics = this.getPodKubeMetrics(pod);
 
     return (
       <TableRow
@@ -162,8 +195,8 @@ export class PodDetailsList extends React.Component<Props> {
           sortable={{
             [sortBy.name]: pod => pod.getName(),
             [sortBy.namespace]: pod => pod.getNs(),
-            [sortBy.cpu]: pod => podsStore.getPodKubeMetrics(pod).cpu,
-            [sortBy.memory]: pod => podsStore.getPodKubeMetrics(pod).memory,
+            [sortBy.cpu]: pod => this.getPodKubeMetrics(pod).cpu,
+            [sortBy.memory]: pod => this.getPodKubeMetrics(pod).memory,
           }}
           sortByDefault={{ sortBy: sortBy.cpu, orderBy: "desc" }}
           sortSyncWithUrl={false}

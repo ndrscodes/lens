@@ -21,7 +21,7 @@
 
 import { autorun, computed, observable, makeObservable } from "mobx";
 
-import { IPodLogsQuery, Pod, podsApi } from "../../../../common/k8s-api/endpoints";
+import { IPodLogsQuery, Pod, PodApi } from "../../../../common/k8s-api/endpoints";
 import { autoBind, interval } from "../../../utils";
 import { DockStore, TabId, TabKind } from "../store";
 import type { LogTabStore } from "../log-tab/store";
@@ -33,6 +33,7 @@ const logLinesToLoad = 500;
 interface Dependencies {
   dockStore: DockStore;
   logTabStore: LogTabStore;
+  podApi: PodApi;
 }
 
 export class LogsStore {
@@ -132,7 +133,7 @@ export class LogsStore {
     const namespace = pod.getNs();
     const name = pod.getName();
 
-    const result = await podsApi.getLogs({ namespace, name }, {
+    const result = await this.dependencies.podApi.getLogs({ namespace, name }, {
       ...params,
       timestamps: true,  // Always setting timestamp to separate old logs from new ones
       container: selectedContainer.name,

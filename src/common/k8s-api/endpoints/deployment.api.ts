@@ -23,58 +23,11 @@ import moment from "moment";
 
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
 import { autoBind } from "../../utils";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { metricsApi } from "./metrics.api";
 import type { IPodMetrics } from "./pods.api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 import type { LabelSelector } from "../kube-object";
-
-export class DeploymentApi extends KubeApi<Deployment> {
-  protected getScaleApiUrl(params: { namespace: string; name: string }) {
-    return `${this.getUrl(params)}/scale`;
-  }
-
-  getReplicas(params: { namespace: string; name: string }): Promise<number> {
-    return this.request
-      .get(this.getScaleApiUrl(params))
-      .then(({ status }: any) => status?.replicas);
-  }
-
-  scale(params: { namespace: string; name: string }, replicas: number) {
-    return this.request.patch(this.getScaleApiUrl(params), {
-      data: {
-        spec: {
-          replicas,
-        },
-      },
-    },
-    {
-      headers: {
-        "content-type": "application/merge-patch+json",
-      },
-    });
-  }
-
-  restart(params: { namespace: string; name: string }) {
-    return this.request.patch(this.getUrl(params), {
-      data: {
-        spec: {
-          template: {
-            metadata: {
-              annotations: { "kubectl.kubernetes.io/restartedAt" : moment.utc().format() },
-            },
-          },
-        },
-      },
-    },
-    {
-      headers: {
-        "content-type": "application/strategic-merge-patch+json",
-      },
-    });
-  }
-}
 
 export function getMetricsForDeployments(deployments: Deployment[], namespace: string, selector = ""): Promise<IPodMetrics> {
   const podSelector = deployments.map(deployment => `${deployment.getName()}-[[:alnum:]]{9,}-[[:alnum:]]{5}`).join("|");
@@ -240,11 +193,61 @@ export class Deployment extends WorkloadKubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const deploymentApi = isClusterPageContext()
-  ? new DeploymentApi({
-    objectConstructor: Deployment,
-  })
-  : undefined;
+interface ReplicasStatus extends KubeJsonApiData {
+  status?: {
+    replicas: number;
+  }
+}
+
+export class DeploymentApi extends KubeApi<Deployment> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Deployment,
+    });
+  }
+
+  protected getScaleApiUrl(params: { namespace: string; name: string }) {
+    return `${this.getUrl(params)}/scale`;
+  }
+
+  async getReplicas(params: { namespace: string; name: string }): Promise<number> {
+    const { status } = await this.request.get<ReplicasStatus>(this.getScaleApiUrl(params));
+
+    return status?.replicas ?? 0;
+  }
+
+  scale(params: { namespace: string; name: string }, replicas: number) {
+    return this.request.patch(this.getScaleApiUrl(params), {
+      data: {
+        spec: {
+          replicas,
+        },
+      },
+    },
+    {
+      headers: {
+        "content-type": "application/merge-patch+json",
+      },
+    });
+  }
+
+  restart(params: { namespace: string; name: string }) {
+    return this.request.patch(this.getUrl(params), {
+      data: {
+        spec: {
+          template: {
+            metadata: {
+              annotations: { "kubectl.kubernetes.io/restartedAt" : moment.utc().format() },
+            },
+          },
+        },
+      },
+    },
+    {
+      headers: {
+        "content-type": "application/strategic-merge-patch+json",
+      },
+    });
+  }
+}

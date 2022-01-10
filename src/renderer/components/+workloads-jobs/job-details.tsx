@@ -30,7 +30,7 @@ import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { Link } from "react-router-dom";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import { PodsStore, podsStore } from "../+workloads-pods/pods.store";
+import { PodStore, podsStore } from "../+workloads-pods/pod.store";
 import { jobStore } from "./job.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { getMetricsForJobs, IPodMetrics, Job } from "../../../common/k8s-api/endpoints";
@@ -56,7 +56,7 @@ export interface JobDetailsProps extends KubeObjectDetailsProps<Job> {
 interface Dependencies {
   apiManager: ApiManager;
   kubeWatchApi: KubeWatchApi;
-  podsStore: PodsStore;
+  podsStore: PodStore;
 }
 
 const NonInjectedJobDetails = observer(({ apiManager, object: job, kubeWatchApi, podsStore }: Dependencies & JobDetailsProps) => {

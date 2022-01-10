@@ -18,17 +18,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { Ingress, ingressApi } from "../../../common/k8s-api/endpoints";
+import type { Ingress, IngressApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { isClusterPageContext } from "../../utils";
 
 export class IngressStore extends KubeObjectStore<Ingress> {
-  api = ingressApi;
+  constructor(public api: IngressApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const ingressStore = isClusterPageContext()
-  ? new IngressStore()
-  : undefined;

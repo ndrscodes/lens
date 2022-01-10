@@ -32,7 +32,7 @@ import { ReleaseRollbackDialog } from "./release-rollback-dialog";
 import { navigation } from "../../navigation";
 import { ItemListLayout } from "../item-object-list/item-list-layout";
 import { HelmReleaseMenu } from "./release-menu";
-import { secretsStore } from "../+config-secrets/secrets.store";
+import { secretsStore } from "../+config-secrets/secret.store";
 import { NamespaceSelectFilter } from "../+namespaces/namespace-select-filter";
 import type { ReleaseRouteParams } from "../../../common/routes";
 import { releaseURL } from "../../../common/routes";

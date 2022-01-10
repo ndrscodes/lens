@@ -20,16 +20,11 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { pdbApi, PodDisruptionBudget } from "../../../common/k8s-api/endpoints/poddisruptionbudget.api";
-import { isClusterPageContext } from "../../utils";
+import type { PodDisruptionBudget, PodDisruptionBudgetApi } from "../../../common/k8s-api/endpoints/poddisruptionbudget.api";
 
-export class PodDisruptionBudgetsStore extends KubeObjectStore<PodDisruptionBudget> {
-  api = pdbApi;
+export class PodDisruptionBudgetStore extends KubeObjectStore<PodDisruptionBudget> {
+  constructor(public api: PodDisruptionBudgetApi) {
+    super();
+  }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const podDisruptionBudgetsStore = isClusterPageContext()
-  ? new PodDisruptionBudgetsStore()
-  : undefined;

@@ -22,12 +22,9 @@
 import { KubeObject } from "../kube-object";
 import { autoBind, cpuUnitsToNumber, iter, unitsToBytes } from "../../../renderer/utils";
 import { IMetrics, metricsApi } from "./metrics.api";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
-export class NodesApi extends KubeApi<Node> {
-}
 
 export function getMetricsForAllNodes(): Promise<INodeMetrics> {
   const opts = { category: "nodes" };
@@ -247,11 +244,11 @@ export class Node extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const nodesApi = isClusterPageContext()
-  ? new NodesApi({
-    objectConstructor: Node,
-  })
-  : undefined;
+export class NodeApi extends KubeApi<Node> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Node,
+    });
+  }
+}

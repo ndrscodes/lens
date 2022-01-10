@@ -22,8 +22,7 @@
 import moment from "moment";
 import { KubeObject } from "../kube-object";
 import { formatDuration } from "../../utils/formatDuration";
-import { KubeApi } from "../kube-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export interface KubeEvent {
   involvedObject: {
@@ -78,11 +77,11 @@ export class KubeEvent extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const eventApi = isClusterPageContext()
-  ? new KubeApi<KubeEvent>({
-    objectConstructor: KubeEvent,
-  })
-  : undefined;
+export class EventApi extends KubeApi<KubeEvent> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: KubeEvent,
+    });
+  }
+}

@@ -75,7 +75,7 @@ export interface KubeObjectStoreSubscribeParams {
 export abstract class KubeObjectStore<T extends KubeObject> extends ItemStore<T> {
   static defaultContext = observable.box<ClusterContext>(); // TODO: support multiple cluster contexts
 
-  public api: KubeApi<T>;
+  public abstract api: KubeApi<T>;
   public readonly limit?: number;
   public readonly bufferSize: number = 50000;
   @observable private loadedNamespaces?: string[];
@@ -88,10 +88,8 @@ export abstract class KubeObjectStore<T extends KubeObject> extends ItemStore<T>
     return when(() => Boolean(this.loadedNamespaces));
   }
 
-  constructor(api?: KubeApi<T>) {
+  constructor() {
     super();
-    if (api) this.api = api;
-
     makeObservable(this);
     autoBind(this);
     this.bindWatchEventsUpdater();

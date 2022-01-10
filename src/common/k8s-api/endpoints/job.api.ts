@@ -19,14 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import get from "lodash/get";
 import { autoBind } from "../../utils";
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { metricsApi } from "./metrics.api";
 import type { KubeJsonApiData } from "../kube-json-api";
 import type { IPodContainer, IPodMetrics } from "./pods.api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 import type { LabelSelector } from "../kube-object";
 
 export class Job extends WorkloadKubeObject {
@@ -113,13 +111,10 @@ export class Job extends WorkloadKubeObject {
   }
 
   getImages() {
-    const containers: IPodContainer[] = get(this, "spec.template.spec.containers", []);
+    const { containers = [] } = this.spec?.template?.spec ?? {};
 
-    return [...containers].map(container => container.image);
+    return containers.map(container => container.image);
   }
-}
-
-export class JobApi extends KubeApi<Job> {
 }
 
 export function getMetricsForJobs(jobs: Job[], namespace: string, selector = ""): Promise<IPodMetrics> {
@@ -139,11 +134,11 @@ export function getMetricsForJobs(jobs: Job[], namespace: string, selector = "")
   });
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const jobApi = isClusterPageContext()
-  ? new JobApi({
-    objectConstructor: Job,
-  })
-  : undefined;
+export class JobApi extends KubeApi<Job> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Job,
+    });
+  }
+}

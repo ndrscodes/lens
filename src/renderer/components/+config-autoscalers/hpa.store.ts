@@ -20,16 +20,10 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { HorizontalPodAutoscaler, hpaApi } from "../../../common/k8s-api/endpoints/hpa.api";
-import { isClusterPageContext } from "../../utils";
+import type { HorizontalPodAutoscaler, HorizontalPodAutoscalerApi } from "../../../common/k8s-api/endpoints/hpa.api";
 
-export class HPAStore extends KubeObjectStore<HorizontalPodAutoscaler> {
-  api = hpaApi;
+export class HorizontalPodAutoscalerStore extends KubeObjectStore<HorizontalPodAutoscaler> {
+  constructor(public api: HorizontalPodAutoscalerApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const hpaStore = isClusterPageContext()
-  ? new HPAStore()
-  : undefined;

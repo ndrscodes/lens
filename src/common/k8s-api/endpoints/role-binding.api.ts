@@ -21,9 +21,8 @@
 
 import { autoBind } from "../../utils";
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export type RoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
 
@@ -62,11 +61,11 @@ export class RoleBinding extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const roleBindingApi = isClusterPageContext()
-  ? new KubeApi<RoleBinding>({
-    objectConstructor: RoleBinding,
-  })
-  : undefined;
+export class RoleBindingApi extends KubeApi<RoleBinding> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: RoleBinding,
+    });
+  }
+}

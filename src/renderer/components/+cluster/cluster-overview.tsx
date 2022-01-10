@@ -25,7 +25,7 @@ import React from "react";
 import { reaction } from "mobx";
 import { disposeOnUnmount, observer } from "mobx-react";
 import { nodesStore } from "../+nodes/nodes.store";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import { getHostedClusterId, interval } from "../../utils";
 import { TabLayout } from "../layout/tab-layout";
 import { Spinner } from "../spinner";

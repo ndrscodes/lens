@@ -19,16 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createContainer } from "@ogre-tools/injectable";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import type { PodStore } from "./pod.store";
 
-export const getDi = () =>
-  createContainer(
-    getRequireContextForRendererCode,
-    getRequireContextForCommonExtensionCode,
-  );
+const podStoreInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/api/v1/pods") as PodStore,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-const getRequireContextForRendererCode = () =>
-  require.context("../", true, /\.injectable\.(ts|tsx)$/);
-
-const getRequireContextForCommonExtensionCode = () =>
-  require.context("../../extensions", true, /\.injectable\.(ts|tsx)$/);
+export default podStoreInjectable;

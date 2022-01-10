@@ -18,14 +18,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { ClusterRole, clusterRoleApi } from "../../../../common/k8s-api/endpoints";
+import type { ClusterRole, ClusterRoleApi } from "../../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../../utils";
+import { autoBind } from "../../../utils";
 
-export class ClusterRolesStore extends KubeObjectStore<ClusterRole> {
-  api = clusterRoleApi;
-
-  constructor() {
+export class ClusterRoleStore extends KubeObjectStore<ClusterRole> {
+  constructor(public api: ClusterRoleApi) {
     super();
     autoBind(this);
   }
@@ -37,10 +35,3 @@ export class ClusterRolesStore extends KubeObjectStore<ClusterRole> {
     ]);
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const clusterRolesStore = isClusterPageContext()
-  ? new ClusterRolesStore()
-  : undefined;

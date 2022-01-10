@@ -26,7 +26,7 @@ import { observer } from "mobx-react";
 import { Icon } from "../icon";
 import { SubHeader } from "../layout/sub-header";
 import { Table, TableCell, TableHead, TableRow } from "../table";
-import { NodesStore, nodesStore } from "../+nodes/nodes.store";
+import { NodeStore, nodesStore } from "../+nodes/nodes.store";
 import { EventStore, eventStore } from "../+events/event.store";
 import { cssNames, prevDefault } from "../../utils";
 import type { ItemObject } from "../../../common/item.store";
@@ -57,7 +57,7 @@ enum sortBy {
 
 interface Dependencies {
   apiManager: ApiManager;
-  nodesStore: NodesStore;
+  nodesStore: NodeStore;
   eventStore: EventStore;
 }
 

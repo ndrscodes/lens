@@ -26,7 +26,6 @@ import React from "react";
 import fse from "fs-extra";
 import { Console } from "console";
 import { stderr, stdout } from "process";
-import { TerminalStore } from "../../../renderer/components/dock/terminal.store";
 import { ThemeStore } from "../../../renderer/theme.store";
 import { UserStore } from "../../../common/user-store";
 import { AppPaths } from "../../../common/app-paths";
@@ -69,7 +68,6 @@ describe("page registry tests", () => {
     });
     UserStore.createInstance();
     ThemeStore.createInstance();
-    TerminalStore.createInstance();
     ClusterPageRegistry.createInstance();
     GlobalPageRegistry.createInstance().add({
       id: "page-with-params",
@@ -105,7 +103,6 @@ describe("page registry tests", () => {
   afterEach(() => {
     GlobalPageRegistry.resetInstance();
     ClusterPageRegistry.resetInstance();
-    TerminalStore.resetInstance();
     ThemeStore.resetInstance();
     UserStore.resetInstance();
     fse.remove("tmp");

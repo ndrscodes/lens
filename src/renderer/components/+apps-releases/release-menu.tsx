@@ -21,69 +21,74 @@
 
 import React from "react";
 import type { HelmRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
-import { cssNames } from "../../utils";
-import { releaseStore } from "./release.store";
+import { cssNames, noop } from "../../utils";
+import { ReleaseStore, releaseStore } from "./release.store";
 import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Icon } from "../icon";
 import { ReleaseRollbackDialog } from "./release-rollback-dialog";
-import { createUpgradeChartTab } from "../dock/upgrade-chart/store";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
+import { observer } from "mobx-react";
 
-interface Props extends MenuActionsProps {
-  release: HelmRelease;
-  hideDetails?(): void;
+export interface HelmReleaseMenuProps extends MenuActionsProps {
+  release: HelmRelease | null | undefined;
+  hideDetails?: () => void;
 }
 
-export class HelmReleaseMenu extends React.Component<Props> {
-  remove = () => {
-    return releaseStore.remove(this.props.release);
+interface Dependencies {
+  newUpgradeChartTab: (release: HelmRelease) => void;
+  releaseStore: ReleaseStore;
+  openRollbackReleaseDialog: (release: HelmRelease) => void;
+}
+
+const NonInjectedHelmReleaseMenu = observer(({
+  newUpgradeChartTab,
+  release,
+  hideDetails = noop,
+  releaseStore,
+  openRollbackReleaseDialog,
+  toolbar,
+  className,
+  ...menuProps
+}: Dependencies & HelmReleaseMenuProps) => {
+  if (!release) {
+    return null;
+  }
+
+  const remove = () => releaseStore.remove(release);
+  const upgrade = () => {
+    newUpgradeChartTab(release);
+    hideDetails();
   };
+  const rollback = () => openRollbackReleaseDialog(release);
 
-  upgrade = () => {
-    const { release, hideDetails } = this.props;
-
-    createUpgradeChartTab(release);
-    hideDetails?.();
-  };
-
-  rollback = () => {
-    ReleaseRollbackDialog.open(this.props.release);
-  };
-
-  renderContent() {
-    const { release, toolbar } = this.props;
-
-    if (!release) return null;
-    const hasRollback = release && release.getRevision() > 1;
-
-    return (
-      <>
-        {hasRollback && (
-          <MenuItem onClick={this.rollback}>
-            <Icon material="history" interactive={toolbar} tooltip="Rollback"/>
-            <span className="title">Rollback</span>
-          </MenuItem>
-        )}
-        <MenuItem onClick={this.upgrade}>
-          <Icon material="refresh" interactive={toolbar} tooltip="Upgrade"/>
-          <span className="title">Upgrade</span>
+  return (
+    <MenuActions
+      {...menuProps}
+      className={cssNames("HelmReleaseMenu", className)}
+      removeAction={remove}
+      removeConfirmationMessage={() => <p>Remove Helm Release <b>{release.name}</b>?</p>}
+    >
+      {release.getRevision() > 1 && (
+        <MenuItem onClick={rollback}>
+          <Icon material="history" interactive={toolbar} tooltip="Rollback"/>
+          <span className="title">Rollback</span>
         </MenuItem>
-      </>
-    );
-  }
+      )}
+      <MenuItem onClick={upgrade}>
+        <Icon material="refresh" interactive={toolbar} tooltip="Upgrade"/>
+        <span className="title">Upgrade</span>
+      </MenuItem>
+    </MenuActions>
+  );
+});
 
-  render() {
-    const { className, release, ...menuProps } = this.props;
-
-    return (
-      <MenuActions
-        {...menuProps}
-        className={cssNames("HelmReleaseMenu", className)}
-        removeAction={this.remove}
-        removeConfirmationMessage={() => <p>Remove Helm Release <b>{release.name}</b>?</p>}
-      >
-        {this.renderContent()}
-      </MenuActions>
-    );
-  }
-}
+export const HelmReleaseMenu = withInjectables<Dependencies, HelmReleaseMenuProps>(NonInjectedHelmReleaseMenu, {
+  getProps: (di, props) => ({
+    newUpgradeChartTab: di.inject(newUpgradeChartTabInjectable),
+    releaseStore,
+    openRollbackReleaseDialog: ReleaseRollbackDialog.open,
+    ...props,
+  }),
+});

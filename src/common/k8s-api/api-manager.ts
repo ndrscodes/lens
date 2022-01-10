@@ -69,15 +69,19 @@ export class ApiManager {
   /**
    * Get a registered api, if a callback is provided then the registered
    * instances are iterated until it returns `true`
-   * @param pathOrCallback Either the `apiBase` of an instance, a resource path for the kind of the api, or a callback function
+   * @param pathOrCallbacks Either the `apiBase` of an instance, a resource path for the kind of the api, or a callback function. Will search for each until one is found.
    * @returns The kube api instance that was registered
    */
-  getApi(pathOrCallback: string | ((api: KubeApi<KubeObject>) => boolean)): KubeApi<KubeObject> | undefined {
-    if (typeof pathOrCallback === "string") {
-      return this.apis.get(pathOrCallback) || this.apis.get(parseKubeApi(pathOrCallback).apiBase);
+  getApi(...pathOrCallbacks: (string | ((api: KubeApi<KubeObject>) => boolean))[]): KubeApi<KubeObject> | undefined {
+    for (const pathOrCallback of pathOrCallbacks) {
+      if (typeof pathOrCallback === "string") {
+        return this.apis.get(pathOrCallback) || this.apis.get(parseKubeApi(pathOrCallback).apiBase);
+      }
+
+      return iter.find(this.apis.values(), pathOrCallback);
     }
 
-    return iter.find(this.apis.values(), pathOrCallback);
+    return undefined;
   }
 
   /**
@@ -173,15 +177,23 @@ export class ApiManager {
 
   /**
    *
-   * @param apiOrBase The `apiBase`, resource descriptor, or `KubeApi` instance that the store is for.
+   * @param apiOrBases The `apiBase`, resource descriptor, or `KubeApi` instance that the store is for. In order of searching
    * @returns The registered store whose api has also been registered
    */
-  getStore(apiOrBase: string | KubeApi<KubeObject>): KubeObjectStore<KubeObject> | undefined;
+  getStore(...apiOrBases: (string | KubeApi<KubeObject>)[]): KubeObjectStore<KubeObject> | undefined;
   /**
    * @deprecated Should use a cast instead as this is an unchecked type param.
    */
-  getStore<S extends KubeObjectStore<KubeObject>>(apiOrBase: string | KubeApi<KubeObject>): S | undefined {
-    return this.stores.get(this.resolveApi(apiOrBase)) as S;
+  getStore<S extends KubeObjectStore<KubeObject>>(...apiOrBases: (string | KubeApi<KubeObject>)[]): S | undefined {
+    for (const apiOrBase of apiOrBases) {
+      const store = this.stores.get(this.resolveApi(apiOrBase)) as S;
+
+      if (store) {
+        return store;
+      }
+    }
+
+    return undefined;
   }
 
   /**

@@ -27,7 +27,7 @@ import type { RouteComponentProps } from "react-router";
 import { AddSecretDialog } from "./add-secret-dialog";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import { Badge } from "../badge";
-import { secretsStore } from "./secrets.store";
+import { secretsStore } from "./secret.store";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { SecretsRouteParams } from "../../../common/routes";
 

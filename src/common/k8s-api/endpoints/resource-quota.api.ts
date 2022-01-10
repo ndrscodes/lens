@@ -20,8 +20,7 @@
  */
 
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export interface IResourceQuotaValues {
   [quota: string]: string;
@@ -81,11 +80,11 @@ export class ResourceQuota extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const resourceQuotaApi = isClusterPageContext()
-  ? new KubeApi<ResourceQuota>({
-    objectConstructor: ResourceQuota,
-  })
-  : undefined;
+export class ResourceQuotaApi extends KubeApi<ResourceQuota> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: ResourceQuota,
+    });
+  }
+}

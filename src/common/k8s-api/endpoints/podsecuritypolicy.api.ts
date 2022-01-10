@@ -21,9 +21,8 @@
 
 import { autoBind } from "../../utils";
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export interface PodSecurityPolicy {
   spec: {
@@ -118,11 +117,11 @@ export class PodSecurityPolicy extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const pspApi = isClusterPageContext()
-  ? new KubeApi<PodSecurityPolicy>({
-    objectConstructor: PodSecurityPolicy,
-  })
-  : undefined;
+export class PodSecurityPolicyApi extends KubeApi<PodSecurityPolicy> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: PodSecurityPolicy,
+    });
+  }
+}

@@ -20,17 +20,14 @@
  */
 import { makeObservable } from "mobx";
 
-import { podsStore } from "../+workloads-pods/pods.store";
-import { PodStatus, StatefulSet, statefulSetApi } from "../../../common/k8s-api/endpoints";
+import { podsStore } from "../+workloads-pods/pod.store";
+import { PodStatus, StatefulSet, StatefulSetApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
+import { autoBind } from "../../utils";
 
 export class StatefulSetStore extends KubeObjectStore<StatefulSet> {
-  api = statefulSetApi;
-
-  constructor() {
+  constructor(public api: StatefulSetApi) {
     super();
-
     makeObservable(this);
     autoBind(this);
   }
@@ -59,10 +56,3 @@ export class StatefulSetStore extends KubeObjectStore<StatefulSet> {
     return status;
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const statefulSetStore = isClusterPageContext()
-  ? new StatefulSetStore()
-  : undefined;

@@ -20,18 +20,7 @@
  */
 
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
-
-export class SelfSubjectRulesReviewApi extends KubeApi<SelfSubjectRulesReview> {
-  create({ namespace = "default" }): Promise<SelfSubjectRulesReview> {
-    return super.create({}, {
-      spec: {
-        namespace,
-      },
-    });
-  }
-}
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export interface ISelfSubjectReviewRule {
   verbs: string[];
@@ -87,12 +76,19 @@ export class SelfSubjectRulesReview extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const selfSubjectRulesReviewApi = isClusterPageContext()
-  ? new SelfSubjectRulesReviewApi({
-    objectConstructor: SelfSubjectRulesReview,
-  })
-  : undefined;
+export class SelfSubjectRulesReviewApi extends KubeApi<SelfSubjectRulesReview> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: SelfSubjectRulesReview,
+    });
+  }
 
+  create({ namespace = "default" }): Promise<SelfSubjectRulesReview> {
+    return super.create({}, {
+      spec: {
+        namespace,
+      },
+    });
+  }
+}

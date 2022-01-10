@@ -20,16 +20,14 @@
  */
 import { makeObservable } from "mobx";
 
-import { podsStore } from "../+workloads-pods/pods.store";
-import { Deployment, ReplicaSet, replicaSetApi } from "../../../common/k8s-api/endpoints";
+import { podsStore } from "../+workloads-pods/pod.store";
+import type { Deployment, ReplicaSet, ReplicaSetApi } from "../../../common/k8s-api/endpoints";
 import { PodStatus } from "../../../common/k8s-api/endpoints/pods.api";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
+import { autoBind } from "../../utils";
 
 export class ReplicaSetStore extends KubeObjectStore<ReplicaSet> {
-  api = replicaSetApi;
-
-  constructor() {
+  constructor(public api: ReplicaSetApi) {
     super();
 
     makeObservable(this);
@@ -66,10 +64,3 @@ export class ReplicaSetStore extends KubeObjectStore<ReplicaSet> {
     );
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const replicaSetStore = isClusterPageContext()
-  ? new ReplicaSetStore()
-  : undefined;

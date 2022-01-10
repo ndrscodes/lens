@@ -18,14 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import type { DeploymentApi } from ".";
+import apiManagerInjectable from "../api-manager.injectable";
 
-import { navigation, PageParam, PageParamInit } from "../../renderer/navigation";
+const deploymentApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-export type { PageParamInit, PageParam } from "../../renderer/navigation/page-param";
-export { navigate, isActiveRoute } from "../../renderer/navigation/helpers";
-export { hideDetails, showDetails, getDetailsUrl } from "../../renderer/components/kube-detail-params";
-export type { URLParams } from "../../common/utils/buildUrl";
-
-export function createPageParam<V>(init: PageParamInit<V>) {
-  return new PageParam<V>(init, navigation);
-}
+export default deploymentApiInjectable;

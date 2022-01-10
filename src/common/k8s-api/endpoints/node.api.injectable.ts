@@ -18,30 +18,14 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { sum } from "lodash";
-import { computed, makeObservable } from "mobx";
 
-import type { Node, NodeApi } from "../../../common/k8s-api/endpoints";
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import type { NodeApi } from "./node.api";
+import apiManagerInjectable from "../api-manager.injectable";
 
-export class NodeStore extends KubeObjectStore<Node> {
-  constructor(public api: NodeApi) {
-    super();
+const nodeApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/nodes") as NodeApi,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-    makeObservable(this);
-    autoBind(this);
-  }
-
-  @computed get masterNodes() {
-    return this.items.filter(node => node.getRoleLabels().includes("master"));
-  }
-
-  @computed get workerNodes() {
-    return this.items.filter(node => !node.getRoleLabels().includes("master"));
-  }
-
-  getWarningsCount(): number {
-    return sum(this.items.map((node: Node) => node.getWarningConditions().length));
-  }
-}
+export default nodeApiInjectable;

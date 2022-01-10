@@ -22,17 +22,8 @@
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
 import { autoBind } from "../../utils";
 import { IMetrics, metricsApi } from "./metrics.api";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
-
-export class PodsApi extends KubeApi<Pod> {
-  async getLogs(params: { namespace: string; name: string }, query?: IPodLogsQuery): Promise<string> {
-    const path = `${this.getUrl(params)}/log`;
-
-    return this.request.get(path, { query });
-  }
-}
 
 export function getMetricsForPods(pods: Pod[], namespace: string, selector = "pod, namespace"): Promise<IPodMetrics> {
   const podSelector = pods.map(pod => pod.getName()).join("|");
@@ -517,11 +508,17 @@ export class Pod extends WorkloadKubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const podsApi = isClusterPageContext()
-  ? new PodsApi({
-    objectConstructor: Pod,
-  })
-  : undefined;
+export class PodApi extends KubeApi<Pod> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Pod,
+    });
+  }
+
+  async getLogs(params: { namespace: string; name: string }, query?: IPodLogsQuery): Promise<string> {
+    const path = `${this.getUrl(params)}/log`;
+
+    return this.request.get(path, { query });
+  }
+}

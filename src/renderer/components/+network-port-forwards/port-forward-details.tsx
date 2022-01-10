@@ -26,23 +26,34 @@ import { Link } from "react-router-dom";
 import { portForwardAddress, PortForwardItem } from "../../port-forward";
 import { Drawer, DrawerItem } from "../drawer";
 import { cssNames } from "../../utils";
-import { podsApi, serviceApi } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
 import { PortForwardMenu } from "./port-forward-menu";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import { observer } from "mobx-react";
+import type { ServiceApi, PodApi } from "../../../common/k8s-api/endpoints";
+import podApiInjectable from "../../../common/k8s-api/endpoints/pod.api.injectable";
+import serviceApiInjectable from "../../../common/k8s-api/endpoints/service.api.injectable";
 
-interface Props {
+export interface PortForwardDetailsProps {
   portForward: PortForwardItem;
   hideDetails(): void;
 }
 
-export class PortForwardDetails extends React.Component<Props> {
+interface Dependencies {
+  serviceApi: ServiceApi;
+  podApi: PodApi;
+}
 
-  renderResourceName() {
-    const { portForward } = this.props;
+const NonInjectedPortForwardDetails = observer(({ podApi, serviceApi, portForward, hideDetails }: Dependencies & PortForwardDetailsProps) => {
+  if (!portForward) {
+    return null;
+  }
+
+  const renderResourceName = () => {
     const name = portForward.getName();
     const api = {
       "service": serviceApi,
-      "pod": podsApi,
+      "pod": podApi,
     }[portForward.kind];
 
     if (!api) {
@@ -56,17 +67,20 @@ export class PortForwardDetails extends React.Component<Props> {
         {name}
       </Link>
     );
-  }
+  };
 
-  renderContent() {
-    const { portForward } = this.props;
-
-    if (!portForward) return null;
-
-    return (
+  return (
+    <Drawer
+      className="PortForwardDetails"
+      usePortal
+      open
+      title={`Port Forward: ${portForwardAddress(portForward)}`}
+      onClose={hideDetails}
+      toolbar={<PortForwardMenu portForward={portForward} toolbar hideDetails={hideDetails}/>}
+    >
       <div>
         <DrawerItem name="Resource Name">
-          {this.renderResourceName()}
+          {renderResourceName()}
         </DrawerItem>
         <DrawerItem name="Namespace">
           {portForward.getNs()}
@@ -87,24 +101,14 @@ export class PortForwardDetails extends React.Component<Props> {
           <span className={cssNames("status", portForward.getStatus().toLowerCase())}>{portForward.getStatus()}</span>
         </DrawerItem>
       </div>
-    );
-  }
+    </Drawer>
+  );
+});
 
-  render() {
-    const { hideDetails, portForward } = this.props;
-    const toolbar = <PortForwardMenu portForward={portForward} toolbar hideDetails={hideDetails}/>;
-
-    return (
-      <Drawer
-        className="PortForwardDetails"
-        usePortal={true}
-        open={!!portForward}
-        title={`Port Forward: ${portForwardAddress(portForward)}`}
-        onClose={hideDetails}
-        toolbar={toolbar}
-      >
-        {this.renderContent()}
-      </Drawer>
-    );
-  }
-}
+export const PortForwardDetails = withInjectables<Dependencies, PortForwardDetailsProps>(NonInjectedPortForwardDetails, {
+  getProps: (di, props) => ({
+    podApi: di.inject(podApiInjectable),
+    serviceApi: di.inject(serviceApiInjectable),
+    ...props,
+  }),
+});

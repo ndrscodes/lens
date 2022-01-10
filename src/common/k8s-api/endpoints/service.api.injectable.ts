@@ -18,27 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import * as Catalog from "./catalog";
-import * as Navigation from "./navigation";
-import * as Theme from "./theming";
-import { IpcRenderer as Ipc } from "../ipc/ipc-renderer";
-import { LensRendererExtension as LensExtension } from "../lens-renderer-extension";
-import k8sRendererApiInjectable from "./k8s-api.injectable";
-import componentsInjectable from "./components.injectable";
+import type { ServiceApi } from ".";
+import apiManagerInjectable from "../api-manager.injectable";
 
-const lensRendererExtensionsApiInjectable = getInjectable({
-  instantiate: (di) => ({
-    Catalog,
-    Component: di.inject(componentsInjectable),
-    K8sApi: di.inject(k8sRendererApiInjectable),
-    Navigation,
-    Theme,
-    Ipc,
-    LensExtension,
-  }),
+const serviceApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/services") as ServiceApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default lensRendererExtensionsApiInjectable;
+export default serviceApiInjectable;

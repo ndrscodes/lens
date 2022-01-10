@@ -20,30 +20,23 @@
  */
 
 import countBy from "lodash/countBy";
-import { observable, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, cpuUnitsToNumber, isClusterPageContext, unitsToBytes } from "../../utils";
-import { Pod, PodMetrics, podMetricsApi, podsApi } from "../../../common/k8s-api/endpoints";
+import { autoBind } from "../../utils";
+import type { Pod, PodApi } from "../../../common/k8s-api/endpoints";
 import type { WorkloadKubeObject } from "../../../common/k8s-api/workload-kube-object";
 
-export class PodsStore extends KubeObjectStore<Pod> {
-  api = podsApi;
-
-  @observable kubeMetrics = observable.array<PodMetrics>([]);
-
-  constructor() {
+export class PodStore extends KubeObjectStore<Pod> {
+  constructor(public api: PodApi) {
     super();
-
-    makeObservable(this);
     autoBind(this);
   }
 
+  /**
+   * @deprecated This function has been removed and returns nothing
+   */
   async loadKubeMetrics(namespace?: string) {
-    try {
-      this.kubeMetrics.replace(await podMetricsApi.list({ namespace }));
-    } catch (error) {
-      console.warn("loadKubeMetrics failed", error);
-    }
+    void namespace;
+    console.warn("loadKubeMetrics has been removed and does nothing");
   }
 
   getPodsByOwner(workload: WorkloadKubeObject): Pod[] {
@@ -72,39 +65,13 @@ export class PodsStore extends KubeObjectStore<Pod> {
     return countBy(pods.map(pod => pod.getStatus()).sort().reverse());
   }
 
+  /**
+   * @deprecated This function has been removed and returns nothing
+   */
   getPodKubeMetrics(pod: Pod) {
-    const containers = pod.getContainers();
-    const empty = { cpu: 0, memory: 0 };
-    const metrics = this.kubeMetrics.find(metric => {
-      return [
-        metric.getName() === pod.getName(),
-        metric.getNs() === pod.getNs(),
-      ].every(v => v);
-    });
+    void pod;
+    console.warn("getPodKubeMetrics has been removed and does nothing");
 
-    if (!metrics) return empty;
-
-    return containers.reduce((total, container) => {
-      const metric = metrics.containers.find(item => item.name == container.name);
-      let cpu = "0";
-      let memory = "0";
-
-      if (metric && metric.usage) {
-        cpu = metric.usage.cpu || "0";
-        memory = metric.usage.memory || "0";
-      }
-
-      return {
-        cpu: total.cpu + cpuUnitsToNumber(cpu),
-        memory: total.memory + unitsToBytes(memory),
-      };
-    }, empty);
+    return { cpu: 0, memory: 0 };
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const podsStore = isClusterPageContext()
-  ? new PodsStore()
-  : undefined;

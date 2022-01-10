@@ -19,13 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { KubeObject } from "../kube-object";
 import { autoBind } from "../../../renderer/utils";
 import { metricsApi } from "./metrics.api";
 import type { IPodMetrics } from "./pods.api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export enum NamespaceStatus {
   ACTIVE = "Active",
@@ -53,9 +52,6 @@ export class Namespace extends KubeObject {
   }
 }
 
-export class NamespaceApi extends KubeApi<Namespace> {
-}
-
 export function getMetricsForNamespace(namespace: string, selector = ""): Promise<IPodMetrics> {
   const opts = { category: "pods", pods: ".*", namespace, selector };
 
@@ -72,11 +68,11 @@ export function getMetricsForNamespace(namespace: string, selector = ""): Promis
   });
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const namespacesApi = isClusterPageContext()
-  ? new NamespaceApi({
-    objectConstructor: Namespace,
-  })
-  : undefined;
+export class NamespaceApi extends KubeApi<Namespace> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Namespace,
+    });
+  }
+}

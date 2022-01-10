@@ -21,22 +21,23 @@
 
 import "./helm-chart-details.scss";
 
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import { getChartDetails, HelmChart } from "../../../common/k8s-api/endpoints/helm-charts.api";
-import { observable, makeObservable, reaction } from "mobx";
-import { disposeOnUnmount, observer } from "mobx-react";
+import { observable, reaction } from "mobx";
+import { observer } from "mobx-react";
 import { Drawer, DrawerItem } from "../drawer";
-import { boundMethod, stopPropagation } from "../../utils";
+import { disposer, stopPropagation } from "../../utils";
 import { MarkdownViewer } from "../markdown-viewer";
 import { Spinner } from "../spinner";
 import { Button } from "../button";
 import { Select, SelectOption } from "../select";
-import { createInstallChartTab } from "../dock/install-chart/store";
 import { Badge } from "../badge";
 import { Tooltip, withStyles } from "@material-ui/core";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import newInstallChartTabInjectable from "../dock/install-chart/create-tab.injectable";
 
-interface Props {
-  chart: HelmChart;
+export interface HelmChartDetailsProps {
+  chart: HelmChart | null | undefined;
   hideDetails(): void;
 }
 
@@ -46,72 +47,60 @@ const LargeTooltip = withStyles({
   },
 })(Tooltip);
 
-@observer
-export class HelmChartDetails extends Component<Props> {
-  @observable chartVersions: HelmChart[];
-  @observable selectedChart?: HelmChart;
-  @observable readme?: string;
-  @observable error?: string;
+interface Dependencies {
+  newInstallChartTab: (chart: HelmChart) => void;
+}
 
-  private abortController?: AbortController;
+const NonInjectedHelmChartDetails = observer(({ newInstallChartTab, chart, hideDetails }: Dependencies & HelmChartDetailsProps) => {
+  const [chartVersions] = useState(observable.array<HelmChart>());
+  const [selectedChart, setSelectedChart] = useState<HelmChart | undefined>(undefined);
+  const [readme, setReadme] = useState("");
+  const [error, setError] = useState("");
+  const [ac, setAc] = useState(new AbortController());
 
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
+  useEffect(() => disposer(
+    () => ac.abort(),
+    reaction(() => chart, async ({ name, repo, version }) => {
+      try {
+        setError("");
+        setSelectedChart(undefined);
+        chartVersions.clear();
+        setReadme("");
 
-  componentWillUnmount() {
-    this.abortController?.abort();
-  }
+        const { readme, versions } = await getChartDetails(repo, name, { version });
 
-  componentDidMount() {
-    disposeOnUnmount(this, [
-      reaction(() => this.props.chart, async ({ name, repo, version }) => {
-        try {
-          this.selectedChart = undefined;
-          this.chartVersions = undefined;
-          this.readme = undefined;
+        setReadme(readme);
+        chartVersions.replace(versions);
+        setSelectedChart(versions[0]);
+      } catch (error) {
+        setError(String(error));
+        setSelectedChart(undefined);
+      }
+    }, {
+      fireImmediately: true,
+    }),
+  ), []);
 
-          const { readme, versions } = await getChartDetails(repo, name, { version });
-
-          this.readme = readme;
-          this.chartVersions = versions;
-          this.selectedChart = versions[0];
-        } catch (error) {
-          this.error = error;
-          this.selectedChart = null;
-        }
-      }, {
-        fireImmediately: true,
-      }),
-    ]);
-  }
-
-  @boundMethod
-  async onVersionChange({ value: chart }: SelectOption<HelmChart>) {
-    this.selectedChart = chart;
-    this.readme = null;
+  const onVersionChange = async ({ value: chart }: SelectOption<HelmChart>) => {
+    setSelectedChart(chart);
+    setReadme(readme);
 
     try {
-      this.abortController?.abort();
-      this.abortController = new AbortController();
-      const { chart: { name, repo } } = this.props;
-      const { readme } = await getChartDetails(repo, name, { version: chart.version, reqInit: { signal: this.abortController.signal } });
+      ac.abort();
+      setAc(new AbortController());
+      const { name, repo } = chart;
+      const { readme } = await getChartDetails(repo, name, { version: chart.version, reqInit: { signal: ac.signal }});
 
-      this.readme = readme;
+      setReadme(readme);
     } catch (error) {
-      this.error = error;
+      setError(String(error));
     }
-  }
-
-  @boundMethod
-  install() {
-    createInstallChartTab(this.selectedChart);
-    this.props.hideDetails();
-  }
-
-  renderIntroduction() {
-    const { selectedChart, chartVersions, onVersionChange } = this;
+  };
+  const install = ()  => {
+    newInstallChartTab(selectedChart);
+    hideDetails();
+  };
+  const renderIntroduction = () => {
     const placeholder = require("./helm-placeholder.svg");
 
     return (
@@ -124,7 +113,7 @@ export class HelmChartDetails extends Component<Props> {
         <div className="intro-contents box grow">
           <div className="description flex align-center justify-space-between">
             {selectedChart.getDescription()}
-            <Button primary label="Install" onClick={this.install} />
+            <Button primary label="Install" onClick={install} />
           </div>
           <DrawerItem name="Version" className="version" onClick={stopPropagation}>
             <Select
@@ -163,55 +152,59 @@ export class HelmChartDetails extends Component<Props> {
         </div>
       </div>
     );
-  }
-
-  renderReadme() {
-    if (this.readme === null) {
+  };
+  const renderReadme = () => {
+    if (readme === null) {
       return <Spinner center />;
     }
 
     return (
       <div className="chart-description">
-        <MarkdownViewer markdown={this.readme} />
+        <MarkdownViewer markdown={readme} />
       </div>
     );
-  }
-
-  renderContent() {
-    if (this.error) {
+  };
+  const renderContent = () => {
+    if (error) {
       return (
         <div className="box grow">
-          <p className="error">{this.error}</p>
+          <p className="error">{error}</p>
         </div>
       );
     }
 
-    if (!this.selectedChart) {
+    if (!selectedChart) {
       return <Spinner center />;
     }
 
     return (
       <div className="box grow">
-        {this.renderIntroduction()}
-        {this.renderReadme()}
+        {renderIntroduction()}
+        {renderReadme()}
       </div>
     );
+  };
+
+  if (!chart) {
+    return null;
   }
 
-  render() {
-    const { chart, hideDetails } = this.props;
-    const title = chart ? `Chart: ${chart.getFullName()}` : "";
+  return (
+    <Drawer
+      className="HelmChartDetails"
+      usePortal
+      open
+      title={`Chart: ${chart.getFullName()}`}
+      onClose={hideDetails}
+    >
+      {renderContent()}
+    </Drawer>
+  );
+});
 
-    return (
-      <Drawer
-        className="HelmChartDetails"
-        usePortal={true}
-        open={!!chart}
-        title={title}
-        onClose={hideDetails}
-      >
-        {this.renderContent()}
-      </Drawer>
-    );
-  }
-}
+export const HelmChartDetails = withInjectables<Dependencies, HelmChartDetailsProps>(NonInjectedHelmChartDetails, {
+  getProps: (di, props) => ({
+    newInstallChartTab: di.inject(newInstallChartTabInjectable),
+    ...props,
+  }),
+});

@@ -24,14 +24,14 @@ import "./log-controls.scss";
 import React from "react";
 import { observer } from "mobx-react";
 
-import { Pod } from "../../../common/k8s-api/endpoints";
-import { cssNames, saveFileDialog } from "../../utils";
-import type { LogsStore } from "./logs/store";
-import { Checkbox } from "../checkbox";
-import { Icon } from "../icon";
-import type { LogTabData } from "./log-tab/store";
+import { Pod } from "../../../../common/k8s-api/endpoints";
+import { cssNames, saveFileDialog } from "../../../utils";
+import type { LogsStore } from "./store";
+import { Checkbox } from "../../checkbox";
+import { Icon } from "../../icon";
+import type { LogTabData } from "../log-tab/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import logsStoreInjectable from "./logs/store.injectable";
+import logsStoreInjectable from "./store.injectable";
 
 export interface LogControlsProps {
   tabData?: LogTabData

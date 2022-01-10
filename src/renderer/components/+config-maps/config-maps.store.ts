@@ -20,16 +20,10 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { ConfigMap, configMapApi } from "../../../common/k8s-api/endpoints/configmap.api";
-import { isClusterPageContext } from "../../utils";
+import type { ConfigMap, ConfigMapApi } from "../../../common/k8s-api/endpoints/configmap.api";
 
-export class ConfigMapsStore extends KubeObjectStore<ConfigMap> {
-  api = configMapApi;
+export class ConfigMapStore extends KubeObjectStore<ConfigMap> {
+  constructor(public api: ConfigMapApi) {
+    super();
+  }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const configMapsStore = isClusterPageContext()
-  ? new ConfigMapsStore()
-  : undefined;

@@ -19,28 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ServiceAccount, serviceAccountsApi } from "../../../../common/k8s-api/endpoints";
+import type { ServiceAccount, ServiceAccountApi } from "../../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../../utils";
 
-export class ServiceAccountsStore extends KubeObjectStore<ServiceAccount> {
-  api = serviceAccountsApi;
-
-  constructor() {
+export class ServiceAccountStore extends KubeObjectStore<ServiceAccount> {
+  constructor(public api: ServiceAccountApi) {
     super();
-    autoBind(this);
   }
 
-  protected async createItem(params: { name: string; namespace?: string }) {
+  protected createItem = async (params: { name: string; namespace?: string }) => {
     await super.createItem(params);
 
     return this.api.get(params); // hackfix: load freshly created account, cause it doesn't have "secrets" field yet
-  }
+  };
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const serviceAccountsStore = isClusterPageContext()
-  ? new ServiceAccountsStore()
-  : undefined;

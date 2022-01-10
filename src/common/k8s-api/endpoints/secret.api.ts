@@ -22,8 +22,7 @@
 import { KubeObject } from "../kube-object";
 import type { KubeJsonApiData } from "../kube-json-api";
 import { autoBind } from "../../utils";
-import { KubeApi } from "../kube-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export enum SecretType {
   Opaque = "Opaque",
@@ -70,11 +69,11 @@ export class Secret extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const secretsApi = isClusterPageContext()
-  ? new KubeApi<Secret>({
-    objectConstructor: Secret,
-  })
-  : undefined;
+export class SecretApi extends KubeApi<Secret> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Secret,
+    });
+  }
+}

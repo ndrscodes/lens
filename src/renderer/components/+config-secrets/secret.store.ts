@@ -18,30 +18,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { sum } from "lodash";
-import { computed, makeObservable } from "mobx";
 
-import type { Node, NodeApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
+import type { Secret, SecretApi } from "../../../common/k8s-api/endpoints";
 
-export class NodeStore extends KubeObjectStore<Node> {
-  constructor(public api: NodeApi) {
+export class SecretStore extends KubeObjectStore<Secret> {
+  constructor(public api: SecretApi)  {
     super();
-
-    makeObservable(this);
-    autoBind(this);
-  }
-
-  @computed get masterNodes() {
-    return this.items.filter(node => node.getRoleLabels().includes("master"));
-  }
-
-  @computed get workerNodes() {
-    return this.items.filter(node => !node.getRoleLabels().includes("master"));
-  }
-
-  getWarningsCount(): number {
-    return sum(this.items.map((node: Node) => node.getWarningConditions().length));
   }
 }

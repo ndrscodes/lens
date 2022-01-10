@@ -20,10 +20,9 @@
  */
 
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { autoBind } from "../../utils";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export enum LimitType {
   CONTAINER = "Container",
@@ -81,11 +80,11 @@ export class LimitRange extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const limitRangeApi = isClusterPageContext()
-  ? new KubeApi<LimitRange>({
-    objectConstructor: LimitRange,
-  })
-  : undefined;
+export class LimitRangeApi extends KubeApi<LimitRange> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: LimitRange,
+    });
+  }
+}

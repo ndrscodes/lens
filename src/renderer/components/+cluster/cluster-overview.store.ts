@@ -21,8 +21,8 @@
 
 import { action, observable, reaction, when, makeObservable } from "mobx";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { Cluster, clusterApi, getMetricsByNodeNames, IClusterMetrics } from "../../../common/k8s-api/endpoints";
-import { autoBind, createStorage, isClusterPageContext } from "../../utils";
+import { Cluster, ClusterApi, getMetricsByNodeNames, IClusterMetrics } from "../../../common/k8s-api/endpoints";
+import { autoBind, createStorage } from "../../utils";
 import { IMetricsReqParams, normalizeMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 import { nodesStore } from "../+nodes/nodes.store";
 
@@ -41,9 +41,7 @@ export interface ClusterOverviewStorageState {
   metricNodeRole: MetricNodeRole,
 }
 
-export class ClusterOverviewStore extends KubeObjectStore<Cluster> implements ClusterOverviewStorageState {
-  api = clusterApi;
-
+export class ClusterStore extends KubeObjectStore<Cluster> implements ClusterOverviewStorageState {
   @observable metrics: Partial<IClusterMetrics> = {};
   @observable metricsLoaded = false;
 
@@ -68,7 +66,7 @@ export class ClusterOverviewStore extends KubeObjectStore<Cluster> implements Cl
     this.storage.merge({ metricNodeRole: value });
   }
 
-  constructor() {
+  constructor(public api: ClusterApi) {
     super();
     makeObservable(this);
     autoBind(this);
@@ -127,10 +125,3 @@ export class ClusterOverviewStore extends KubeObjectStore<Cluster> implements Cl
     this.storage?.reset();
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const clusterOverviewStore = isClusterPageContext()
-  ? new ClusterOverviewStore()
-  : undefined;

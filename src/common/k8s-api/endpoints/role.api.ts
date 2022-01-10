@@ -20,8 +20,7 @@
  */
 
 import { KubeObject } from "../kube-object";
-import { KubeApi } from "../kube-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export interface Role {
   rules: {
@@ -42,11 +41,11 @@ export class Role extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const roleApi = isClusterPageContext()
-  ? new KubeApi<Role>({
-    objectConstructor: Role,
-  })
-  : undefined;
+export class RoleApi extends KubeApi<Role> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: Role,
+    });
+  }
+}

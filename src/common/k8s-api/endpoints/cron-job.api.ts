@@ -24,41 +24,8 @@ import { KubeObject } from "../kube-object";
 import type { IPodContainer } from "./pods.api";
 import { formatDuration } from "../../utils/formatDuration";
 import { autoBind } from "../../utils";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
-
-export class CronJobApi extends KubeApi<CronJob> {
-  suspend(params: { namespace: string; name: string }) {
-    return this.request.patch(this.getUrl(params), {
-      data: {
-        spec: {
-          suspend: true,
-        },
-      },
-    },
-    {
-      headers: {
-        "content-type": "application/strategic-merge-patch+json",
-      },
-    });
-  }
-
-  resume(params: { namespace: string; name: string }) {
-    return this.request.patch(this.getUrl(params), {
-      data: {
-        spec: {
-          suspend: false,
-        },
-      },
-    },
-    {
-      headers: {
-        "content-type": "application/strategic-merge-patch+json",
-      },
-    });
-  }
-}
 
 export interface CronJob {
   spec: {
@@ -141,11 +108,41 @@ export class CronJob extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const cronJobApi = isClusterPageContext()
-  ? new CronJobApi({
-    objectConstructor: CronJob,
-  })
-  : undefined;
+export class CronJobApi extends KubeApi<CronJob> {
+  constructor(args: SpecificApiOptions<CronJob> = {}) {
+    super({
+      ...args,
+      objectConstructor: CronJob,
+    });
+  }
+
+  suspend(params: { namespace: string; name: string }) {
+    return this.request.patch(this.getUrl(params), {
+      data: {
+        spec: {
+          suspend: true,
+        },
+      },
+    },
+    {
+      headers: {
+        "content-type": "application/strategic-merge-patch+json",
+      },
+    });
+  }
+
+  resume(params: { namespace: string; name: string }) {
+    return this.request.patch(this.getUrl(params), {
+      data: {
+        spec: {
+          suspend: false,
+        },
+      },
+    },
+    {
+      headers: {
+        "content-type": "application/strategic-merge-patch+json",
+      },
+    });
+  }
+}

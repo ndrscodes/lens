@@ -33,7 +33,7 @@ import { getDiForUnitTesting } from "../../getDiForUnitTesting";
 
 import clusterInjectable from "./dependencies/cluster.injectable";
 import hideDetailsInjectable from "./dependencies/hide-details.injectable";
-import { TabKind } from "../dock/dock/store";
+import { TabKind } from "../dock/store";
 import kubeObjectMenuRegistryInjectable from "./dependencies/kube-object-menu-items/kube-object-menu-registry.injectable";
 import { DiRender, renderFor } from "../test-utils/renderFor";
 import type { Cluster } from "../../../main/cluster";

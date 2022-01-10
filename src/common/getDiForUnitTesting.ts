@@ -19,8 +19,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ThemeStore } from "../../renderer/theme.store";
+import glob from "glob";
+import { memoize } from "lodash/fp";
 
-export function getActiveTheme() {
-  return ThemeStore.getInstance().activeTheme;
-}
+import {
+  createContainer,
+  ConfigurableDependencyInjectionContainer,
+} from "@ogre-tools/injectable";
+
+export const getDiForUnitTesting = () => {
+  const di: ConfigurableDependencyInjectionContainer = createContainer();
+
+  getInjectableFilePaths()
+    .map(key => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const injectable = require(key).default;
+
+      return {
+        id: key,
+        ...injectable,
+        aliases: [injectable, ...(injectable.aliases || [])],
+      };
+    })
+
+    .forEach(injectable => di.register(injectable));
+
+  di.preventSideEffects();
+
+  return di;
+};
+
+const getInjectableFilePaths = memoize(() => [
+  ...glob.sync("./**/*.injectable.{ts,tsx}", { cwd: __dirname }),
+  ...glob.sync("../extensions/**/*.injectable.{ts,tsx}", { cwd: __dirname }),
+]);

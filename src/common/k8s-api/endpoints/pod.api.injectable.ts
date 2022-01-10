@@ -18,19 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { isClusterPageContext } from "../../utils";
-import { CRDStore } from "./crd.store";
-import initCustomResourceStoreInjectable from "./init-custom-resource-store.injectable";
+import type { PodApi } from ".";
+import apiManagerInjectable from "../api-manager.injectable";
 
-const crdStoreInjectable = getInjectable({
-  instantiate: (di) => isClusterPageContext()
-    ? new CRDStore({
-      initCustomResourceStore: di.inject(initCustomResourceStoreInjectable),
-    })
-    : undefined,
+const podApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/pods") as PodApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default crdStoreInjectable;
+export default podApiInjectable;

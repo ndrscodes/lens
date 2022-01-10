@@ -24,11 +24,10 @@ import "./pods.scss";
 import React, { Fragment } from "react";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
-import { podsStore } from "./pods.store";
 import type { RouteComponentProps } from "react-router";
-import { EventStore, eventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/event.store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
-import { nodesApi, Pod } from "../../../common/k8s-api/endpoints";
+import type { NodeApi, Pod } from "../../../common/k8s-api/endpoints";
 import { StatusBrick } from "../status-brick";
 import { cssNames, getConvertedParts, stopPropagation } from "../../utils";
 import toPairs from "lodash/toPairs";
@@ -41,7 +40,10 @@ import type { PodsRouteParams } from "../../../common/routes";
 import { getDetailsUrl } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
-import type { PodsStore } from "../../../extensions/renderer/k8s-api";
+import type { PodsStore } from "../../../extensions/renderer-api/k8s-api";
+import nodeApiInjectable from "../../../common/k8s-api/endpoints/node.api.injectable";
+import podStoreInjectable from "./pod.store.injectable";
+import eventStoreInjectable from "../+events/event.store.injectable";
 
 enum columnId {
   name = "name",
@@ -60,11 +62,12 @@ export interface PodsProps extends RouteComponentProps<PodsRouteParams> {
 
 interface Dependencies {
   apiManager: ApiManager;
-  podsStore: PodsStore;
+  podStore: PodsStore;
   eventStore: EventStore;
+  nodeApi: NodeApi;
 }
 
-const NonInjectedPods = observer(({ apiManager, podsStore, eventStore }: Dependencies & PodsProps) => {
+const NonInjectedPods = observer(({ apiManager, podStore, eventStore, nodeApi }: Dependencies & PodsProps) => {
   const renderContainersStatus = (pod: Pod) => (
     pod.getContainerStatuses()
       .map(({ name, state, ready }) => (
@@ -97,7 +100,7 @@ const NonInjectedPods = observer(({ apiManager, podsStore, eventStore }: Depende
   return (
     <KubeObjectListLayout
       className="Pods"
-      store={podsStore}
+      store={podStore}
       dependentStores={[eventStore]} // status icon component uses event store
       tableId = "workloads_pods"
       isConfigurable
@@ -151,7 +154,7 @@ const NonInjectedPods = observer(({ apiManager, podsStore, eventStore }: Depende
         }),
         pod.getNodeName() ?
           <Badge flat key="node" className="node" tooltip={pod.getNodeName()} expandable={false}>
-            <Link to={getDetailsUrl(nodesApi.getUrl({ name: pod.getNodeName() }))} onClick={stopPropagation}>
+            <Link to={getDetailsUrl(nodeApi.getUrl({ name: pod.getNodeName() }))} onClick={stopPropagation}>
               {pod.getNodeName()}
             </Link>
           </Badge>
@@ -167,8 +170,9 @@ const NonInjectedPods = observer(({ apiManager, podsStore, eventStore }: Depende
 export const Pods = withInjectables<Dependencies, PodsProps>(NonInjectedPods, {
   getProps: (di, props) => ({
     apiManager: di.inject(apiManagerInjectable),
-    podsStore,
-    eventStore,
+    podStore: di.inject(podStoreInjectable),
+    eventStore: di.inject(eventStoreInjectable),
+    nodeApi: di.inject(nodeApiInjectable),
     ...props,
   }),
 });

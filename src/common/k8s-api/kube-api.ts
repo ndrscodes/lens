@@ -41,6 +41,13 @@ import { Agent, AgentOptions } from "https";
 import type { Patch } from "rfc6902";
 import { makeObservable, observable } from "mobx";
 
+export type SpecificApiOptions<T extends KubeObject> = Omit<IKubeApiOptions<T>, "objectConstructor"> & {
+  /**
+   * @deprecated A specific objectConstructor should not be passed in and will be overridden
+   */
+  objectConstructor?: any;
+};
+
 /**
  * The options used for creating a `KubeApi`
  */

@@ -19,8 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { KubeObject } from "../kube-object";
 
 export interface ClusterRole {
@@ -42,11 +41,11 @@ export class ClusterRole extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const clusterRoleApi = isClusterPageContext()
-  ? new KubeApi<ClusterRole>({
-    objectConstructor: ClusterRole,
-  })
-  : undefined;
+export class ClusterRoleApi extends KubeApi<ClusterRole> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: ClusterRole,
+    });
+  }
+}

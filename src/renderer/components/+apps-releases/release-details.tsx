@@ -41,7 +41,7 @@ import { Notifications } from "../notifications";
 import { ThemeStore } from "../../theme.store";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";
-import { secretsStore, SecretsStore } from "../+config-secrets/secrets.store";
+import { secretsStore, SecretStore } from "../+config-secrets/secret.store";
 import type { Secret } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
 import { Checkbox } from "../checkbox";
@@ -59,7 +59,7 @@ export interface ReleaseDetailsProps {
 interface Dependencies {
   newUpgradeChartTab: (release: HelmRelease, data?: DockTabCreateSpecific) => DockTabData;
   apiManager: ApiManager;
-  secretsStore: SecretsStore;
+  secretsStore: SecretStore;
 }
 
 const NonInjectedReleaseDetails = observer(({

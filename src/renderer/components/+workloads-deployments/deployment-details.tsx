@@ -29,7 +29,7 @@ import { Badge } from "../badge";
 import { Deployment, getMetricsForDeployments, IPodMetrics } from "../../../common/k8s-api/endpoints";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { ResourceMetrics, ResourceMetricsText } from "../resource-metrics";
 import { deploymentStore } from "./deployments.store";

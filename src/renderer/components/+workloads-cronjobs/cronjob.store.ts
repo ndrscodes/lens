@@ -20,14 +20,12 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind, isClusterPageContext } from "../../utils";
-import { CronJob, cronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
+import { autoBind } from "../../utils";
+import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
 import { jobStore } from "../+workloads-jobs/job.store";
 
 export class CronJobStore extends KubeObjectStore<CronJob> {
-  api = cronJobApi;
-
-  constructor() {
+  constructor(public api: CronJobApi) {
     super();
     autoBind(this);
   }
@@ -56,10 +54,3 @@ export class CronJobStore extends KubeObjectStore<CronJob> {
     return jobs.filter(job => !job.getCondition()).length;
   }
 }
-
-/**
- * Only available within kubernetes cluster pages
- */
-export const cronJobStore = isClusterPageContext()
-  ? new CronJobStore()
-  : undefined;

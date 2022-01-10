@@ -18,18 +18,12 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { Secret, secretsApi } from "../../../common/k8s-api/endpoints";
-import { isClusterPageContext } from "../../utils";
+let legacyGlobalDi: DependencyInjectionContainer;
 
-export class SecretsStore extends KubeObjectStore<Secret> {
-  api = secretsApi;
-}
+export const setLegacyGlobalDiForExtensionApi = (di: DependencyInjectionContainer) => {
+  legacyGlobalDi = di;
+};
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const secretsStore = isClusterPageContext()
-  ? new SecretsStore()
-  : undefined;
+export const getLegacyGlobalDiForExtensionApi = () => legacyGlobalDi;

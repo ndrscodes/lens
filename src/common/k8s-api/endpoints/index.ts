@@ -38,7 +38,7 @@ export * from "./job.api";
 export * from "./limit-range.api";
 export * from "./namespaces.api";
 export * from "./network-policy.api";
-export * from "./nodes.api";
+export * from "./node.api";
 export * from "./persistent-volume.api";
 export * from "./persistent-volume-claims.api";
 export * from "./pods.api";

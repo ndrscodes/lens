@@ -26,7 +26,7 @@ import type { KubeConfig } from "@kubernetes/client-node";
 import type { Cluster } from "../cluster";
 import { ShellOpenError, ShellSession } from "./shell-session";
 import { get } from "lodash";
-import { Node, NodesApi } from "../../common/k8s-api/endpoints";
+import { Node, NodeApi } from "../../common/k8s-api/endpoints";
 import { KubeJsonApi } from "../../common/k8s-api/kube-json-api";
 import logger from "../logger";
 import { TerminalChannels } from "../../renderer/api/terminal-api";
@@ -62,7 +62,7 @@ export class NodeShellSession extends ShellSession {
 
     const env = await this.getCachedShellEnv();
     const args = ["exec", "-i", "-t", "-n", "kube-system", this.podName, "--"];
-    const nodeApi = new NodesApi({
+    const nodeApi = new NodeApi({
       objectConstructor: Node,
       request: KubeJsonApi.forCluster(this.cluster.id),
     });

@@ -18,15 +18,31 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import type { Injectable } from "@ogre-tools/injectable";
 
-export type KubeObjectStatus = {
-  level: KubeObjectStatusLevel;
-  text: string;
-  timestamp?: string;
-};
+import { getLegacyGlobalDiForExtensionApi } from "./legacy-global-di-for-extension-api";
 
-export enum KubeObjectStatusLevel {
-  INFO = 1,
-  WARNING = 2,
-  CRITICAL = 3,
-}
+type TentativeTuple<T> = T extends object ? [T] : [undefined?];
+
+type FactoryType = <
+  TInjectable extends Injectable<unknown, TInstance, TInstantiationParameter>,
+  TInstantiationParameter,
+  TInstance extends (...args: unknown[]) => any,
+  TFunction extends (...args: unknown[]) => any = Awaited<
+    ReturnType<TInjectable["instantiate"]>
+  >,
+>(
+  injectableKey: TInjectable,
+  ...instantiationParameter: TentativeTuple<TInstantiationParameter>
+) => (...args: Parameters<TFunction>) => ReturnType<TFunction>;
+
+export const asLegacyGlobalFunctionForExtensionApi: FactoryType =
+  (injectableKey, ...instantiationParameter) =>
+    (...args) => {
+      const injected = getLegacyGlobalDiForExtensionApi().inject(
+        injectableKey,
+        ...instantiationParameter,
+      );
+
+      return injected(...args);
+    };

@@ -29,7 +29,7 @@ import { DrawerItem } from "../drawer";
 import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import { statefulSetStore } from "./statefulset.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { getMetricsForStatefulSets, IPodMetrics, StatefulSet } from "../../../common/k8s-api/endpoints";

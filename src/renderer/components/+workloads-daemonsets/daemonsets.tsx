@@ -27,7 +27,7 @@ import type { RouteComponentProps } from "react-router";
 import type { DaemonSet } from "../../../common/k8s-api/endpoints";
 import { eventStore } from "../+events/event.store";
 import { daemonSetStore } from "./daemonsets.store";
-import { podsStore } from "../+workloads-pods/pods.store";
+import { podsStore } from "../+workloads-pods/pod.store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import { Badge } from "../badge";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";

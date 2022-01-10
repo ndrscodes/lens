@@ -28,7 +28,7 @@ import { Drawer } from "../drawer";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Spinner } from "../spinner";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
-import type { CRDStore } from "../+custom-resources/crd.store";
+import type { CustomResourceDefinitionStore } from "../+custom-resources/crd.store";
 import { KubeObjectMenu } from "../kube-object-menu";
 import { CrdResourceDetails } from "../+custom-resources";
 import { KubeObjectMeta } from "../kube-object-meta";
@@ -47,7 +47,7 @@ export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
 interface Dependencies {
   kubeDetailItems: IComputedValue<Map<string, Map<string, KubeObjectDetailComponents<KubeObject>[]>>>;
   apiManager: ApiManager;
-  crdStore: CRDStore;
+  crdStore: CustomResourceDefinitionStore;
 }
 
 const NonInjectedKubeObjectDetails = observer(({ kubeDetailItems, apiManager, crdStore }: Dependencies) => {

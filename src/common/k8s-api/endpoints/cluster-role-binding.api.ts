@@ -18,8 +18,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { KubeObject } from "../kube-object";
 
 export type ClusterRoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
@@ -54,11 +53,11 @@ export class ClusterRoleBinding extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const clusterRoleBindingApi = isClusterPageContext()
-  ? new KubeApi<ClusterRoleBinding>({
-    objectConstructor: ClusterRoleBinding,
-  })
-  : undefined;
+export class ClusterRoleBindingApi extends KubeApi<ClusterRoleBinding> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: ClusterRoleBinding,
+    });
+  }
+}

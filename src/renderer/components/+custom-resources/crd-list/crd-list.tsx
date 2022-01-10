@@ -26,7 +26,7 @@ import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import { iter, stopPropagation, ToggleSet } from "../../../utils";
 import { KubeObjectListLayout } from "../../kube-object-list-layout";
-import type { CRDStore } from "../crd.store";
+import type { CustomResourceDefinitionStore } from "../crd.store";
 import { Select } from "../../select";
 import { Icon } from "../../icon";
 import { withInjectables } from "@ogre-tools/injectable-react";
@@ -47,7 +47,7 @@ export interface CrdListProps {
 }
 
 interface Dependencies {
-  crdStore: CRDStore;
+  crdStore: CustomResourceDefinitionStore;
   crdGroupsUrlParam: PageParam<string[]>;
 }
 

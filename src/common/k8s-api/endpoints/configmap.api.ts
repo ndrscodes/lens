@@ -21,9 +21,8 @@
 
 import { KubeObject } from "../kube-object";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { KubeApi } from "../kube-api";
+import { KubeApi, SpecificApiOptions } from "../kube-api";
 import { autoBind } from "../../utils";
-import { isClusterPageContext } from "../../utils/cluster-id-url-parsing";
 
 export interface ConfigMap {
   data: {
@@ -48,11 +47,11 @@ export class ConfigMap extends KubeObject {
   }
 }
 
-/**
- * Only available within kubernetes cluster pages
- */
-export const configMapApi = isClusterPageContext()
-  ? new KubeApi<ConfigMap>({
-    objectConstructor: ConfigMap,
-  })
-  : undefined;
+export class ConfigMapApi extends KubeApi<ConfigMap> {
+  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+    super({
+      ...args,
+      objectConstructor: ConfigMap,
+    });
+  }
+}

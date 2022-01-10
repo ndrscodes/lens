@@ -21,93 +21,63 @@
 
 import "./deployment-scale-dialog.scss";
 
-import React, { Component } from "react";
-import { computed, observable, makeObservable } from "mobx";
+import React, { useState } from "react";
+import { observable } from "mobx";
 import { observer } from "mobx-react";
 import { Dialog, DialogProps } from "../dialog";
 import { Wizard, WizardStep } from "../wizard";
-import { Deployment, DeploymentApi, deploymentApi } from "../../../common/k8s-api/endpoints";
+import type { Deployment, DeploymentApi } from "../../../common/k8s-api/endpoints";
 import { Icon } from "../icon";
 import { Slider } from "../slider";
 import { Notifications } from "../notifications";
 import { cssNames } from "../../utils";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import deploymentApiInjectable from "../../../common/k8s-api/endpoints/deployment.api.injectable";
 
-interface Props extends Partial<DialogProps> {
-  deploymentApi: DeploymentApi
+export interface DeploymentScaleDialogProps extends Partial<DialogProps> {
 }
 
 const dialogState = observable.object({
-  isOpen: false,
-  data: null as Deployment,
+  deployment: null as Deployment,
+}, {
+  deployment: observable.ref,
 });
 
-@observer
-export class DeploymentScaleDialog extends Component<Props> {
-  static defaultProps = {
-    deploymentApi,
+interface Dependencies {
+  deploymentApi: DeploymentApi;
+}
+
+const defaultScaleMax = 50;
+const scaleMin = 0;
+
+const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, ...dialogProps }: Dependencies & DeploymentScaleDialogProps) => {
+  const [ready, setReady] = useState(false);
+  const [currentReplicas, setCurrentReplicas] = useState(0);
+  const [desiredReplicas, setDesiredReplicas] = useState(0);
+
+  const { deployment } = dialogState;
+  const scaleMax = Math.min(currentReplicas, defaultScaleMax) * 2;
+
+  const onOpen = async () => {
+    setCurrentReplicas(
+      await deploymentApi.getReplicas({
+        namespace: deployment.getNs(),
+        name: deployment.getName(),
+      }),
+    );
+    setDesiredReplicas(currentReplicas);
+    setReady(true);
   };
 
-  @observable ready = false;
-  @observable currentReplicas = 0;
-  @observable desiredReplicas = 0;
+  const onClose = () => setReady(false);
+  const onChange = (evt: React.ChangeEvent, value: number) => setDesiredReplicas(value);
+  const desiredReplicasUp = () => setDesiredReplicas(Math.min(scaleMax, desiredReplicas + 1));
+  const desiredReplicasDown = () => setDesiredReplicas(Math.max(scaleMin, desiredReplicas - 1));
 
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
-
-  static open(deployment: Deployment) {
-    dialogState.isOpen = true;
-    dialogState.data = deployment;
-  }
-
-  static close() {
-    dialogState.isOpen = false;
-  }
-
-  get deployment() {
-    return dialogState.data;
-  }
-
-  close = () => {
-    DeploymentScaleDialog.close();
-  };
-
-  @computed get scaleMax() {
-    const { currentReplicas } = this;
-    const defaultMax = 50;
-
-    return currentReplicas <= defaultMax
-      ? defaultMax * 2
-      : currentReplicas * 2;
-  }
-
-  onOpen = async () => {
-    const { deployment } = this;
-
-    this.currentReplicas = await this.props.deploymentApi.getReplicas({
-      namespace: deployment.getNs(),
-      name: deployment.getName(),
-    });
-    this.desiredReplicas = this.currentReplicas;
-    this.ready = true;
-  };
-
-  onClose = () => {
-    this.ready = false;
-  };
-
-  onChange = (evt: React.ChangeEvent, value: number) => {
-    this.desiredReplicas = value;
-  };
-
-  scale = async () => {
-    const { deployment } = this;
-    const { currentReplicas, desiredReplicas, close } = this;
-
+  const scale = async () => {
     try {
       if (currentReplicas !== desiredReplicas) {
-        await this.props.deploymentApi.scale({
+        await deploymentApi.scale({
           name: deployment.getName(),
           namespace: deployment.getNs(),
         }, desiredReplicas);
@@ -118,84 +88,75 @@ export class DeploymentScaleDialog extends Component<Props> {
     }
   };
 
-  private readonly scaleMin = 0;
-
-  desiredReplicasUp = () => {
-    this.desiredReplicas = Math.min(this.scaleMax, this.desiredReplicas + 1);
-  };
-
-  desiredReplicasDown = () => {
-    this.desiredReplicas = Math.max(this.scaleMin, this.desiredReplicas - 1);
-  };
-
-  renderContents() {
-    const { currentReplicas, desiredReplicas, onChange, scaleMax } = this;
-    const warning = currentReplicas < 10 && desiredReplicas > 90;
-
-    return (
-      <>
-        <div className="current-scale" data-testid="current-scale">
-          Current replica scale: {currentReplicas}
-        </div>
-        <div className="flex gaps align-center">
-          <div className="desired-scale" data-testid="desired-scale">
-            Desired number of replicas: {desiredReplicas}
-          </div>
-          <div className="slider-container flex align-center">
-            <Slider value={desiredReplicas} max={scaleMax} onChange={onChange as any /** see: https://github.com/mui-org/material-ui/issues/20191 */}/>
-          </div>
-          <div className="plus-minus-container flex gaps">
-            <Icon
-              material="add_circle_outline"
-              onClick={this.desiredReplicasUp}
-              data-testid="desired-replicas-up"
-            />
-            <Icon
-              material="remove_circle_outline"
-              onClick={this.desiredReplicasDown}
-              data-testid="desired-replicas-down"
-            />
-          </div>
-        </div>
-        {warning &&
-        <div className="warning" data-testid="warning">
-          <Icon material="warning"/>
-          High number of replicas may cause cluster performance issues
-        </div>
-        }
-      </>
-    );
-  }
-
-  render() {
-    const { className, ...dialogProps } = this.props;
-    const deploymentName = this.deployment ? this.deployment.getName() : "";
-    const header = (
-      <h5>
-        Scale Deployment <span>{deploymentName}</span>
-      </h5>
-    );
-
-    return (
-      <Dialog
-        {...dialogProps}
-        isOpen={dialogState.isOpen}
-        className={cssNames("DeploymentScaleDialog", className)}
-        onOpen={this.onOpen}
-        onClose={this.onClose}
-        close={this.close}
+  return (
+    <Dialog
+      {...dialogProps}
+      isOpen={Boolean(deployment)}
+      className={cssNames("DeploymentScaleDialog", className)}
+      onOpen={onOpen}
+      onClose={onClose}
+      close={close}
+    >
+      <Wizard
+        header={(
+          <h5>
+            Scale Deployment <span>{deployment?.getName()}</span>
+          </h5>
+        )}
+        done={close}
       >
-        <Wizard header={header} done={this.close}>
-          <WizardStep
-            contentClass="flex gaps column"
-            next={this.scale}
-            nextLabel="Scale"
-            disabledNext={!this.ready}
-          >
-            {this.renderContents()}
-          </WizardStep>
-        </Wizard>
-      </Dialog>
-    );
-  }
+        <WizardStep
+          contentClass="flex gaps column"
+          next={scale}
+          nextLabel="Scale"
+          disabledNext={!ready}
+        >
+          <div className="current-scale" data-testid="current-scale">
+            Current replica scale: {currentReplicas}
+          </div>
+          <div className="flex gaps align-center">
+            <div className="desired-scale" data-testid="desired-scale">
+              Desired number of replicas: {desiredReplicas}
+            </div>
+            <div className="slider-container flex align-center">
+              <Slider value={desiredReplicas} max={scaleMax} onChange={onChange as any /** see: https://github.com/mui-org/material-ui/issues/20191 */}/>
+            </div>
+            <div className="plus-minus-container flex gaps">
+              <Icon
+                material="add_circle_outline"
+                onClick={desiredReplicasUp}
+                data-testid="desired-replicas-up"
+              />
+              <Icon
+                material="remove_circle_outline"
+                onClick={desiredReplicasDown}
+                data-testid="desired-replicas-down"
+              />
+            </div>
+          </div>
+          {currentReplicas < 10 && desiredReplicas > 90 && (
+            <div className="warning" data-testid="warning">
+              <Icon material="warning"/>
+              High number of replicas may cause cluster performance issues
+            </div>
+          )}
+        </WizardStep>
+      </Wizard>
+    </Dialog>
+  );
+});
+
+export const DeploymentScaleDialog = withInjectables<Dependencies, DeploymentScaleDialogProps>(NonInjectedDeploymentScaleDialog, {
+  getProps: (di, props) => ({
+    deploymentApi: di.inject(deploymentApiInjectable),
+    ...props,
+  }),
+});
+
+export function openDeploymentScaleDialog(deployment: Deployment) {
+  dialogState.deployment = deployment;
+}
+
+export function closeDeploymentScaleDialog() {
+  dialogState.deployment = null;
 }

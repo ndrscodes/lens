@@ -30,7 +30,7 @@ import { Workloads } from "../+workloads";
 import { UserManagement } from "../+user-management";
 import { Storage } from "../+storage";
 import { Network } from "../+network";
-import type { CRDStore } from "../+custom-resources/crd.store";
+import type { CustomResourceDefinitionStore } from "../+custom-resources/crd.store";
 import { CustomResources } from "../+custom-resources/custom-resources";
 import { isActiveRoute } from "../../navigation";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
@@ -54,7 +54,7 @@ export interface SidebarProps {
 
 interface Dependencies {
   kubeWatchApi: KubeWatchApi;
-  crdStore: CRDStore;
+  crdStore: CustomResourceDefinitionStore;
   clusterEntity: KubernetesCluster;
   clusterPageMenuRegistry: ClusterPageMenuRegistry;
   clusterPageRegistry: ClusterPageRegistry;
