@@ -18,19 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import type { PersistentVolumeStore } from "./persistent-volume.store";
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
-import type { StorageClass, StorageClassApi } from "../../../common/k8s-api/endpoints/storage-class.api";
-import { volumesStore } from "../+storage-volumes/persistent-volume.store";
+const persistentVolumeStoreInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/api/v1/persistentvolumes") as PersistentVolumeStore,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-export class StorageClassStore extends KubeObjectStore<StorageClass> {
-  constructor(public api: StorageClassApi) {
-    super();
-    autoBind(this);
-  }
-
-  getPersistentVolumes(storageClass: StorageClass) {
-    return volumesStore.getByStorageClass(storageClass);
-  }
-}
+export default persistentVolumeStoreInjectable;

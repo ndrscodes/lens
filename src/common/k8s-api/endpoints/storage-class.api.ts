@@ -63,7 +63,7 @@ export class StorageClass extends KubeObject {
 }
 
 export class StorageClassApi extends KubeApi<StorageClass> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<StorageClass> = {}) {
     super({
       ...args,
       objectConstructor: StorageClass,

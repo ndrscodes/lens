@@ -31,7 +31,7 @@ import { StorageClass } from "../../../common/k8s-api/endpoints";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { storageClassStore } from "./storage-class.store";
 import { VolumeDetailsList } from "../+storage-volumes/volume-details-list";
-import { volumesStore } from "../+storage-volumes/volumes.store";
+import { volumesStore } from "../+storage-volumes/persistent-volume.store";
 import logger from "../../../common/logger";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 

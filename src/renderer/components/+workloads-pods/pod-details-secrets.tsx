@@ -21,67 +21,67 @@
 
 import "./pod-details-secrets.scss";
 
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { autorun, observable, makeObservable } from "mobx";
-import { disposeOnUnmount, observer } from "mobx-react";
-import { Pod, Secret, secretsApi } from "../../../common/k8s-api/endpoints";
+import { autorun, observable } from "mobx";
+import { observer } from "mobx-react";
+import type { Pod, Secret, SecretApi } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import secretApiInjectable from "../../../common/k8s-api/endpoints/secret.api.injectable";
 
-interface Props {
+export interface PodDetailsSecretsProps {
   pod: Pod;
 }
 
-@observer
-export class PodDetailsSecrets extends Component<Props> {
-  @observable secrets: Map<string, Secret> = observable.map<string, Secret>();
+interface Dependencies {
+  secretApi: SecretApi;
+}
 
-  @disposeOnUnmount
-  secretsLoader = autorun(async () => {
-    const { pod } = this.props;
+const NonInjectedPodDetailsSecrets = observer(({ secretApi, pod }: Dependencies & PodDetailsSecretsProps) => {
+  const [secrets] = useState(observable.map<string, Secret>());
 
-    const secrets = await Promise.all(
-      pod.getSecrets().map(secretName => secretsApi.get({
+  useEffect(() => autorun(async () => {
+    const getSecrets = await Promise.all(
+      pod.getSecrets().map(secretName => secretApi.get({
         name: secretName,
         namespace: pod.getNs(),
       })),
     );
 
-    secrets.forEach(secret => secret && this.secrets.set(secret.getName(), secret));
-  });
+    for (const secret of getSecrets) {
+      if (secret) {
+        secrets.set(secret.getName(), secret);
+      }
+    }
+  }), []);
 
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
+  return (
+    <div className="PodDetailsSecrets">
+      {
+        pod.getSecrets().map(secretName => {
+          const secret = secrets.get(secretName);
 
-  render() {
-    const { pod } = this.props;
+          return secret
+            ? (
+              <Link key={secret.getId()} to={getDetailsUrl(secret.selfLink)}>
+                {secret.getName()}
+              </Link>
+            )
+            : (
+              <span key={secretName}>
+                {secretName}
+              </span>
+            );
+        })
+      }
+    </div>
+  );
+});
 
-    return (
-      <div className="PodDetailsSecrets">
-        {
-          pod.getSecrets().map(secretName => {
-            const secret = this.secrets.get(secretName);
-
-            if (secret) {
-              return this.renderSecretLink(secret);
-            } else {
-              return (
-                <span key={secretName}>{secretName}</span>
-              );
-            }
-          })
-        }
-      </div>
-    );
-  }
-
-  protected renderSecretLink(secret: Secret) {
-    return (
-      <Link key={secret.getId()} to={getDetailsUrl(secret.selfLink)}>
-        {secret.getName()}
-      </Link>
-    );
-  }
-}
+export const PodDetailsSecrets = withInjectables<Dependencies, PodDetailsSecretsProps>(NonInjectedPodDetailsSecrets, {
+  getProps: (di, props) => ({
+    secretApi: di.inject(secretApiInjectable),
+    ...props,
+  }),
+});

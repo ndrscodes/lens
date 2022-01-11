@@ -38,7 +38,7 @@ import { NodeStore } from "../../renderer/components/+nodes/nodes.store";
 import { PodSecurityPolicyStore } from "../../renderer/components/+pod-security-policies/pod-security-policies.store";
 import { StorageClassStore } from "../../renderer/components/+storage-classes/storage-class.store";
 import { PersistentVolumeClaimStore } from "../../renderer/components/+storage-volume-claims/volume-claim.store";
-import { PersistentVolumeStore } from "../../renderer/components/+storage-volumes/volumes.store";
+import { PersistentVolumeStore } from "../../renderer/components/+storage-volumes/persistent-volume.store";
 import { ClusterRoleBindingStore } from "../../renderer/components/+user-management/+cluster-role-bindings/store";
 import { ClusterRoleStore } from "../../renderer/components/+user-management/+cluster-roles/store";
 import { RoleBindingStore } from "../../renderer/components/+user-management/+role-bindings/store";

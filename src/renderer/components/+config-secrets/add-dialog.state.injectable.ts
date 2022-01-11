@@ -19,18 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
-import type { StorageClass, StorageClassApi } from "../../../common/k8s-api/endpoints/storage-class.api";
-import { volumesStore } from "../+storage-volumes/persistent-volume.store";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { observable } from "mobx";
 
-export class StorageClassStore extends KubeObjectStore<StorageClass> {
-  constructor(public api: StorageClassApi) {
-    super();
-    autoBind(this);
-  }
-
-  getPersistentVolumes(storageClass: StorageClass) {
-    return volumesStore.getByStorageClass(storageClass);
-  }
+export interface AddSecretDialogState {
+  isOpen: boolean;
 }
+
+const addSecretDialogStateInjectable = getInjectable({
+  instantiate: () => observable.object<AddSecretDialogState>({
+    isOpen: false,
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default addSecretDialogStateInjectable;

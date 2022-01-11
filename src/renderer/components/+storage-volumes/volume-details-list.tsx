@@ -33,7 +33,7 @@ import { Spinner } from "../spinner/spinner";
 import { DrawerTitle } from "../drawer/drawer-title";
 import { Table } from "../table/table";
 import { TableHead } from "../table/table-head";
-import { volumesStore } from "./volumes.store";
+import { volumesStore } from "./persistent-volume.store";
 import kebabCase from "lodash/kebabCase";
 
 interface Props {

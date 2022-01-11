@@ -70,7 +70,7 @@ export class Secret extends KubeObject {
 }
 
 export class SecretApi extends KubeApi<Secret> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Secret> = {}) {
     super({
       ...args,
       objectConstructor: Secret,
