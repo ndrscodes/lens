@@ -32,3 +32,8 @@ export interface AppPreferenceRegistration {
   showInPreferencesTab?: string;
   components: AppPreferenceComponents;
 }
+
+export interface RegisteredAppPreference extends AppPreferenceRegistration {
+  id: string;
+}
+
