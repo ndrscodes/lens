@@ -26,13 +26,17 @@ import { autoBind } from "../../utils";
 import type { EventApi, KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Pod } from "../../../common/k8s-api/endpoints/pods.api";
-import { podsStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/pod.store";
+
+export interface EventStoreDependencies {
+  podStore: PodStore;
+}
 
 export class EventStore extends KubeObjectStore<KubeEvent> {
   limit = 1000;
   saveLimit = 50000;
 
-  constructor(public api: EventApi) {
+  constructor(public api: EventApi, protected dependencies: EventStoreDependencies) {
     super();
     autoBind(this);
   }
@@ -65,7 +69,7 @@ export class EventStore extends KubeObjectStore<KubeEvent> {
       const { kind, uid } = recent.involvedObject;
 
       if (kind == Pod.kind) {  // Wipe out running pods
-        const pod = podsStore.items.find(pod => pod.getId() == uid);
+        const pod = this.dependencies.podStore.getById(uid);
 
         if (!pod || (!pod.hasIssues() && pod.spec.priority < 500000)) return undefined;
       }

@@ -23,16 +23,20 @@ import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
 import type { Job, JobApi } from "../../../common/k8s-api/endpoints/job.api";
 import { CronJob, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
-import { podsStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/pod.store";
+
+export interface JobStoreDependencies {
+  podStore: PodStore;
+}
 
 export class JobStore extends KubeObjectStore<Job> {
-  constructor(public api: JobApi) {
+  constructor(public api: JobApi, protected dependencies: JobStoreDependencies) {
     super();
     autoBind(this);
   }
 
   getChildPods(job: Job): Pod[] {
-    return podsStore.getPodsByOwnerId(job.getId());
+    return this.dependencies.podStore.getPodsByOwnerId(job.getId());
   }
 
   getJobsByOwner(cronJob: CronJob) {

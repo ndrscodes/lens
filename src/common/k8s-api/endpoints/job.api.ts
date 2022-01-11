@@ -135,7 +135,7 @@ export function getMetricsForJobs(jobs: Job[], namespace: string, selector = "")
 }
 
 export class JobApi extends KubeApi<Job> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Job> = {}) {
     super({
       ...args,
       objectConstructor: Job,

@@ -18,43 +18,25 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import type { CronJob } from "../../../common/k8s-api/endpoints";
+import { bind } from "../../utils";
+import type { CronJobTriggerDialogState } from "./trigger-dialog.state.injectable";
+import cronjobTriggerDialogStateInjectable from "./trigger-dialog.state.injectable";
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
-import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
-import type { JobStore } from "../+workloads-jobs/job.store";
-
-export interface CronJobStoreDependencies {
-  jobStore: JobStore;
+interface Dependencies {
+  cronjobTriggerDialogState: CronJobTriggerDialogState;
 }
 
-export class CronJobStore extends KubeObjectStore<CronJob> {
-  constructor(public api: CronJobApi, protected dependencies: CronJobStoreDependencies) {
-    super();
-    autoBind(this);
-  }
-
-  getStatuses(cronJobs?: CronJob[]) {
-    const status = { scheduled: 0, suspended: 0 };
-
-    cronJobs.forEach(cronJob => {
-      if (cronJob.spec.suspend) {
-        status.suspended++;
-      }
-      else {
-        status.scheduled++;
-      }
-    });
-
-    return status;
-  }
-
-  getActiveJobsNum(cronJob: CronJob) {
-    // Active jobs are jobs without any condition 'Complete' nor 'Failed'
-    const jobs = this.dependencies.jobStore.getJobsByOwner(cronJob);
-
-    if (!jobs.length) return 0;
-
-    return jobs.filter(job => !job.getCondition()).length;
-  }
+function openCronJobTriggerDialog({ cronjobTriggerDialogState }: Dependencies, cronJob: CronJob): void {
+  cronjobTriggerDialogState.cronJob = cronJob;
 }
+
+const openCronJobTriggerDialogInjectable = getInjectable({
+  instantiate: (di) => bind(openCronJobTriggerDialog, null, {
+    cronjobTriggerDialogState: di.inject(cronjobTriggerDialogStateInjectable),
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default openCronJobTriggerDialogInjectable;

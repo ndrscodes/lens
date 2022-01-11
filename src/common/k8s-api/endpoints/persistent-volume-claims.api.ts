@@ -107,7 +107,7 @@ export class PersistentVolumeClaim extends KubeObject {
 }
 
 export class PersistentVolumeClaimApi extends KubeApi<PersistentVolumeClaim> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<PersistentVolumeClaim> = {}) {
     super({
       ...args,
       objectConstructor: PersistentVolumeClaim,

@@ -113,7 +113,7 @@ export function getMetricsForDaemonSets(daemonsets: DaemonSet[], namespace: stri
 }
 
 export class DaemonSetApi extends KubeApi<DaemonSet> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<DaemonSet> = {}) {
     super({
       ...args,
       objectConstructor: DaemonSet,

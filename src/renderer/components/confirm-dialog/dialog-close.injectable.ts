@@ -18,43 +18,24 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { bind } from "../../utils";
+import type { ConfirmDialogState } from "./dialog.state.injectable";
+import confirmDialogStateInjectable from "./dialog.state.injectable";
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
-import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
-import type { JobStore } from "../+workloads-jobs/job.store";
-
-export interface CronJobStoreDependencies {
-  jobStore: JobStore;
+interface Dependencies {
+  confirmDialogState: ConfirmDialogState;
 }
 
-export class CronJobStore extends KubeObjectStore<CronJob> {
-  constructor(public api: CronJobApi, protected dependencies: CronJobStoreDependencies) {
-    super();
-    autoBind(this);
-  }
-
-  getStatuses(cronJobs?: CronJob[]) {
-    const status = { scheduled: 0, suspended: 0 };
-
-    cronJobs.forEach(cronJob => {
-      if (cronJob.spec.suspend) {
-        status.suspended++;
-      }
-      else {
-        status.scheduled++;
-      }
-    });
-
-    return status;
-  }
-
-  getActiveJobsNum(cronJob: CronJob) {
-    // Active jobs are jobs without any condition 'Complete' nor 'Failed'
-    const jobs = this.dependencies.jobStore.getJobsByOwner(cronJob);
-
-    if (!jobs.length) return 0;
-
-    return jobs.filter(job => !job.getCondition()).length;
-  }
+function closeConfirmDialog({ confirmDialogState }: Dependencies): void {
+  confirmDialogState.params = null;
 }
+
+const closeConfirmDialogInjectable = getInjectable({
+  instantiate: (di) => bind(closeConfirmDialog, null, {
+    confirmDialogState: di.inject(confirmDialogStateInjectable),
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default closeConfirmDialogInjectable;

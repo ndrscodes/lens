@@ -70,60 +70,61 @@ function createAndInit(): ApiManager {
     return apiManager;
   }
 
-  const constructorPairs = [
-    [ClusterApi, ClusterStore],
-    [ClusterRoleApi, ClusterRoleStore],
-    [ClusterRoleBindingApi, ClusterRoleBindingStore],
-    [ConfigMapApi, ConfigMapStore],
-    [CronJobApi, CronJobStore],
-    [DaemonSetApi, DaemonSetStore],
-    [DeploymentApi, DeploymentStore],
-    [EndpointApi, EndpointStore],
-    [EventApi, EventStore],
-    [HorizontalPodAutoscalerApi, HorizontalPodAutoscalerStore],
-    [IngressApi, IngressStore],
-    [JobApi, JobStore],
-    [LimitRangeApi, LimitRangeStore],
-    [NamespaceApi, NamespaceStore],
-    [NetworkPolicyApi, NetworkPolicyStore],
-    [NodeApi, NodeStore],
-    [PersistentVolumeApi, PersistentVolumeStore],
-    [PersistentVolumeClaimApi, PersistentVolumeClaimStore],
-    [PodApi, PodStore],
-    [PodDisruptionBudgetApi, PodDisruptionBudgetStore],
-    [PodSecurityPolicyApi, PodSecurityPolicyStore],
-    [ReplicaSetApi, ReplicaSetStore],
-    [ResourceQuotaApi, ResourceQuotaStore],
-    [RoleApi, RoleStore],
-    [RoleBindingApi, RoleBindingStore],
-    [SecretApi, SecretStore],
-    [ServiceAccountApi, ServiceAccountStore],
-    [ServiceApi, ServiceStore],
-    [StatefulSetApi, StatefulSetStore],
-    [StorageClassApi, StorageClassStore],
-  ] as const;
 
-  for (const [apiConstructor, storeConstructor] of constructorPairs) {
-    const api = new apiConstructor();
+  const clusterApi = new ClusterApi();
 
-    apiManager.registerApi(api);
-    apiManager.registerStore(new storeConstructor(api as any));
-  }
+  apiManager.registerApi(clusterApi);
+  apiManager.registerStore(new ClusterStore(clusterApi));
 
-  // CustomResourceDefinitions have to be handled seperately because of a different dep
+  const clusterRoleApi = new ClusterRoleApi();
+
+  apiManager.registerApi(clusterRoleApi);
+  apiManager.registerStore(new ClusterRoleStore(clusterRoleApi));
+
+  const clusterRoleBindingApi = new ClusterRoleBindingApi();
+
+  apiManager.registerApi(clusterRoleBindingApi);
+  apiManager.registerStore(new ClusterRoleBindingStore(clusterRoleBindingApi));
+
+  const configMapApi = new ConfigMapApi();
+
+  apiManager.registerApi(configMapApi);
+  apiManager.registerStore(new ConfigMapStore(configMapApi));
+
+  const podApi = new PodApi();
+  const podStore = new PodStore(podApi);
+
+  apiManager.registerApi(podApi);
+  apiManager.registerStore(podStore);
+
+  const jobApi = new JobApi();
+  const jobStore = new JobStore(jobApi, {
+    podStore,
+  });
+
+  apiManager.registerApi(jobApi);
+  apiManager.registerStore(jobStore);
+
+  const cronJobApi = new CronJobApi();
+
+  apiManager.registerApi(cronJobApi);
+  apiManager.registerStore(new CronJobStore(cronJobApi, {
+    jobStore,
+  }));
+
   const customResourceDefinitionApi = new CustomResourceDefinitionApi();
 
   apiManager.registerApi(customResourceDefinitionApi);
   apiManager.registerStore(new CustomResourceDefinitionStore(customResourceDefinitionApi, {
     initCustomResourceStore(crd: CustomResourceDefinition) {
       const objectConstructor = class extends KubeObject {
-      static readonly kind = crd.getResourceKind();
-      static readonly namespaced = crd.isNamespaced();
-      static readonly apiBase = crd.getResourceApiBase();
+        static readonly kind = crd.getResourceKind();
+        static readonly namespaced = crd.isNamespaced();
+        static readonly apiBase = crd.getResourceApiBase();
       };
 
       const api = apiManager.getApi(objectConstructor.apiBase)
-      ?? new KubeApi({ objectConstructor });
+        ?? new KubeApi({ objectConstructor });
 
       if (!apiManager.hasApi(api)) {
         apiManager.registerApi(api);
@@ -131,11 +132,130 @@ function createAndInit(): ApiManager {
 
       if (!apiManager.getStore(api)) {
         apiManager.registerStore(new class extends KubeObjectStore<KubeObject> {
-        api = api;
+            api = api;
         });
       }
     },
   }));
+
+
+  const daemonSetApi = new DaemonSetApi();
+
+  apiManager.registerApi(daemonSetApi);
+  apiManager.registerStore(new DaemonSetStore(daemonSetApi));
+
+  const deploymentApi = new DeploymentApi();
+
+  apiManager.registerApi(deploymentApi);
+  apiManager.registerStore(new DeploymentStore(deploymentApi));
+
+  const endpointApi = new EndpointApi();
+
+  apiManager.registerApi(endpointApi);
+  apiManager.registerStore(new EndpointStore(endpointApi));
+
+  const eventApi = new EventApi();
+
+  apiManager.registerApi(eventApi);
+  apiManager.registerStore(new EventStore(eventApi, {
+    podStore,
+  }));
+
+  const horizontalPodAutoscalerApi = new HorizontalPodAutoscalerApi();
+
+  apiManager.registerApi(horizontalPodAutoscalerApi);
+  apiManager.registerStore(new HorizontalPodAutoscalerStore(horizontalPodAutoscalerApi));
+
+  const ingressApi = new IngressApi();
+
+  apiManager.registerApi(ingressApi);
+  apiManager.registerStore(new IngressStore(ingressApi));
+
+  const limitRangeApi = new LimitRangeApi();
+
+  apiManager.registerApi(limitRangeApi);
+  apiManager.registerStore(new LimitRangeStore(limitRangeApi));
+
+  const namespaceApi = new NamespaceApi();
+
+  apiManager.registerApi(namespaceApi);
+  apiManager.registerStore(new NamespaceStore(namespaceApi));
+
+  const networkPolicyApi = new NetworkPolicyApi();
+
+  apiManager.registerApi(networkPolicyApi);
+  apiManager.registerStore(new NetworkPolicyStore(networkPolicyApi));
+
+  const nodeApi = new NodeApi();
+
+  apiManager.registerApi(nodeApi);
+  apiManager.registerStore(new NodeStore(nodeApi));
+
+  const persistentVolumeApi = new PersistentVolumeApi();
+
+  apiManager.registerApi(persistentVolumeApi);
+  apiManager.registerStore(new PersistentVolumeStore(persistentVolumeApi));
+
+  const persistentVolumeClaimApi = new PersistentVolumeClaimApi();
+
+  apiManager.registerApi(persistentVolumeClaimApi);
+  apiManager.registerStore(new PersistentVolumeClaimStore(persistentVolumeClaimApi));
+
+  const podDisruptionBudgetApi = new PodDisruptionBudgetApi();
+
+  apiManager.registerApi(podDisruptionBudgetApi);
+  apiManager.registerStore(new PodDisruptionBudgetStore(podDisruptionBudgetApi));
+
+  const podSecurityPolicyApi = new PodSecurityPolicyApi();
+
+  apiManager.registerApi(podSecurityPolicyApi);
+  apiManager.registerStore(new PodSecurityPolicyStore(podSecurityPolicyApi));
+
+  const replicaSetApi = new ReplicaSetApi();
+
+  apiManager.registerApi(replicaSetApi);
+  apiManager.registerStore(new ReplicaSetStore(replicaSetApi));
+
+  const resourceQuotaApi = new ResourceQuotaApi();
+
+  apiManager.registerApi(resourceQuotaApi);
+  apiManager.registerStore(new ResourceQuotaStore(resourceQuotaApi));
+
+  const roleApi = new RoleApi();
+
+  apiManager.registerApi(roleApi);
+  apiManager.registerStore(new RoleStore(roleApi));
+
+  const roleBindingApi = new RoleBindingApi();
+
+  apiManager.registerApi(roleBindingApi);
+  apiManager.registerStore(new RoleBindingStore(roleBindingApi));
+
+  const secretApi = new SecretApi();
+
+  apiManager.registerApi(secretApi);
+  apiManager.registerStore(new SecretStore(secretApi));
+
+  const serviceAccountApi = new ServiceAccountApi();
+
+  apiManager.registerApi(serviceAccountApi);
+  apiManager.registerStore(new ServiceAccountStore(serviceAccountApi));
+
+  const serviceApi = new ServiceApi();
+
+  apiManager.registerApi(serviceApi);
+  apiManager.registerStore(new ServiceStore(serviceApi));
+
+  const statefulSetApi = new StatefulSetApi();
+
+  apiManager.registerApi(statefulSetApi);
+  apiManager.registerStore(new StatefulSetStore(statefulSetApi));
+
+  const storageClassApi = new StorageClassApi();
+
+  apiManager.registerApi(storageClassApi);
+  apiManager.registerStore(new StorageClassStore(storageClassApi));
+
 
   // There is no store for these apis, so just register them
   apiManager.registerApi(new PodMetricsApi());

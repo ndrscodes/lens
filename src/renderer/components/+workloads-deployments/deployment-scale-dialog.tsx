@@ -22,7 +22,6 @@
 import "./deployment-scale-dialog.scss";
 
 import React, { useState } from "react";
-import { observable } from "mobx";
 import { observer } from "mobx-react";
 import { Dialog, DialogProps } from "../dialog";
 import { Wizard, WizardStep } from "../wizard";
@@ -33,30 +32,27 @@ import { Notifications } from "../notifications";
 import { cssNames } from "../../utils";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import deploymentApiInjectable from "../../../common/k8s-api/endpoints/deployment.api.injectable";
+import deploymentScaleDialogStateInjectable from "./scale-dialog.state.injectable";
+import closeDeploymentScaleDialogInjectable from "./scale-dialog-close.injectable";
 
 export interface DeploymentScaleDialogProps extends Partial<DialogProps> {
 }
 
-const dialogState = observable.object({
-  deployment: null as Deployment,
-}, {
-  deployment: observable.ref,
-});
-
 interface Dependencies {
   deploymentApi: DeploymentApi;
+  deployment: Deployment | null;
+  closeDeploymentScaleDialog: () => void;
 }
 
 const defaultScaleMax = 50;
-const scaleMin = 0;
 
-const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, ...dialogProps }: Dependencies & DeploymentScaleDialogProps) => {
+const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, closeDeploymentScaleDialog, className, ...dialogProps }: Dependencies & DeploymentScaleDialogProps) => {
   const [ready, setReady] = useState(false);
   const [currentReplicas, setCurrentReplicas] = useState(0);
   const [desiredReplicas, setDesiredReplicas] = useState(0);
 
-  const { deployment } = dialogState;
   const scaleMax = Math.min(currentReplicas, defaultScaleMax) * 2;
+  const scaleMin = 0;
 
   const onOpen = async () => {
     setCurrentReplicas(
@@ -82,7 +78,7 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, .
           namespace: deployment.getNs(),
         }, desiredReplicas);
       }
-      close();
+      closeDeploymentScaleDialog();
     } catch (err) {
       Notifications.error(err);
     }
@@ -95,7 +91,7 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, .
       className={cssNames("DeploymentScaleDialog", className)}
       onOpen={onOpen}
       onClose={onClose}
-      close={close}
+      close={closeDeploymentScaleDialog}
     >
       <Wizard
         header={(
@@ -103,7 +99,7 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, .
             Scale Deployment <span>{deployment?.getName()}</span>
           </h5>
         )}
-        done={close}
+        done={closeDeploymentScaleDialog}
       >
         <WizardStep
           contentClass="flex gaps column"
@@ -149,14 +145,8 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, className, .
 export const DeploymentScaleDialog = withInjectables<Dependencies, DeploymentScaleDialogProps>(NonInjectedDeploymentScaleDialog, {
   getProps: (di, props) => ({
     deploymentApi: di.inject(deploymentApiInjectable),
+    deployment: di.inject(deploymentScaleDialogStateInjectable).deployment,
+    closeDeploymentScaleDialog: di.inject(closeDeploymentScaleDialogInjectable),
     ...props,
   }),
 });
-
-export function openDeploymentScaleDialog(deployment: Deployment) {
-  dialogState.deployment = deployment;
-}
-
-export function closeDeploymentScaleDialog() {
-  dialogState.deployment = null;
-}

@@ -18,43 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../api-manager.injectable";
+import type { ConfigMapApi } from "./configmap.api";
 
-import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { autoBind } from "../../utils";
-import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
-import type { JobStore } from "../+workloads-jobs/job.store";
+const configMapApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/configmaps") as ConfigMapApi,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-export interface CronJobStoreDependencies {
-  jobStore: JobStore;
-}
-
-export class CronJobStore extends KubeObjectStore<CronJob> {
-  constructor(public api: CronJobApi, protected dependencies: CronJobStoreDependencies) {
-    super();
-    autoBind(this);
-  }
-
-  getStatuses(cronJobs?: CronJob[]) {
-    const status = { scheduled: 0, suspended: 0 };
-
-    cronJobs.forEach(cronJob => {
-      if (cronJob.spec.suspend) {
-        status.suspended++;
-      }
-      else {
-        status.scheduled++;
-      }
-    });
-
-    return status;
-  }
-
-  getActiveJobsNum(cronJob: CronJob) {
-    // Active jobs are jobs without any condition 'Complete' nor 'Failed'
-    const jobs = this.dependencies.jobStore.getJobsByOwner(cronJob);
-
-    if (!jobs.length) return 0;
-
-    return jobs.filter(job => !job.getCondition()).length;
-  }
-}
+export default configMapApiInjectable;

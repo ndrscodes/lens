@@ -48,7 +48,7 @@ export class ConfigMap extends KubeObject {
 }
 
 export class ConfigMapApi extends KubeApi<ConfigMap> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<ConfigMap> = {}) {
     super({
       ...args,
       objectConstructor: ConfigMap,
