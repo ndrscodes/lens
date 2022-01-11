@@ -21,7 +21,7 @@
 
 import "@testing-library/jest-dom/extend-expect";
 
-import { ReplicaSetScaleDialog } from "./replicaset-scale-dialog";
+import { ReplicaSetScaleDialog } from "./scale-dialog";
 import { render, waitFor, fireEvent } from "@testing-library/react";
 import React from "react";
 import { ReplicaSet, ReplicaSetApi } from "../../../common/k8s-api/endpoints/replica-set.api";

@@ -23,7 +23,7 @@ import { KubeObjectMenuRegistry } from "../../extensions/registries";
 import { ServiceAccountMenu } from "../components/+user-management/+service-accounts";
 import { CronJobMenu } from "../components/+workloads-cronjobs";
 import { DeploymentMenu } from "../components/+workloads-deployments";
-import { ReplicaSetMenu } from "../components/+workloads-replicasets";
+import { ReplicaSetMenu } from "../components/+workloads-replica-sets";
 import { StatefulSetMenu } from "../components/+workloads-statefulsets";
 
 export function initKubeObjectMenuRegistry() {

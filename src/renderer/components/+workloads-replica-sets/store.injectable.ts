@@ -19,23 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { podsStore } from "../+workloads-pods/pod.store";
-import { deploymentStore } from "../+workloads-deployments/deployments.store";
-import { daemonSetStore } from "../+workloads-daemonsets/daemonsets.store";
-import { statefulSetStore } from "../+workloads-statefulsets/statefulset.store";
-import { jobStore } from "../+workloads-jobs/job.store";
-import { cronJobStore } from "../+workloads-cronjobs/cronjob.store";
-import type { KubeResource } from "../../../common/rbac";
-import { replicaSetStore } from "../+workloads-replica-sets/store";
-import type { KubeObject } from "../../../common/k8s-api/kube-object";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import type { ReplicaSetStore } from "../../../extensions/renderer-api/k8s-api";
 
-export const workloadStores = new Map<KubeResource, KubeObjectStore<KubeObject>>([
-  ["pods", podsStore],
-  ["deployments", deploymentStore],
-  ["daemonsets", daemonSetStore],
-  ["statefulsets", statefulSetStore],
-  ["replicasets", replicaSetStore],
-  ["jobs", jobStore],
-  ["cronjobs", cronJobStore],
-]);
+const replicaSetStoreInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/apis/apps/v1/replicasets") as ReplicaSetStore,
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default replicaSetStoreInjectable;

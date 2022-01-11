@@ -41,7 +41,7 @@ import { clusterSetFrameIdHandler } from "../common/cluster-ipc";
 import { ClusterPageMenuRegistration, ClusterPageMenuRegistry } from "../extensions/registries";
 import { StatefulSetScaleDialog } from "./components/+workloads-statefulsets/statefulset-scale-dialog";
 import { KubeWatchApi, kubeWatchApi } from "../common/k8s-api/kube-watch-api";
-import { ReplicaSetScaleDialog } from "./components/+workloads-replicasets/replicaset-scale-dialog";
+import { ReplicaSetScaleDialog } from "./components/+workloads-replica-sets/scale-dialog";
 import { CommandContainer } from "./components/command-palette/command-container";
 import { KubeObjectStore } from "../common/k8s-api/kube-object.store";
 import { FrameContext } from "./components/context";

@@ -29,7 +29,7 @@ import { podsStore } from "../+workloads-pods/pod.store";
 import { deploymentStore } from "../+workloads-deployments/deployments.store";
 import { daemonSetStore } from "../+workloads-daemonsets/daemonsets.store";
 import { statefulSetStore } from "../+workloads-statefulsets/statefulset.store";
-import { replicaSetStore } from "../+workloads-replicasets/replicasets.store";
+import { replicaSetStore } from "../+workloads-replica-sets/store";
 import { jobStore } from "../+workloads-jobs/job.store";
 import { cronJobStore } from "../+workloads-cronjobs/cronjob.store";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";

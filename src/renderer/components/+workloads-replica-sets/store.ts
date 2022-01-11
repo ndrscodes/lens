@@ -20,14 +20,18 @@
  */
 import { makeObservable } from "mobx";
 
-import { podsStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/pod.store";
 import type { Deployment, ReplicaSet, ReplicaSetApi } from "../../../common/k8s-api/endpoints";
 import { PodStatus } from "../../../common/k8s-api/endpoints/pods.api";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
 
+export interface ReplicaSetStoreDependencies {
+  podStore: PodStore;
+}
+
 export class ReplicaSetStore extends KubeObjectStore<ReplicaSet> {
-  constructor(public api: ReplicaSetApi) {
+  constructor(public api: ReplicaSetApi, protected dependencies: ReplicaSetStoreDependencies) {
     super();
 
     makeObservable(this);
@@ -35,7 +39,7 @@ export class ReplicaSetStore extends KubeObjectStore<ReplicaSet> {
   }
 
   getChildPods(replicaSet: ReplicaSet) {
-    return podsStore.getPodsByOwnerId(replicaSet.getId());
+    return this.dependencies.podStore.getPodsByOwnerId(replicaSet.getId());
   }
 
   getStatuses(replicaSets: ReplicaSet[]) {

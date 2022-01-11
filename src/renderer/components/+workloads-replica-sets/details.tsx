@@ -19,12 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import "./replicaset-details.scss";
+import "./details.scss";
 import React from "react";
 import { makeObservable, observable, reaction } from "mobx";
 import { DrawerItem } from "../drawer";
 import { Badge } from "../badge";
-import { replicaSetStore } from "./replicasets.store";
+import { replicaSetStore } from "./store";
 import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";

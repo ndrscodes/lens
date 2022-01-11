@@ -21,7 +21,7 @@
 
 import { observable } from "mobx";
 import { podsStore } from "../+workloads-pods/pod.store";
-import { replicaSetStore } from "../+workloads-replicasets/replicasets.store";
+import { replicaSetStore } from "../+workloads-replica-sets/store";
 import { ReplicaSet, Pod } from "../../../common/k8s-api/endpoints";
 
 const runningReplicaSet = new ReplicaSet({

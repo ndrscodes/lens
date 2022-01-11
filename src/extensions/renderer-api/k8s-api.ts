@@ -29,6 +29,7 @@ import nodeApiInjectable from "../../common/k8s-api/endpoints/node.api.injectabl
 import persistentVolumeClaimApiInjectable from "../../common/k8s-api/endpoints/persistent-volume-claim.api.injectable";
 import persistentVolumeApiInjectable from "../../common/k8s-api/endpoints/persistent-volume.api.injectable";
 import podApiInjectable from "../../common/k8s-api/endpoints/pod.api.injectable";
+import replicaSetApiInjectable from "../../common/k8s-api/endpoints/replica-set.api.injectable";
 import secretApiInjectable from "../../common/k8s-api/endpoints/secret.api.injectable";
 import serviceApiInjectable from "../../common/k8s-api/endpoints/service.api.injectable";
 import statefulSetApiInjectable from "../../common/k8s-api/endpoints/stateful-set.api.injectable";
@@ -36,6 +37,7 @@ import secretStoreInjectable from "../../renderer/components/+config-secrets/sec
 import eventStoreInjectable from "../../renderer/components/+events/event.store.injectable";
 import cronJobStoreInjectable from "../../renderer/components/+workloads-cronjobs/cronjob.store.injectable";
 import jobStoreInjectable from "../../renderer/components/+workloads-jobs/job.store.injectable";
+import replicaSetStoreInjectable from "../../renderer/components/+workloads-replica-sets/store.injectable";
 import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
 
 export { isAllowedResource } from "../../common/utils/allowed-resource";
@@ -52,7 +54,7 @@ export { Job, JobApi } from "../../common/k8s-api/endpoints";
 export { CronJob, CronJobApi } from "../../common/k8s-api/endpoints";
 export { ConfigMap, ConfigMapApi } from "../../common/k8s-api/endpoints";
 export { Secret, SecretApi } from "../../common/k8s-api/endpoints";
-export { ReplicaSet, replicaSetApi } from "../../common/k8s-api/endpoints";
+export { ReplicaSet, ReplicaSetApi } from "../../common/k8s-api/endpoints";
 export { ResourceQuota, resourceQuotaApi } from "../../common/k8s-api/endpoints";
 export { LimitRange, limitRangeApi } from "../../common/k8s-api/endpoints";
 export { HorizontalPodAutoscaler, hpaApi } from "../../common/k8s-api/endpoints";
@@ -92,7 +94,7 @@ export type { JobStore } from "../../renderer/components/+workloads-jobs/job.sto
 export type { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cronjob.store";
 export type { ConfigMapStore as ConfigMapsStore } from "../../renderer/components/+config-maps/config-maps.store";
 export type { SecretStore as SecretsStore } from "../../renderer/components/+config-secrets/secret.store";
-export type { ReplicaSetStore } from "../../renderer/components/+workloads-replicasets/replicasets.store";
+export type { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
 export type { ResourceQuotaStore as ResourceQuotasStore } from "../../renderer/components/+config-resource-quotas/resource-quotas.store";
 export type { LimitRangeStore as LimitRangesStore } from "../../renderer/components/+config-limit-ranges/limit-ranges.store";
 export type { HorizontalPodAutoscalerStore as HPAStore } from "../../renderer/components/+config-autoscalers/hpa.store";
@@ -124,8 +126,10 @@ export const configMapApi = asLegacyGlobalObjectForExtensionApi(configMapApiInje
 export const pvcApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeClaimApiInjectable);
 export const persistentVolumeApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeApiInjectable);
 export const secretApi = asLegacyGlobalObjectForExtensionApi(secretApiInjectable);
+export const replicaSetApi = asLegacyGlobalObjectForExtensionApi(replicaSetApiInjectable);
 
 export const eventStore = asLegacyGlobalObjectForExtensionApi(eventStoreInjectable);
 export const cronJobStore = asLegacyGlobalObjectForExtensionApi(cronJobStoreInjectable);
 export const jobStore = asLegacyGlobalObjectForExtensionApi(jobStoreInjectable);
 export const secretStore = asLegacyGlobalObjectForExtensionApi(secretStoreInjectable);
+export const replicaSetStore = asLegacyGlobalObjectForExtensionApi(replicaSetStoreInjectable);

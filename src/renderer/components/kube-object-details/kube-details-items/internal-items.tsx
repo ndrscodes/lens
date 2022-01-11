@@ -50,7 +50,7 @@ import { DaemonSetDetails } from "../../+workloads-daemonsets";
 import { DeploymentDetails } from "../../+workloads-deployments";
 import { JobDetails } from "../../+workloads-jobs";
 import { PodDetails } from "../../+workloads-pods";
-import { ReplicaSetDetails } from "../../+workloads-replicasets";
+import { ReplicaSetDetails } from "../../+workloads-replica-sets";
 import { StatefulSetDetails } from "../../+workloads-statefulsets";
 import type { KubeObjectDetailRegistration } from "./kube-detail-items";
 

@@ -19,46 +19,46 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import "./deployment-scale-dialog.scss";
+import "./scale-dialog.scss";
 
 import React, { useState } from "react";
 import { observer } from "mobx-react";
 import { Dialog, DialogProps } from "../dialog";
 import { Wizard, WizardStep } from "../wizard";
-import type { Deployment, DeploymentApi } from "../../../common/k8s-api/endpoints";
 import { Icon } from "../icon";
 import { Slider } from "../slider";
 import { Notifications } from "../notifications";
 import { cssNames } from "../../utils";
+import type { ReplicaSet, ReplicaSetApi } from "../../../common/k8s-api/endpoints/replica-set.api";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import deploymentApiInjectable from "../../../common/k8s-api/endpoints/deployment.api.injectable";
-import deploymentScaleDialogStateInjectable from "./scale-dialog.state.injectable";
-import closeDeploymentScaleDialogInjectable from "./scale-dialog-close.injectable";
+import replicaSetApiInjectable from "../../../common/k8s-api/endpoints/replica-set.api.injectable";
+import replicasetScaleDialogStateInjectable from "./scale-dialog.state.injectable";
+import closeReplicaSetScaleDialogInjectable from "./scale-dialog-close.injectable";
 
-export interface DeploymentScaleDialogProps extends Partial<DialogProps> {
+export interface ReplicaSetScaleDialogProps extends Partial<DialogProps> {
 }
 
 interface Dependencies {
-  deploymentApi: DeploymentApi;
-  deployment: Deployment | null;
-  closeDeploymentScaleDialog: () => void;
+  replicaSetApi: ReplicaSetApi
+  replicaSet: ReplicaSet | null;
+  closeReplicaSetScaleDialog: () => void;
 }
 
 const defaultScaleMax = 50;
 
-const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, closeDeploymentScaleDialog, className, ...dialogProps }: Dependencies & DeploymentScaleDialogProps) => {
+const NonInjectedReplicaSetScaleDialog = observer(({ replicaSetApi, replicaSet, closeReplicaSetScaleDialog, className, ...dialogProps }: Dependencies & ReplicaSetScaleDialogProps) => {
   const [ready, setReady] = useState(false);
   const [currentReplicas, setCurrentReplicas] = useState(0);
   const [desiredReplicas, setDesiredReplicas] = useState(0);
-  const isOpen = Boolean(deployment);
+  const isOpen = Boolean(replicaSet);
   const scaleMax = Math.min(currentReplicas, defaultScaleMax) * 2;
   const scaleMin = 0;
 
   const onOpen = async () => {
     setCurrentReplicas(
-      await deploymentApi.getReplicas({
-        namespace: deployment.getNs(),
-        name: deployment.getName(),
+      await replicaSetApi.getReplicas({
+        namespace: replicaSet.getNs(),
+        name: replicaSet.getName(),
       }),
     );
     setDesiredReplicas(currentReplicas);
@@ -73,12 +73,12 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, 
   const scale = async () => {
     try {
       if (currentReplicas !== desiredReplicas) {
-        await deploymentApi.scale({
-          name: deployment.getName(),
-          namespace: deployment.getNs(),
+        await replicaSetApi.scale({
+          name: replicaSet.getName(),
+          namespace: replicaSet.getNs(),
         }, desiredReplicas);
       }
-      closeDeploymentScaleDialog();
+      closeReplicaSetScaleDialog();
     } catch (err) {
       Notifications.error(err);
     }
@@ -88,18 +88,18 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, 
     <Dialog
       {...dialogProps}
       isOpen={isOpen}
-      className={cssNames("DeploymentScaleDialog", className)}
+      className={cssNames("ReplicaSetScaleDialog", className)}
       onOpen={onOpen}
       onClose={onClose}
-      close={closeDeploymentScaleDialog}
+      close={closeReplicaSetScaleDialog}
     >
       <Wizard
         header={(
           <h5>
-            Scale Deployment <span>{deployment?.getName()}</span>
+            Scale Replica Set <span>{replicaSet?.getName()}</span>
           </h5>
         )}
-        done={closeDeploymentScaleDialog}
+        done={closeReplicaSetScaleDialog}
       >
         <WizardStep
           contentClass="flex gaps column"
@@ -108,14 +108,16 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, 
           disabledNext={!ready}
         >
           <div className="current-scale" data-testid="current-scale">
-            Current replica scale: {currentReplicas}
+          Current replica scale: {currentReplicas}
           </div>
           <div className="flex gaps align-center">
             <div className="desired-scale" data-testid="desired-scale">
-              Desired number of replicas: {desiredReplicas}
+            Desired number of replicas: {desiredReplicas}
             </div>
-            <div className="slider-container flex align-center">
-              <Slider value={desiredReplicas} max={scaleMax} onChange={onChange as any /** see: https://github.com/mui-org/material-ui/issues/20191 */}/>
+            <div className="slider-container flex align-center" data-testid="slider">
+              <Slider value={desiredReplicas} max={scaleMax}
+                onChange={onChange as any /** see: https://github.com/mui-org/material-ui/issues/20191 */}
+              />
             </div>
             <div className="plus-minus-container flex gaps">
               <Icon
@@ -142,11 +144,11 @@ const NonInjectedDeploymentScaleDialog = observer(({ deploymentApi, deployment, 
   );
 });
 
-export const DeploymentScaleDialog = withInjectables<Dependencies, DeploymentScaleDialogProps>(NonInjectedDeploymentScaleDialog, {
+export const ReplicaSetScaleDialog = withInjectables<Dependencies, ReplicaSetScaleDialogProps>(NonInjectedReplicaSetScaleDialog, {
   getProps: (di, props) => ({
-    deploymentApi: di.inject(deploymentApiInjectable),
-    deployment: di.inject(deploymentScaleDialogStateInjectable).deployment,
-    closeDeploymentScaleDialog: di.inject(closeDeploymentScaleDialogInjectable),
+    replicaSetApi: di.inject(replicaSetApiInjectable),
+    replicaSet: di.inject(replicasetScaleDialogStateInjectable).replicaset,
+    closeReplicaSetScaleDialog: di.inject(closeReplicaSetScaleDialogInjectable),
     ...props,
   }),
 });

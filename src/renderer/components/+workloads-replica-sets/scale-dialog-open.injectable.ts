@@ -18,24 +18,25 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import type { ReplicaSet } from "../../../common/k8s-api/endpoints";
+import { bind } from "../../utils";
+import type { ReplicaSetScaleDialogState } from "./scale-dialog.state.injectable";
+import replicasetScaleDialogStateInjectable from "./scale-dialog.state.injectable";
 
-import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { podsStore } from "../+workloads-pods/pod.store";
-import { deploymentStore } from "../+workloads-deployments/deployments.store";
-import { daemonSetStore } from "../+workloads-daemonsets/daemonsets.store";
-import { statefulSetStore } from "../+workloads-statefulsets/statefulset.store";
-import { jobStore } from "../+workloads-jobs/job.store";
-import { cronJobStore } from "../+workloads-cronjobs/cronjob.store";
-import type { KubeResource } from "../../../common/rbac";
-import { replicaSetStore } from "../+workloads-replica-sets/store";
-import type { KubeObject } from "../../../common/k8s-api/kube-object";
+interface Dependencies {
+  replicasetScaleDialogState: ReplicaSetScaleDialogState;
+}
 
-export const workloadStores = new Map<KubeResource, KubeObjectStore<KubeObject>>([
-  ["pods", podsStore],
-  ["deployments", deploymentStore],
-  ["daemonsets", daemonSetStore],
-  ["statefulsets", statefulSetStore],
-  ["replicasets", replicaSetStore],
-  ["jobs", jobStore],
-  ["cronjobs", cronJobStore],
-]);
+function openReplicaSetScaleDialog({ replicasetScaleDialogState }: Dependencies, replicaset: ReplicaSet): void {
+  replicasetScaleDialogState.replicaset = replicaset;
+}
+
+const openReplicaSetScaleDialogInjectable = getInjectable({
+  instantiate: (di) => bind(openReplicaSetScaleDialog, null, {
+    replicasetScaleDialogState: di.inject(replicasetScaleDialogStateInjectable),
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default openReplicaSetScaleDialogInjectable;

@@ -49,7 +49,7 @@ import { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/
 import { DeploymentStore } from "../../renderer/components/+workloads-deployments/deployments.store";
 import { JobStore } from "../../renderer/components/+workloads-jobs/job.store";
 import { PodStore } from "../../renderer/components/+workloads-pods/pod.store";
-import { ReplicaSetStore } from "../../renderer/components/+workloads-replicasets/replicasets.store";
+import { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
 import { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/statefulset.store";
 import { isClusterPageContext } from "../utils";
 import { ApiManager } from "./api-manager";
@@ -214,7 +214,9 @@ function createAndInit(): ApiManager {
   const replicaSetApi = new ReplicaSetApi();
 
   apiManager.registerApi(replicaSetApi);
-  apiManager.registerStore(new ReplicaSetStore(replicaSetApi));
+  apiManager.registerStore(new ReplicaSetStore(replicaSetApi, {
+    podStore,
+  }));
 
   const resourceQuotaApi = new ResourceQuotaApi();
 

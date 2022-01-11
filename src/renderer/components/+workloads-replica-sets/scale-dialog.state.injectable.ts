@@ -18,6 +18,21 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { observable } from "mobx";
+import type { ReplicaSet } from "../../../common/k8s-api/endpoints";
 
-export * from "./replicasets";
-export * from "./replicaset-details";
+export interface ReplicaSetScaleDialogState {
+  replicaset: ReplicaSet | null;
+}
+
+const replicasetScaleDialogStateInjectable = getInjectable({
+  instantiate: () => observable.object<ReplicaSetScaleDialogState>({
+    replicaset: null,
+  }, {
+    replicaset: observable.ref,
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default replicasetScaleDialogStateInjectable;
