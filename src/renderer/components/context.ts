@@ -20,7 +20,7 @@
  */
 
 import type { Cluster } from "../../main/cluster";
-import { namespaceStore } from "./+namespaces/namespace.store";
+import { namespaceStore } from "./+namespaces/store";
 import type { ClusterContext } from "../../common/k8s-api/cluster-context";
 import { computed, makeObservable } from "mobx";
 

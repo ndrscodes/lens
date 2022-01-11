@@ -200,7 +200,7 @@ interface ReplicasStatus extends KubeJsonApiData {
 }
 
 export class DeploymentApi extends KubeApi<Deployment> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Deployment> = {}) {
     super({
       ...args,
       objectConstructor: Deployment,

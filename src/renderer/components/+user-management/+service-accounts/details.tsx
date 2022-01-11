@@ -21,13 +21,12 @@
 
 import "./details.scss";
 
-import { autorun, observable, makeObservable } from "mobx";
-import { disposeOnUnmount, observer } from "mobx-react";
-import React from "react";
+import { autorun } from "mobx";
+import { observer } from "mobx-react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-import { secretsStore } from "../../+config-secrets/secret.store";
-import { Secret, SecretType, ServiceAccount } from "../../../../common/k8s-api/endpoints";
+import type { SecretStore } from "../../+config-secrets/store";
+import { Secret, SecretRef, SecretType, ServiceAccount } from "../../../../common/k8s-api/endpoints";
 import { DrawerItem, DrawerTitle } from "../../drawer";
 import { Icon } from "../../icon";
 import type { KubeObjectDetailsProps } from "../../kube-object-details";
@@ -35,132 +34,125 @@ import { KubeObjectMeta } from "../../kube-object-meta";
 import { Spinner } from "../../spinner";
 import { ServiceAccountsSecret } from "./secret";
 import { getDetailsUrl } from "../../kube-detail-params";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import logger from "../../../../common/logger";
+import secretStoreInjectable from "../../+config-secrets/store.injectable";
 
-interface Props extends KubeObjectDetailsProps<ServiceAccount> {
+export interface ServiceAccountsDetailsProps extends KubeObjectDetailsProps<ServiceAccount> {
 }
 
-@observer
-export class ServiceAccountsDetails extends React.Component<Props> {
-  @observable secrets: Secret[];
-  @observable imagePullSecrets: Secret[];
+interface Dependencies {
+  secretStore: SecretStore
+}
 
-  @disposeOnUnmount
-  loadSecrets = autorun(async () => {
-    this.secrets = null;
-    this.imagePullSecrets = null;
-    const { object: serviceAccount } = this.props;
+const NonInjectedServiceAccountsDetails = observer(({ secretStore, object: serviceAccount }: Dependencies & ServiceAccountsDetailsProps) => {
+  const [secrets, setSecrets] = useState<Secret[]>([]);
+  const [imagePullSecrets, setImagePullSecrets] = useState<Secret[]>([]);
 
-    if (!serviceAccount) {
-      return;
-    }
+  if (!serviceAccount) {
+    return null;
+  }
+
+  if (!(serviceAccount instanceof ServiceAccount)) {
+    logger.error("[ServiceAccountsDetails]: passed object that is not an instanceof ServiceAccount", serviceAccount);
+
+    return null;
+  }
+
+  const loadSecret = async ({ name }: SecretRef) => {
     const namespace = serviceAccount.getNs();
-    const secrets = serviceAccount.getSecrets().map(({ name }) => {
-      return secretsStore.load({ name, namespace });
-    });
 
-    this.secrets = await Promise.all(secrets);
-    const imagePullSecrets = serviceAccount.getImagePullSecrets().map(async ({ name }) => {
-      return secretsStore.load({ name, namespace }).catch(() => this.generateDummySecretObject(name));
-    });
-
-    this.imagePullSecrets = await Promise.all(imagePullSecrets);
-  });
-
-  constructor(props: Props) {
-    super(props);
-    makeObservable(this);
-  }
-
-  renderSecrets() {
-    const { secrets } = this;
-
-    if (!secrets) {
-      return <Spinner center/>;
+    try {
+      return await secretStore.load({ name, namespace });
+    } catch {
+      // If error, return dummy secret
+      return new Secret({
+        apiVersion: "v1",
+        kind: "Secret",
+        metadata: {
+          name,
+          namespace,
+          uid: null,
+          selfLink: null,
+          resourceVersion: null,
+        },
+        type: SecretType.Opaque,
+      });
     }
+  };
 
-    return secrets.map(secret =>
-      <ServiceAccountsSecret key={secret.getId()} secret={secret}/>,
-    );
-  }
+  useEffect(() => autorun(async () => {
+    setSecrets(null);
+    setImagePullSecrets(null);
+    setSecrets(await Promise.all(serviceAccount.getSecrets().map(loadSecret)));
+    setImagePullSecrets(await Promise.all(serviceAccount.getImagePullSecrets().map(loadSecret)));
+  }), []);
 
-  renderImagePullSecrets() {
-    const { imagePullSecrets } = this;
-
-    if (!imagePullSecrets) {
-      return <Spinner center/>;
-    }
-
-    return this.renderSecretLinks(imagePullSecrets);
-  }
-
-  renderSecretLinks(secrets: Secret[]) {
-    return secrets.map((secret) => {
-      if (secret.getId() === null) {
-        return (
+  const renderSecretLinks = (secrets: Secret[]) => (
+    secrets.map(secret => (
+      secret.getId() === null
+        ? (
           <div key={secret.getName()}>
             {secret.getName()}
             <Icon
               small material="warning"
-              tooltip="Secret is not found"
-            />
+              tooltip="Secret is not found" />
           </div>
-        );
-      }
+        )
+        : (
+          <Link key={secret.getId()} to={getDetailsUrl(secret.selfLink)}>
+            {secret.getName()}
+          </Link>
+        )
+    ))
+  );
 
-      return (
-        <Link key={secret.getId()} to={getDetailsUrl(secret.selfLink)}>
-          {secret.getName()}
-        </Link>
-      );
-    });
-  }
+  const tokens = secretStore.items.filter(secret => (
+    secret.getNs() == serviceAccount.getNs()
+    && secret.metadata.annotations?.[`kubernetes.io/service-account.name: ${serviceAccount.getName()}`]
+  ));
 
-  generateDummySecretObject(name: string) {
-    return new Secret({
-      apiVersion: "v1",
-      kind: "Secret",
-      metadata: {
-        name,
-        uid: null,
-        selfLink: null,
-        resourceVersion: null,
-      },
-      type: SecretType.Opaque,
-    });
-  }
+  return (
+    <div className="ServiceAccountsDetails">
+      <KubeObjectMeta object={serviceAccount}/>
 
-  render() {
-    const { object: serviceAccount } = this.props;
-
-    if (!serviceAccount) {
-      return null;
-    }
-    const tokens = secretsStore.items.filter(secret =>
-      secret.getNs() == serviceAccount.getNs() &&
-      secret.getAnnotations().some(annot => annot == `kubernetes.io/service-account.name: ${serviceAccount.getName()}`),
-    );
-    const imagePullSecrets = serviceAccount.getImagePullSecrets();
-
-    return (
-      <div className="ServiceAccountsDetails">
-        <KubeObjectMeta object={serviceAccount}/>
-
-        {tokens.length > 0 &&
+      {tokens.length > 0 &&(
         <DrawerItem name="Tokens" className="links">
-          {this.renderSecretLinks(tokens)}
+          {renderSecretLinks(tokens)}
         </DrawerItem>
-        }
-        {imagePullSecrets.length > 0 &&
+      )}
+      {serviceAccount.getImagePullSecrets().length > 0 &&(
         <DrawerItem name="ImagePullSecrets" className="links">
-          {this.renderImagePullSecrets()}
+          {
+            imagePullSecrets
+              ? renderSecretLinks(imagePullSecrets)
+              : <Spinner center/>
+          }
         </DrawerItem>
-        }
+      )}
 
-        <DrawerTitle title="Mountable secrets"/>
-        <div className="secrets">
-          {this.renderSecrets()}
-        </div>
+      <DrawerTitle title="Mountable secrets"/>
+      <div className="secrets">
+        {
+          secrets
+            ? (
+              secrets.map(secret => (
+                <ServiceAccountsSecret
+                  key={secret.getId()}
+                  secret={secret}
+                />
+              ))
+            )
+            : <Spinner center/>
+        }
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
+
+export const ServiceAccountsDetails = withInjectables<Dependencies, ServiceAccountsDetailsProps>(NonInjectedServiceAccountsDetails, {
+  getProps: (di, props) => ({
+    secretStore: di.inject(secretStoreInjectable),
+    ...props,
+  }),
+});

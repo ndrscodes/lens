@@ -30,9 +30,9 @@ import { Badge } from "../badge";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { SecretsRouteParams } from "../../../common/routes";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import secretStoreInjectable from "./secret.store.injectable";
-import type { SecretStore } from "./secret.store";
-import openAddSecretDialogInjectable from "./open-add-secret-dialog.injectable";
+import secretStoreInjectable from "./store.injectable";
+import type { SecretStore } from "./store";
+import openAddSecretDialogInjectable from "./add-dialog-open.injectable";
 
 enum columnId {
   name = "name",

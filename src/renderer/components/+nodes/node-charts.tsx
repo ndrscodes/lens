@@ -20,20 +20,17 @@
  */
 
 import React, { useContext } from "react";
-import type { IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
 import { BarChart, cpuOptions, memoryOptions } from "../chart";
 import { isMetricsEmpty, normalizeMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 import { NoMetrics } from "../resource-metrics/no-metrics";
-import { IResourceMetricsValue, ResourceMetricsContext } from "../resource-metrics";
+import { ResourceMetricsContext } from "../resource-metrics";
 import { observer } from "mobx-react";
 import type { ChartOptions, ChartPoint } from "chart.js";
 import { ThemeStore } from "../../theme.store";
 import { mapValues } from "lodash";
 
-type IContext = IResourceMetricsValue<Node, { metrics: IClusterMetrics }>;
-
 export const NodeCharts = observer(() => {
-  const { params: { metrics }, tabId, object } = useContext<IContext>(ResourceMetricsContext);
+  const { metrics, tabId, object } = useContext(ResourceMetricsContext);
   const id = object.getId();
   const { chartCapacityColor } = ThemeStore.getInstance().activeTheme.colors;
 

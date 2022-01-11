@@ -22,33 +22,30 @@
 import { KubeObject } from "../kube-object";
 import { KubeApi, SpecificApiOptions } from "../kube-api";
 
-export interface IResourceQuotaValues {
-  [quota: string]: string;
+export const resourceQuotaKinds = [
+  "limits.cpu",
+  "limits.memory",
+  "requests.cpu",
+  "requests.memory",
+  "requests.storage",
+  "persistentvolumeclaims",
+  "count/pods",
+  "count/persistentvolumeclaims",
+  "count/services",
+  "count/secrets",
+  "count/configmaps",
+  "count/replicationcontrollers",
+  "count/deployments.apps",
+  "count/replicasets.apps",
+  "count/statefulsets.apps",
+  "count/jobs.batch",
+  "count/cronjobs.batch",
+  "count/deployments.extensions",
+] as const;
 
-  // Compute Resource Quota
-  "limits.cpu"?: string;
-  "limits.memory"?: string;
-  "requests.cpu"?: string;
-  "requests.memory"?: string;
+export type ResourceQuotaKinds = typeof resourceQuotaKinds[number];
 
-  // Storage Resource Quota
-  "requests.storage"?: string;
-  "persistentvolumeclaims"?: string;
-
-  // Object Count Quota
-  "count/pods"?: string;
-  "count/persistentvolumeclaims"?: string;
-  "count/services"?: string;
-  "count/secrets"?: string;
-  "count/configmaps"?: string;
-  "count/replicationcontrollers"?: string;
-  "count/deployments.apps"?: string;
-  "count/replicasets.apps"?: string;
-  "count/statefulsets.apps"?: string;
-  "count/jobs.batch"?: string;
-  "count/cronjobs.batch"?: string;
-  "count/deployments.extensions"?: string;
-}
+export type IResourceQuotaValues = Partial<Record<ResourceQuotaKinds | string, string>>;
 
 export interface ResourceQuota {
   spec: {
@@ -81,7 +78,7 @@ export class ResourceQuota extends KubeObject {
 }
 
 export class ResourceQuotaApi extends KubeApi<ResourceQuota> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<ResourceQuota> = {}) {
     super({
       ...args,
       objectConstructor: ResourceQuota,

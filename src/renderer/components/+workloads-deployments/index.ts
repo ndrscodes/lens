@@ -20,4 +20,4 @@
  */
 
 export * from "./deployments";
-export * from "./deployment-details";
+export * from "./details";

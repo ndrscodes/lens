@@ -28,7 +28,7 @@ import { cssNames } from "../../../utils";
 import type { DockTabData } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { Spinner } from "../../spinner";
-import { releaseStore } from "../../+apps-releases/release.store";
+import { releaseStore } from "../../+apps-releases/store";
 import { Badge } from "../../badge";
 import { EditorPanel } from "../editor/editor-panel";
 import { helmChartStore, IChartVersion } from "../../+apps-helm-charts/helm-chart.store";

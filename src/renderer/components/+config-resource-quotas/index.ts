@@ -20,4 +20,4 @@
  */
 
 export * from "./resource-quotas";
-export * from "./resource-quota-details";
+export * from "./details";

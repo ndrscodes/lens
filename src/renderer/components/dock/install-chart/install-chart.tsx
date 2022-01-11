@@ -32,7 +32,7 @@ import type { IChartInstallData, InstallChartManager } from "./store";
 import { Spinner } from "../../spinner";
 import { Icon } from "../../icon";
 import { Button } from "../../button";
-import { releaseStore } from "../../+apps-releases/release.store";
+import { releaseStore } from "../../+apps-releases/store";
 import { LogsDialog } from "../../dialog/logs-dialog";
 import { Select, SelectOption } from "../../select";
 import { Input } from "../../input";

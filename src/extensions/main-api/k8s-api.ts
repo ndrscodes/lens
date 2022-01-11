@@ -37,7 +37,7 @@ export { Secret } from "../../common/k8s-api/endpoints/secret.api";
 export { ReplicaSet } from "../../common/k8s-api/endpoints/replica-set.api";
 export { ResourceQuota } from "../../common/k8s-api/endpoints/resource-quota.api";
 export { LimitRange } from "../../common/k8s-api/endpoints/limit-range.api";
-export { HorizontalPodAutoscaler } from "../../common/k8s-api/endpoints/hpa.api";
+export { HorizontalPodAutoscaler } from "../../common/k8s-api/endpoints/horizonal-pod-autoscaler.api";
 export { PodDisruptionBudget } from "../../common/k8s-api/endpoints/poddisruptionbudget.api";
 export { Service } from "../../common/k8s-api/endpoints/service.api";
 export { Endpoint } from "../../common/k8s-api/endpoints/endpoint.api";
@@ -48,7 +48,7 @@ export { PersistentVolumeClaim, PersistentVolumeClaimApi as PersistentVolumeClai
 export { StorageClass } from "../../common/k8s-api/endpoints/storage-class.api";
 export { Namespace } from "../../common/k8s-api/endpoints/namespaces.api";
 export { KubeEvent } from "../../common/k8s-api/endpoints/events.api";
-export { ServiceAccount } from "../../common/k8s-api/endpoints/service-accounts.api";
+export { ServiceAccount } from "../../common/k8s-api/endpoints/service-account.api";
 export { Role } from "../../common/k8s-api/endpoints/role.api";
 export { RoleBinding } from "../../common/k8s-api/endpoints/role-binding.api";
 export { ClusterRole } from "../../common/k8s-api/endpoints/cluster-role.api";

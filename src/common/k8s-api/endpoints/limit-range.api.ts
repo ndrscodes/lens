@@ -81,7 +81,7 @@ export class LimitRange extends KubeObject {
 }
 
 export class LimitRangeApi extends KubeApi<LimitRange> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<LimitRange> = {}) {
     super({
       ...args,
       objectConstructor: LimitRange,

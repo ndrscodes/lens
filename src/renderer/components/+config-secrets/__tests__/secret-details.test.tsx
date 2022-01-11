@@ -21,7 +21,7 @@
 
 import React from "react";
 import { render } from "@testing-library/react";
-import { SecretDetails } from "../secret-details";
+import { SecretDetails } from "../details";
 import { Secret, SecretType } from "../../../../common/k8s-api/endpoints";
 
 jest.mock("../../kube-object-meta/kube-object-meta");

@@ -20,4 +20,4 @@
  */
 
 export * from "./statefulsets";
-export * from "./statefulset-details";
+export * from "./details";

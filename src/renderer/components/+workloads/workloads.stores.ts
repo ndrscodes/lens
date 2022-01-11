@@ -21,10 +21,10 @@
 
 import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { podsStore } from "../+workloads-pods/pod.store";
-import { deploymentStore } from "../+workloads-deployments/deployments.store";
-import { daemonSetStore } from "../+workloads-daemonsets/daemonsets.store";
-import { statefulSetStore } from "../+workloads-statefulsets/statefulset.store";
-import { jobStore } from "../+workloads-jobs/job.store";
+import { deploymentStore } from "../+workloads-deployments/store";
+import { daemonSetStore } from "../+workloads-daemonsets/store";
+import { statefulSetStore } from "../+workloads-statefulsets/store";
+import { jobStore } from "../+workloads-jobs/store";
 import { cronJobStore } from "../+workloads-cronjobs/cronjob.store";
 import type { KubeResource } from "../../../common/rbac";
 import { replicaSetStore } from "../+workloads-replica-sets/store";

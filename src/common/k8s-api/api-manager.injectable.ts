@@ -21,15 +21,15 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { ClusterStore } from "../../renderer/components/+cluster/cluster-overview.store";
-import { HorizontalPodAutoscalerStore } from "../../renderer/components/+config-autoscalers/hpa.store";
-import { LimitRangeStore } from "../../renderer/components/+config-limit-ranges/limit-ranges.store";
+import { HorizontalPodAutoscalerStore } from "../../renderer/components/+config-autoscalers/store";
+import { LimitRangeStore } from "../../renderer/components/+config-limit-ranges/store";
 import { ConfigMapStore } from "../../renderer/components/+config-maps/config-maps.store";
 import { PodDisruptionBudgetStore } from "../../renderer/components/+config-pod-disruption-budgets/pod-disruption-budgets.store";
-import { ResourceQuotaStore } from "../../renderer/components/+config-resource-quotas/resource-quotas.store";
-import { SecretStore } from "../../renderer/components/+config-secrets/secret.store";
+import { ResourceQuotaStore } from "../../renderer/components/+config-resource-quotas/store";
+import { SecretStore } from "../../renderer/components/+config-secrets/store";
 import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resources/crd.store";
 import { EventStore } from "../../renderer/components/+events/event.store";
-import { NamespaceStore } from "../../renderer/components/+namespaces/namespace.store";
+import { NamespaceStore } from "../../renderer/components/+namespaces/store";
 import { EndpointStore } from "../../renderer/components/+network-endpoints/endpoints.store";
 import { IngressStore } from "../../renderer/components/+network-ingresses/ingress.store";
 import { NetworkPolicyStore } from "../../renderer/components/+network-policies/network-policy.store";
@@ -45,12 +45,12 @@ import { RoleBindingStore } from "../../renderer/components/+user-management/+ro
 import { RoleStore } from "../../renderer/components/+user-management/+roles/store";
 import { ServiceAccountStore } from "../../renderer/components/+user-management/+service-accounts/store";
 import { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cronjob.store";
-import { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/daemonsets.store";
-import { DeploymentStore } from "../../renderer/components/+workloads-deployments/deployments.store";
-import { JobStore } from "../../renderer/components/+workloads-jobs/job.store";
+import { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/store";
+import { DeploymentStore } from "../../renderer/components/+workloads-deployments/store";
+import { JobStore } from "../../renderer/components/+workloads-jobs/store";
 import { PodStore } from "../../renderer/components/+workloads-pods/pod.store";
 import { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
-import { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/statefulset.store";
+import { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/store";
 import { isClusterPageContext } from "../utils";
 import { ApiManager } from "./api-manager";
 import { ClusterApi, ClusterRoleApi, ClusterRoleBindingApi, ConfigMapApi, CronJobApi, CustomResourceDefinition, CustomResourceDefinitionApi, DaemonSetApi, DeploymentApi, EndpointApi, EventApi, HorizontalPodAutoscalerApi, IngressApi, JobApi, LimitRangeApi, NamespaceApi, NetworkPolicyApi, NodeApi, PersistentVolumeApi, PersistentVolumeClaimApi, PodApi, PodDisruptionBudgetApi, PodMetricsApi, PodSecurityPolicyApi, ReplicaSetApi, ResourceQuotaApi, RoleApi, RoleBindingApi, SecretApi, SelfSubjectRulesReviewApi, ServiceAccountApi, ServiceApi, StatefulSetApi, StorageClassApi } from "./endpoints";

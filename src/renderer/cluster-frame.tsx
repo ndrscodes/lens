@@ -53,7 +53,7 @@ import { Notifications } from "./components/notifications";
 import { KubeObjectDetails } from "./components/kube-object-details";
 import { KubeConfigDialog } from "./components/kubeconfig-dialog";
 import { Terminal } from "./components/dock/terminal/terminal";
-import { namespaceStore } from "./components/+namespaces/namespace.store";
+import { namespaceStore } from "./components/+namespaces/store";
 import { Sidebar } from "./components/layout/sidebar";
 import { Dock } from "./components/dock/dock";
 import { Apps } from "./components/+apps";

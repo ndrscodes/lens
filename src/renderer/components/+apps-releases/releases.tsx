@@ -25,18 +25,18 @@ import React, { Component } from "react";
 import kebabCase from "lodash/kebabCase";
 import { disposeOnUnmount, observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
-import { releaseStore } from "./release.store";
+import { releaseStore } from "./store";
 import type { HelmRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
 import { ReleaseDetails } from "./release-details";
 import { ReleaseRollbackDialog } from "./release-rollback-dialog";
 import { navigation } from "../../navigation";
 import { ItemListLayout } from "../item-object-list/item-list-layout";
 import { HelmReleaseMenu } from "./release-menu";
-import { secretsStore } from "../+config-secrets/secret.store";
+import { secretsStore } from "../+config-secrets/store";
 import { NamespaceSelectFilter } from "../+namespaces/namespace-select-filter";
 import type { ReleaseRouteParams } from "../../../common/routes";
 import { releaseURL } from "../../../common/routes";
-import { namespaceStore } from "../+namespaces/namespace.store";
+import { namespaceStore } from "../+namespaces/store";
 
 enum columnId {
   name = "name",

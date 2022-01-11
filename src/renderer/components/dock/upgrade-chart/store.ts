@@ -20,7 +20,7 @@
  */
 
 import { action, autorun, computed, IReactionDisposer, makeObservable, reaction } from "mobx";
-import { releaseStore } from "../../+apps-releases/release.store";
+import { releaseStore } from "../../+apps-releases/store";
 import { getReleaseValues } from "../../../../common/k8s-api/endpoints/helm-releases.api";
 import { iter } from "../../../utils";
 import { DockTabStore, DockTabStoreDependencies } from "../dock-tab/store";

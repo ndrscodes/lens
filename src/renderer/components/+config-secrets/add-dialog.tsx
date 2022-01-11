@@ -40,7 +40,7 @@ import upperFirst from "lodash/upperFirst";
 import { showDetails } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import addSecretDialogStateInjectable from "./add-dialog.state.injectable";
-import closeAddSecretDialogInjectable from "./close-add-secret-dialog.injectable";
+import closeAddSecretDialogInjectable from "./add-dialog-close.injectable";
 import secretApiInjectable from "../../../common/k8s-api/endpoints/secret.api.injectable";
 
 export interface AddSecretDialogProps extends Partial<DialogProps> {

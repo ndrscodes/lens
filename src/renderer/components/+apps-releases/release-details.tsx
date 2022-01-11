@@ -36,12 +36,12 @@ import { observer } from "mobx-react";
 import { Spinner } from "../spinner";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import { Button } from "../button";
-import { releaseStore } from "./release.store";
+import { releaseStore } from "./store";
 import { Notifications } from "../notifications";
 import { ThemeStore } from "../../theme.store";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";
-import { secretsStore, SecretStore } from "../+config-secrets/secret.store";
+import type { SecretStore } from "../+config-secrets/store";
 import type { Secret } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
 import { Checkbox } from "../checkbox";
@@ -50,6 +50,7 @@ import type { DockTabCreateSpecific, DockTabData } from "../dock/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import secretStoreInjectable from "../+config-secrets/store.injectable";
 
 export interface ReleaseDetailsProps {
   release: HelmRelease;
@@ -59,7 +60,7 @@ export interface ReleaseDetailsProps {
 interface Dependencies {
   newUpgradeChartTab: (release: HelmRelease, data?: DockTabCreateSpecific) => DockTabData;
   apiManager: ApiManager;
-  secretsStore: SecretStore;
+  secretStore: SecretStore;
 }
 
 const NonInjectedReleaseDetails = observer(({
@@ -67,7 +68,7 @@ const NonInjectedReleaseDetails = observer(({
   hideDetails,
   newUpgradeChartTab,
   apiManager,
-  secretsStore,
+  secretStore,
 }: Dependencies & ReleaseDetailsProps) => {
   const [details, setDetails] = useState<IReleaseDetails | null>(null);
   const [values, setValues] = useState("");
@@ -135,7 +136,7 @@ const NonInjectedReleaseDetails = observer(({
       loadValues();
       setReleaseSecret(undefined);
     }),
-    reaction(() => secretsStore.getItems(), () => {
+    reaction(() => secretStore.getItems(), () => {
       if (!release) return;
       const { getReleaseSecret } = releaseStore;
       const secret = getReleaseSecret(release);
@@ -327,7 +328,7 @@ export const ReleaseDetails = withInjectables<Dependencies, ReleaseDetailsProps>
   getProps: (di, props) => ({
     newUpgradeChartTab: di.inject(newUpgradeChartTabInjectable),
     apiManager: di.inject(apiManagerInjectable),
-    secretsStore,
+    secretStore: di.inject(secretStoreInjectable),
     ...props,
   }),
 });

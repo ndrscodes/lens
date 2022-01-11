@@ -21,19 +21,23 @@
 
 import "./namespace-select-filter.scss";
 
-import React from "react";
-import { disposeOnUnmount, observer } from "mobx-react";
+import React, { useEffect, useState } from "react";
+import { observer } from "mobx-react";
 import { components, PlaceholderProps } from "react-select";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
-
+import { observable } from "mobx";
 import { Icon } from "../icon";
 import { NamespaceSelect } from "./namespace-select";
-import { namespaceStore } from "./namespace.store";
-
+import type { NamespaceStore } from "./store";
 import type { SelectOption, SelectProps } from "../select";
 import { isMac } from "../../../common/vars";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import namespaceStoreInjectable from "./store.injectable";
 
-const Placeholder = observer((props: PlaceholderProps<any, boolean>) => {
+interface Dependencies {
+  namespaceStore: NamespaceStore;
+}
+
+const NonInjectedPlaceholder = observer(({ namespaceStore, ...props }: Dependencies & PlaceholderProps<any, boolean>) => {
   const getPlaceholder = (): React.ReactNode => {
     const namespaces = namespaceStore.contextNamespaces;
 
@@ -55,50 +59,44 @@ const Placeholder = observer((props: PlaceholderProps<any, boolean>) => {
   );
 });
 
-@observer
-export class NamespaceSelectFilter extends React.Component<SelectProps> {
-  static isMultiSelection = observable.box(false);
-  static isMenuOpen = observable.box(false);
+export const Placeholder = withInjectables<Dependencies, PlaceholderProps<any, boolean>>(NonInjectedPlaceholder, {
+  getProps: (di, props) => ({
+    namespaceStore: di.inject(namespaceStoreInjectable),
+    ...props,
+  }),
+});
 
-  /**
-   * Only updated on every open
-   */
-  private selected = observable.set<string>();
-  private didToggle = false;
-
-  constructor(props: SelectProps) {
-    super(props);
-    makeObservable(this);
+function isSelectionKey(e: React.KeyboardEvent): boolean {
+  if (isMac) {
+    return e.key === "Meta";
   }
 
-  @computed get isMultiSelection() {
-    return NamespaceSelectFilter.isMultiSelection.get();
-  }
+  // windows or linux
+  return e.key === "Control";
+}
 
-  set isMultiSelection(val: boolean) {
-    NamespaceSelectFilter.isMultiSelection.set(val);
-  }
+export interface NamespaceSelectFilterProps extends SelectProps {
 
-  @computed get isMenuOpen() {
-    return NamespaceSelectFilter.isMenuOpen.get();
-  }
+}
 
-  set isMenuOpen(val: boolean) {
-    NamespaceSelectFilter.isMenuOpen.set(val);
-  }
+interface Dependencies {
+  namespaceStore: NamespaceStore;
+}
 
-  componentDidMount() {
-    disposeOnUnmount(this, [
-      reaction(() => this.isMenuOpen, newVal => {
-        if (newVal) { // rising edge of selection
-          this.selected.replace(namespaceStore.selectedNames);
-          this.didToggle = false;
-        }
-      }),
-    ]);
-  }
+const NonInjectedNamespaceSelectFilter = observer(({ namespaceStore }: Dependencies & NamespaceSelectFilterProps) => {
+  const [selected] = useState(observable.set<string>());
+  const [didToggle, setDidToggle] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMultiSelect, setIsMultiSelect] = useState(false);
 
-  formatOptionLabel({ value: namespace, label }: SelectOption) {
+  useEffect(() => {
+    if (isOpen) {
+      selected.replace(namespaceStore.selectedNames);
+      setDidToggle(false);
+    }
+  }, [isOpen]);
+
+  const formatOptionLabel = ({ value: namespace, label }: SelectOption) => {
     if (namespace) {
       const isSelected = namespaceStore.hasContext(namespace);
 
@@ -112,13 +110,11 @@ export class NamespaceSelectFilter extends React.Component<SelectProps> {
     }
 
     return label;
-  }
-
-  @action
-  onChange = ([{ value: namespace }]: SelectOption[]) => {
+  };
+  const onChange = ([{ value: namespace }]: SelectOption[]) => {
     if (namespace) {
-      if (this.isMultiSelection) {
-        this.didToggle = true;
+      if (isMultiSelect) {
+        setDidToggle(true);
         namespaceStore.toggleSingle(namespace);
       } else {
         namespaceStore.selectSingle(namespace);
@@ -127,66 +123,56 @@ export class NamespaceSelectFilter extends React.Component<SelectProps> {
       namespaceStore.selectAll();
     }
   };
-
-  private isSelectionKey(e: React.KeyboardEvent): boolean {
-    if (isMac) {
-      return e.key === "Meta";
-    }
-
-    return e.key === "Control"; // windows or linux
-  }
-
-  @action
-  onKeyDown = (e: React.KeyboardEvent) => {
-    if (this.isSelectionKey(e)) {
-      this.isMultiSelection = true;
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (isSelectionKey(e)) {
+      setIsMultiSelect(true);
     }
   };
-
-  @action
-  onKeyUp = (e: React.KeyboardEvent) => {
-    if (this.isSelectionKey(e)) {
-      this.isMultiSelection = false;
+  const onKeyUp = (e: React.KeyboardEvent) => {
+    if (isSelectionKey(e)) {
+      setIsMultiSelect(false);
     }
 
-    if (!this.isMultiSelection && this.didToggle) {
-      this.isMenuOpen = false;
+    if (!isMultiSelect && didToggle) {
+      setIsOpen(false);
     }
   };
-
-  @action
-  onClick = () => {
-    if (!this.isMenuOpen) {
-      this.isMenuOpen = true;
-    } else if (!this.isMultiSelection) {
-      this.isMenuOpen = !this.isMenuOpen;
+  const onClick = () => {
+    if (!isOpen) {
+      setIsOpen(true);
+    } else if (!isMultiSelect) {
+      setIsOpen(!isOpen);
     }
   };
-
-  reset = () => {
-    this.isMultiSelection = false;
-    this.isMenuOpen = false;
+  const reset = () => {
+    setIsMultiSelect(false);
+    setIsOpen(false);
   };
 
-  render() {
-    return (
-      <div onKeyUp={this.onKeyUp} onKeyDown={this.onKeyDown} onClick={this.onClick}>
-        <NamespaceSelect
-          isMulti={true}
-          menuIsOpen={this.isMenuOpen}
-          components={{ Placeholder }}
-          showAllNamespacesOption={true}
-          closeMenuOnSelect={false}
-          controlShouldRenderValue={false}
-          placeholder={""}
-          onChange={this.onChange}
-          onBlur={this.reset}
-          formatOptionLabel={this.formatOptionLabel}
-          className="NamespaceSelectFilter"
-          menuClass="NamespaceSelectFilterMenu"
-          sort={(left, right) => +this.selected.has(right.value) - +this.selected.has(left.value)}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div onKeyUp={onKeyUp} onKeyDown={onKeyDown} onClick={onClick}>
+      <NamespaceSelect
+        isMulti={true}
+        menuIsOpen={isOpen}
+        components={{ Placeholder }}
+        showAllNamespacesOption={true}
+        closeMenuOnSelect={false}
+        controlShouldRenderValue={false}
+        placeholder={""}
+        onChange={onChange}
+        onBlur={reset}
+        formatOptionLabel={formatOptionLabel}
+        className="NamespaceSelectFilter"
+        menuClass="NamespaceSelectFilterMenu"
+        sort={(left, right) => +selected.has(right.value) - +selected.has(left.value)}
+      />
+    </div>
+  );
+});
+
+export const NamespaceSelectFilter = withInjectables<Dependencies, NamespaceSelectFilterProps>(NonInjectedNamespaceSelectFilter, {
+  getProps: (di, props) => ({
+    namespaceStore: di.inject(namespaceStoreInjectable),
+    ...props,
+  }),
+});

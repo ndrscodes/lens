@@ -25,31 +25,47 @@ import React from "react";
 import { observer } from "mobx-react";
 import { OverviewWorkloadStatus } from "./overview-workload-status";
 import { Link } from "react-router-dom";
-import { workloadStores } from "../+workloads";
-import { namespaceStore } from "../+namespaces/namespace.store";
+import type { NamespaceStore } from "../+namespaces/store";
 import type { KubeResource } from "../../../common/rbac";
 import { ResourceNames } from "../../utils/rbac";
-import { boundMethod } from "../../utils";
 import { workloadURL } from "../../../common/routes";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import namespaceStoreInjectable from "../+namespaces/store.injectable";
+import type { CronJobStore } from "../+workloads-cronjobs/cronjob.store";
+import type { DaemonSetStore } from "../+workloads-daemonsets/store";
+import type { DeploymentStore } from "../+workloads-deployments/store";
+import type { JobStore } from "../+workloads-jobs/store";
+import type { ReplicaSetStore } from "../+workloads-replica-sets/store";
+import type { StatefulSetStore } from "../+workloads-statefulsets/store";
+import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
+import type { KubeObject } from "../../../common/k8s-api/kube-object";
+import type { PodsStore } from "../../../extensions/renderer-api/k8s-api";
+import cronJobStoreInjectable from "../+workloads-cronjobs/cronjob.store.injectable";
+import daemonSetStoreInjectable from "../+workloads-daemonsets/store.injectable";
+import deploymentStoreInjectable from "../+workloads-deployments/store.injectable";
+import jobStoreInjectable from "../+workloads-jobs/job.store.injectable";
+import podStoreInjectable from "../+workloads-pods/pod.store.injectable";
+import replicaSetStoreInjectable from "../+workloads-replica-sets/store.injectable";
+import statefulSetStoreInjectable from "../+workloads-statefulsets/store.injectable";
 
-const resources: KubeResource[] = [
-  "pods",
-  "deployments",
-  "statefulsets",
-  "daemonsets",
-  "replicasets",
-  "jobs",
-  "cronjobs",
-];
+export interface OverviewStatusesProps {
+}
 
-@observer
-export class OverviewStatuses extends React.Component {
-  @boundMethod
-  renderWorkload(resource: KubeResource): React.ReactElement {
-    const store = workloadStores.get(resource);
+interface Dependencies {
+  namespaceStore: NamespaceStore;
+  podStore: PodsStore;
+  deploymentStore: DeploymentStore;
+  daemonSetStore: DaemonSetStore;
+  statefulSetStore: StatefulSetStore;
+  replicaSetStore: ReplicaSetStore;
+  jobStore: JobStore;
+  cronJobStore: CronJobStore;
+}
 
-    if (!store) {
+const NonInjectedOverviewStatuses = observer(({ namespaceStore, podStore, deploymentStore, daemonSetStore, statefulSetStore, replicaSetStore, jobStore, cronJobStore }: Dependencies & OverviewStatusesProps) => {
+  const renderWorkload = (resource: KubeResource, store: KubeObjectStore<KubeObject>) => {
+    if (!isAllowedResource(resource)) {
       return null;
     }
 
@@ -63,19 +79,34 @@ export class OverviewStatuses extends React.Component {
         <OverviewWorkloadStatus status={store.getStatuses(items)} />
       </div>
     );
-  }
+  };
 
-  render() {
-    const workloads = resources
-      .filter(isAllowedResource)
-      .map(this.renderWorkload);
-
-    return (
-      <div className="OverviewStatuses">
-        <div className="workloads">
-          {workloads}
-        </div>
+  return (
+    <div className="OverviewStatuses">
+      <div className="workloads">
+        {renderWorkload("pods", podStore)}
+        {renderWorkload("deployments", deploymentStore)}
+        {renderWorkload("daemonsets", daemonSetStore)}
+        {renderWorkload("statefulsets", statefulSetStore)}
+        {renderWorkload("replicasets", replicaSetStore)}
+        {renderWorkload("jobs", jobStore)}
+        {renderWorkload("cronjobs", cronJobStore)}
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
+
+export const OverviewStatuses = withInjectables<Dependencies, OverviewStatusesProps>(NonInjectedOverviewStatuses, {
+  getProps: (di, props) => ({
+    namespaceStore: di.inject(namespaceStoreInjectable),
+    cronJobStore: di.inject(cronJobStoreInjectable),
+    daemonSetStore: di.inject(daemonSetStoreInjectable),
+    deploymentStore: di.inject(deploymentStoreInjectable),
+    jobStore: di.inject(jobStoreInjectable),
+    podStore: di.inject(podStoreInjectable),
+    replicaSetStore: di.inject(replicaSetStoreInjectable),
+    statefulSetStore: di.inject(statefulSetStoreInjectable),
+    ...props,
+  }),
+});
+

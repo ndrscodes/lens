@@ -19,7 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-@import "autoscaler.mixins";
+$hpa-status-colors: (
+  abletoscale: var(--colorOk),
+  scalingactive: var(--colorInfo),
+  scalinglimited: var(--colorSoftError),
+);
+
+@mixin hpa-status-bgc {
+  @each $status, $color in $hpa-status-colors {
+    &.#{$status} {
+      background: $color;
+      color: white;
+    }
+  }
+}
 
 .HorizontalPodAutoscalers {
   .TableCell {

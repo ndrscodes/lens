@@ -20,4 +20,4 @@
  */
 
 export * from "./limit-ranges";
-export * from "./limit-range-details";
+export * from "./details";

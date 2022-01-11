@@ -26,7 +26,7 @@ import { observer } from "mobx-react";
 import type { IPodContainer, Secret } from "../../../common/k8s-api/endpoints";
 import { DrawerItem } from "../drawer";
 import { autorun } from "mobx";
-import { secretsStore } from "../+config-secrets/secret.store";
+import { secretsStore } from "../+config-secrets/store";
 import { configMapsStore } from "../+config-maps/config-maps.store";
 import { Icon } from "../icon";
 import { base64, cssNames, iter } from "../../utils";

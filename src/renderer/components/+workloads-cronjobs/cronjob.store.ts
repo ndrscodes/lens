@@ -22,7 +22,7 @@
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
 import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
-import type { JobStore } from "../+workloads-jobs/job.store";
+import type { JobStore } from "../+workloads-jobs/store";
 
 export interface CronJobStoreDependencies {
   jobStore: JobStore;

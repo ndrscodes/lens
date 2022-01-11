@@ -22,7 +22,7 @@
 import React from "react";
 import type { HelmRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
 import { cssNames, noop } from "../../utils";
-import { ReleaseStore, releaseStore } from "./release.store";
+import { ReleaseStore, releaseStore } from "./store";
 import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Icon } from "../icon";

@@ -20,7 +20,7 @@
  */
 
 import { observable } from "mobx";
-import { daemonSetStore } from "../+workloads-daemonsets/daemonsets.store";
+import { daemonSetStore } from "../+workloads-daemonsets/store";
 import { podsStore } from "../+workloads-pods/pod.store";
 import { DaemonSet, Pod } from "../../../common/k8s-api/endpoints";
 

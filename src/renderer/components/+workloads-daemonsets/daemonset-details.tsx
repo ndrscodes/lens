@@ -28,7 +28,7 @@ import { Badge } from "../badge";
 import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import { daemonSetStore } from "./daemonsets.store";
+import { daemonSetStore } from "./store";
 import { podsStore } from "../+workloads-pods/pod.store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { DaemonSet, getMetricsForDaemonSets, IPodMetrics } from "../../../common/k8s-api/endpoints";

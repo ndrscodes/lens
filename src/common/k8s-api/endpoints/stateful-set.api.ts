@@ -132,7 +132,7 @@ interface ReplicasStatus extends KubeJsonApiData {
 }
 
 export class StatefulSetApi extends KubeApi<StatefulSet> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<StatefulSet> = {}) {
     super({
       ...args,
       objectConstructor: StatefulSet,

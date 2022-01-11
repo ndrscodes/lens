@@ -25,7 +25,7 @@ import groupBy from "lodash/groupBy";
 import React, { ReactNode } from "react";
 import { computed, makeObservable } from "mobx";
 import { observer } from "mobx-react";
-import { ConfirmDialog, ConfirmDialogParams } from "../confirm-dialog";
+import type { ConfirmDialogParams } from "../confirm-dialog";
 import { Table, TableCell, TableCellProps, TableHead, TableProps, TableRow, TableRowProps, TableSortCallbacks } from "../table";
 import { boundMethod, createStorage, cssNames, IClassName, isReactNode, noop, ObservableToggleSet, prevDefault, stopPropagation } from "../../utils";
 import { AddRemoveButtons, AddRemoveButtonsProps } from "../add-remove-buttons";
@@ -40,9 +40,8 @@ import { MenuActions } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Checkbox } from "../checkbox";
 import { UserStore } from "../../../common/user-store";
-import { namespaceStore } from "../+namespaces/namespace.store";
-
-
+import { withInjectables } from "@ogre-tools/injectable-react";
+import openConfirmDialogInjectable from "../confirm-dialog/dialog-open.injectable";
 
 export type SearchFilter<I extends ItemObject> = (item: I) => string | number | (string | number)[];
 export type SearchFilters<I extends ItemObject> = Record<string, SearchFilter<I>>;
@@ -54,6 +53,10 @@ export interface HeaderPlaceholders {
   searchProps?: SearchInputUrlProps;
   filters?: ReactNode;
   info?: ReactNode;
+}
+
+interface Dependencies {
+  openConfirmDialog: (params: ConfirmDialogParams) => void;
 }
 
 export type HeaderCustomizer = (placeholders: HeaderPlaceholders) => HeaderPlaceholders;
@@ -72,7 +75,7 @@ export interface ItemListLayoutProps<I extends ItemObject> {
   // header (title, filtering, searching, etc.)
   showHeader?: boolean;
   headerClassName?: IClassName;
-  renderHeaderTitle?: ReactNode | ((parent: ItemListLayout<I>) => ReactNode);
+  renderHeaderTitle?: ReactNode | ((parent: NonInjectableItemListLayout<I>) => ReactNode);
   customizeHeader?: HeaderCustomizer | HeaderCustomizer[];
 
   // items list configuration
@@ -96,7 +99,7 @@ export interface ItemListLayoutProps<I extends ItemObject> {
 
   // other
   customizeRemoveDialog?: (selectedItems: I[]) => Partial<ConfirmDialogParams>;
-  renderFooter?: (parent: ItemListLayout<I>) => React.ReactNode;
+  renderFooter?: (parent: NonInjectableItemListLayout<I>) => React.ReactNode;
 
   /**
    * Message to display when a store failed to load
@@ -126,14 +129,14 @@ const defaultProps: Partial<ItemListLayoutProps<ItemObject>> = {
 };
 
 @observer
-export class ItemListLayout<I extends ItemObject> extends React.Component<ItemListLayoutProps<I>> {
+class NonInjectableItemListLayout<I extends ItemObject> extends React.Component<ItemListLayoutProps<I> & Dependencies> {
   static defaultProps = defaultProps as object;
 
   private storage = createStorage("item_list_layout", {
     showFilters: false, // setup defaults
   });
 
-  constructor(props: ItemListLayoutProps<I>) {
+  constructor(props: ItemListLayoutProps<I> & Dependencies) {
     super(props);
     makeObservable(this);
   }
@@ -166,7 +169,7 @@ export class ItemListLayout<I extends ItemObject> extends React.Component<ItemLi
     const { store, dependentStores } = this.props;
     const stores = Array.from(new Set([store, ...dependentStores]));
 
-    stores.forEach(store => store.loadAll(namespaceStore.contextNamespaces));
+    stores.forEach(store => store.loadAll());
   }
 
   private filterCallbacks: ItemsFilters<I> = {
@@ -304,7 +307,7 @@ export class ItemListLayout<I extends ItemObject> extends React.Component<ItemLi
     const tail = tailCount > 0 ? <>, and <b>{tailCount}</b> more</> : null;
     const message = selectedCount <= 1 ? <p>Remove item <b>{selectedNames}</b>?</p> : <p>Remove <b>{selectedCount}</b> items <b>{selectedNames}</b>{tail}?</p>;
 
-    ConfirmDialog.open({
+    this.props.openConfirmDialog({
       ok: removeSelectedItems,
       labelOk: "Remove",
       message,
@@ -527,4 +530,13 @@ export class ItemListLayout<I extends ItemObject> extends React.Component<ItemLi
       </div>
     );
   }
+}
+
+export function ItemListLayout<I extends ItemObject>(props: ItemListLayoutProps<I>) {
+  return withInjectables<Dependencies, ItemListLayoutProps<I>>(NonInjectableItemListLayout, {
+    getProps: (di, props) => ({
+      openConfirmDialog: di.inject(openConfirmDialogInjectable),
+      ...props,
+    }),
+  })(props);
 }

@@ -20,4 +20,4 @@
  */
 
 export * from "./cronjobs";
-export * from "./cronjob-details";
+export * from "./details";
