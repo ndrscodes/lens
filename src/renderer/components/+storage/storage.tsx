@@ -24,9 +24,9 @@ import "./storage.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
-import { PersistentVolumes } from "../+storage-volumes";
+import { PersistentVolumes } from "../+persistent-volumes";
 import { StorageClasses } from "../+storage-classes";
-import { PersistentVolumeClaims } from "../+storage-volume-claims";
+import { PersistentVolumeClaims } from "../+persistent-volume-claims";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
 import * as routes from "../../../common/routes";
 

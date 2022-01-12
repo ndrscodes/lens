@@ -30,7 +30,7 @@ import { ClusterOverview } from "./components/+cluster/cluster-overview";
 import { Events } from "./components/+events/events";
 import { DeploymentScaleDialog } from "./components/+workloads-deployments/scale-dialog";
 import { CronJobTriggerDialog } from "./components/+workloads-cronjobs/cronjob-trigger-dialog";
-import { CustomResources } from "./components/+custom-resources/custom-resources";
+import { CustomResources } from "./components/+custom-resource-definitions/custom-resources";
 import { isAllowedResource } from "../common/utils/allowed-resource";
 import logger from "../main/logger";
 import { webFrame } from "electron";

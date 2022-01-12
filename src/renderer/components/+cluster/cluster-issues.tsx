@@ -26,8 +26,8 @@ import { observer } from "mobx-react";
 import { Icon } from "../icon";
 import { SubHeader } from "../layout/sub-header";
 import { Table, TableCell, TableHead, TableRow } from "../table";
-import { NodeStore, nodesStore } from "../+nodes/nodes.store";
-import { EventStore, eventStore } from "../+events/event.store";
+import type { NodeStore } from "../+nodes/store";
+import type { EventStore } from "../+events/store";
 import { cssNames, prevDefault } from "../../utils";
 import type { ItemObject } from "../../../common/item.store";
 import { Spinner } from "../spinner";
@@ -36,6 +36,8 @@ import { kubeSelectedUrlParam, toggleDetails } from "../kube-detail-params";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import nodeStoreInjectable from "../+nodes/store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 
 export interface ClusterIssuesProps {
   className?: string;
@@ -57,13 +59,13 @@ enum sortBy {
 
 interface Dependencies {
   apiManager: ApiManager;
-  nodesStore: NodeStore;
+  nodeStore: NodeStore;
   eventStore: EventStore;
 }
 
-const NonInjectedClusterIssues = observer(({ apiManager, nodesStore, eventStore, className }: Dependencies & ClusterIssuesProps) => {
+const NonInjectedClusterIssues = observer(({ apiManager, nodeStore, eventStore, className }: Dependencies & ClusterIssuesProps) => {
   const warnings: IWarning[] = [
-    ...nodesStore.items.flatMap(node => (
+    ...nodeStore.items.flatMap(node => (
       node.getWarningConditions()
         .map(({ message }) => ({
           age: node.getAge(),
@@ -172,8 +174,8 @@ const NonInjectedClusterIssues = observer(({ apiManager, nodesStore, eventStore,
 export const ClusterIssues = withInjectables<Dependencies, ClusterIssuesProps>(NonInjectedClusterIssues, {
   getProps: (di, props) => ({
     apiManager: di.inject(apiManagerInjectable),
-    nodesStore,
-    eventStore,
+    nodeStore: di.inject(nodeStoreInjectable),
+    eventStore: di.inject(eventStoreInjectable),
     ...props,
   }),
 });

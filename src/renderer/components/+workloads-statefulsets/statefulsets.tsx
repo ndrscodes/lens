@@ -27,13 +27,13 @@ import type { RouteComponentProps } from "react-router";
 import type { StatefulSet } from "../../../common/k8s-api/endpoints";
 import type { PodStore } from "../+workloads-pods/store";
 import type { StatefulSetStore } from "./store";
-import type { EventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { StatefulSetsRouteParams } from "../../../common/routes";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import podStoreInjectable from "../+workloads-pods/store.injectable";
-import eventStoreInjectable from "../+events/event.store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 import statefulSetStoreInjectable from "./store.injectable";
 import { StatefulSetMenu } from "./item-menu";
 

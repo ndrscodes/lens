@@ -86,7 +86,7 @@ const NonInjectedNamespaceDetails = observer(({ resourceQuotaStore, limitRangeSt
           loader={loadMetrics}
           tabs={podMetricTabs}
           object={namespace}
-          params={{ metrics }}
+          metrics={metrics}
         >
           <PodCharts />
         </ResourceMetrics>

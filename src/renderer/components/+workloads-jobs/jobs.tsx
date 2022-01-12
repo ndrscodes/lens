@@ -25,14 +25,14 @@ import React from "react";
 import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import type { JobStore } from "./store";
-import type { EventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import kebabCase from "lodash/kebabCase";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { JobsRouteParams } from "../../../common/routes";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import jobStoreInjectable from "./store.injectable";
-import eventStoreInjectable from "../+events/event.store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 
 enum columnId {
   name = "name",

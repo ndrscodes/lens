@@ -27,7 +27,7 @@ import { useInterval } from "../../hooks";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { cssNames } from "../../utils";
 import { Spinner } from "../spinner";
-import type { IPodMetrics } from "../../../common/k8s-api/endpoints";
+import type { IMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 
 export interface ResourceMetricsProps {
   tabs: React.ReactNode[];
@@ -41,13 +41,13 @@ export interface ResourceMetricsProps {
   interval?: number;
   className?: string;
   children?: React.ReactChildren | React.ReactChild;
-  metrics: IPodMetrics | null;
+  metrics: Record<string, IMetrics | undefined> | null;
 }
 
 export interface IResourceMetricsValue {
   object: KubeObject;
   tabId: number;
-  metrics: IPodMetrics | null;
+  metrics: Record<string, IMetrics | undefined> | null;
 }
 
 export const ResourceMetricsContext = createContext<IResourceMetricsValue>(null);

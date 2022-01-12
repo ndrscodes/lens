@@ -24,7 +24,7 @@ import "./daemonsets.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
-import type { EventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/store";
 import type { PodStore } from "../+workloads-pods/store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import { Badge } from "../badge";
@@ -34,7 +34,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import type { DaemonSetStore } from "./store";
 import daemonSetStoreInjectable from "./store.injectable";
 import podStoreInjectable from "../+workloads-pods/store.injectable";
-import eventStoreInjectable from "../+events/event.store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 
 enum columnId {
   name = "name",

@@ -26,7 +26,7 @@ import { action, observable } from "mobx";
 import { observer } from "mobx-react";
 import { orderBy } from "lodash";
 import { TabLayout } from "../layout/tab-layout";
-import { EventStore, eventStore } from "./event.store";
+import type { EventStore } from "./store";
 import { KubeObjectListLayout, KubeObjectListLayoutProps } from "../kube-object-list-layout";
 import type { KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
 import type { TableSortCallbacks, TableSortParams } from "../table";
@@ -40,6 +40,7 @@ import { getDetailsUrl } from "../kube-detail-params";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import eventStoreInjectable from "./store.injectable";
 
 enum columnId {
   message = "message",
@@ -204,7 +205,7 @@ const NonInjectedEvents = observer(({ apiManager, eventStore, className, compact
 
 export const Events = withInjectables<Dependencies, EventsProps>(NonInjectedEvents, {
   getProps: (di, props) => ({
-    eventStore,
+    eventStore: di.inject(eventStoreInjectable),
     apiManager: di.inject(apiManagerInjectable),
     ...props,
   }),

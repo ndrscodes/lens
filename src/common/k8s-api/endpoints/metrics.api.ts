@@ -175,7 +175,7 @@ export function getItemMetrics(metrics: Record<string, IMetrics>, itemName: stri
 }
 
 export function getMetricLastPoints(metrics: Record<string, IMetrics>) {
-  const result: Partial<{ [metric: string]: number }> = {};
+  const result: Partial<Record<string, number>> = {};
 
   Object.keys(metrics).forEach(metricName => {
     try {

@@ -29,10 +29,10 @@ import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { RouteComponentProps } from "react-router";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import type { ReplicaSetsRouteParams } from "../../../common/routes";
-import type { EventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import replicaSetStoreInjectable from "./store.injectable";
-import eventStoreInjectable from "../+events/event.store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 import { ReplicaSetMenu } from "./item-menu";
 
 enum columnId {

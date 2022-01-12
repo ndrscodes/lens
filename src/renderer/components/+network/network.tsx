@@ -24,11 +24,11 @@ import "./network.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
-import { Services } from "../+network-services";
-import { Endpoints } from "../+network-endpoints";
-import { Ingresses } from "../+network-ingresses";
+import { Services } from "../+services";
+import { Endpoints } from "../+endpoints";
+import { Ingresses } from "../+ingresses";
 import { NetworkPolicies } from "../+network-policies";
-import { PortForwards } from "../+network-port-forwards";
+import { PortForwards } from "../+port-forwards";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
 import * as routes from "../../../common/routes";
 

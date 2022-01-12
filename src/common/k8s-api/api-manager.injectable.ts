@@ -20,25 +20,25 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { ClusterStore } from "../../renderer/components/+cluster/cluster-overview.store";
+import { ClusterStore } from "../../renderer/components/+cluster/store";
 import { HorizontalPodAutoscalerStore } from "../../renderer/components/+config-autoscalers/store";
 import { LimitRangeStore } from "../../renderer/components/+config-limit-ranges/store";
-import { ConfigMapStore } from "../../renderer/components/+config-maps/config-maps.store";
-import { PodDisruptionBudgetStore } from "../../renderer/components/+config-pod-disruption-budgets/pod-disruption-budgets.store";
+import { ConfigMapStore } from "../../renderer/components/+config-maps/store";
+import { PodDisruptionBudgetStore } from "../../renderer/components/+config-pod-disruption-budgets/store";
 import { ResourceQuotaStore } from "../../renderer/components/+config-resource-quotas/store";
 import { SecretStore } from "../../renderer/components/+config-secrets/store";
-import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resources/crd.store";
-import { EventStore } from "../../renderer/components/+events/event.store";
+import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resource-definitions/store";
+import { EventStore } from "../../renderer/components/+events/store";
 import { NamespaceStore } from "../../renderer/components/+namespaces/store";
-import { EndpointStore } from "../../renderer/components/+network-endpoints/endpoints.store";
-import { IngressStore } from "../../renderer/components/+network-ingresses/ingress.store";
-import { NetworkPolicyStore } from "../../renderer/components/+network-policies/network-policy.store";
-import { ServiceStore } from "../../renderer/components/+network-services/services.store";
-import { NodeStore } from "../../renderer/components/+nodes/nodes.store";
-import { PodSecurityPolicyStore } from "../../renderer/components/+pod-security-policies/pod-security-policies.store";
-import { StorageClassStore } from "../../renderer/components/+storage-classes/storage-class.store";
-import { PersistentVolumeClaimStore } from "../../renderer/components/+storage-volume-claims/volume-claim.store";
-import { PersistentVolumeStore } from "../../renderer/components/+storage-volumes/persistent-volume.store";
+import { EndpointStore } from "../../renderer/components/+endpoints/store";
+import { IngressStore } from "../../renderer/components/+ingresses/store";
+import { NetworkPolicyStore } from "../../renderer/components/+network-policies/store";
+import { ServiceStore } from "../../renderer/components/+services/services.store";
+import { NodeStore } from "../../renderer/components/+nodes/store";
+import { PodSecurityPolicyStore } from "../../renderer/components/+pod-security-policies/store";
+import { StorageClassStore } from "../../renderer/components/+storage-classes/store";
+import { PersistentVolumeClaimStore } from "../../renderer/components/+persistent-volume-claims/store";
+import { PersistentVolumeStore } from "../../renderer/components/+persistent-volumes/store";
 import { ClusterRoleBindingStore } from "../../renderer/components/+user-management/+cluster-role-bindings/store";
 import { ClusterRoleStore } from "../../renderer/components/+user-management/+cluster-roles/store";
 import { RoleBindingStore } from "../../renderer/components/+user-management/+role-bindings/store";
@@ -142,12 +142,16 @@ function createAndInit(): ApiManager {
   const daemonSetApi = new DaemonSetApi();
 
   apiManager.registerApi(daemonSetApi);
-  apiManager.registerStore(new DaemonSetStore(daemonSetApi));
+  apiManager.registerStore(new DaemonSetStore(daemonSetApi, {
+    podStore,
+  }));
 
   const deploymentApi = new DeploymentApi();
 
   apiManager.registerApi(deploymentApi);
-  apiManager.registerStore(new DeploymentStore(deploymentApi));
+  apiManager.registerStore(new DeploymentStore(deploymentApi, {
+    podStore,
+  }));
 
   const endpointApi = new EndpointApi();
 
@@ -192,9 +196,10 @@ function createAndInit(): ApiManager {
   apiManager.registerStore(new NodeStore(nodeApi));
 
   const persistentVolumeApi = new PersistentVolumeApi();
+  const persistentVolumeStore = new PersistentVolumeStore(persistentVolumeApi);
 
   apiManager.registerApi(persistentVolumeApi);
-  apiManager.registerStore(new PersistentVolumeStore(persistentVolumeApi));
+  apiManager.registerStore(persistentVolumeStore);
 
   const persistentVolumeClaimApi = new PersistentVolumeClaimApi();
 
@@ -251,12 +256,16 @@ function createAndInit(): ApiManager {
   const statefulSetApi = new StatefulSetApi();
 
   apiManager.registerApi(statefulSetApi);
-  apiManager.registerStore(new StatefulSetStore(statefulSetApi));
+  apiManager.registerStore(new StatefulSetStore(statefulSetApi, {
+    podStore,
+  }));
 
   const storageClassApi = new StorageClassApi();
 
   apiManager.registerApi(storageClassApi);
-  apiManager.registerStore(new StorageClassStore(storageClassApi));
+  apiManager.registerStore(new StorageClassStore(storageClassApi, {
+    persistentVolumeStore,
+  }));
 
 
   // There is no store for these apis, so just register them

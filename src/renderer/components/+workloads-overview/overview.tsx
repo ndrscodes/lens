@@ -24,7 +24,7 @@ import "./overview.scss";
 import React from "react";
 import { disposeOnUnmount, observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
-import { eventStore } from "../+events/event.store";
+import { eventStore } from "../+events/store";
 import { podsStore } from "../+workloads-pods/store";
 import { deploymentStore } from "../+workloads-deployments/store";
 import { daemonSetStore } from "../+workloads-daemonsets/store";

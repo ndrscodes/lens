@@ -22,7 +22,7 @@
 import React from "react";
 import { findByTestId, findByText, render } from "@testing-library/react";
 import { NetworkPolicy, NetworkPolicySpec } from "../../../../common/k8s-api/endpoints";
-import { NetworkPolicyDetails } from "../network-policy-details";
+import { NetworkPolicyDetails } from "../details";
 
 jest.mock("../../kube-object-meta");
 

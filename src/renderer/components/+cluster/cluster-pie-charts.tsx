@@ -23,21 +23,28 @@ import styles from "./cluster-pie-charts.module.scss";
 
 import React from "react";
 import { observer } from "mobx-react";
-import { clusterOverviewStore, MetricNodeRole } from "./cluster-overview.store";
 import { Spinner } from "../spinner";
 import { Icon } from "../icon";
-import { nodesStore } from "../+nodes/nodes.store";
 import { ChartData, PieChart } from "../chart";
 import { ClusterNoMetrics } from "./cluster-no-metrics";
 import { bytesToUnits, cssNames } from "../../utils";
 import { ThemeStore } from "../../theme.store";
 import { getMetricLastPoints } from "../../../common/k8s-api/endpoints/metrics.api";
+import type { IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
+import { MetricNodeRole } from "./overview.state";
 
 function createLabels(rawLabelData: [string, number | undefined][]): string[] {
   return rawLabelData.map(([key, value]) => `${key}: ${value?.toFixed(2) || "N/A"}`);
 }
 
-export const ClusterPieCharts = observer(() => {
+export interface ClusterPieChartsProps {
+  metrics: IClusterMetrics | null;
+  metricsNodeRole: MetricNodeRole;
+  masterNodes: Node[];
+  workerNodes: Node[];
+}
+
+export const ClusterPieCharts = observer(({ metrics, masterNodes, workerNodes, metricsNodeRole }: ClusterPieChartsProps) => {
   const renderLimitWarning = () => {
     return (
       <div className="node-warning flex gaps align-center">
@@ -47,8 +54,7 @@ export const ClusterPieCharts = observer(() => {
     );
   };
 
-  const renderCharts = () => {
-    const data = getMetricLastPoints(clusterOverviewStore.metrics);
+  const renderCharts = (data: Partial<Record<string, number>>) => {
     const { memoryUsage, memoryRequests, memoryAllocatableCapacity, memoryCapacity, memoryLimits } = data;
     const { cpuUsage, cpuRequests, cpuAllocatableCapacity, cpuCapacity, cpuLimits } = data;
     const { podUsage, podAllocatableCapacity, podCapacity } = data;
@@ -214,9 +220,7 @@ export const ClusterPieCharts = observer(() => {
   };
 
   const renderContent = () => {
-    const { masterNodes, workerNodes } = nodesStore;
-    const { metricNodeRole, metricsLoaded } = clusterOverviewStore;
-    const nodes = metricNodeRole === MetricNodeRole.MASTER ? masterNodes : workerNodes;
+    const nodes = metricsNodeRole === MetricNodeRole.MASTER ? masterNodes : workerNodes;
 
     if (!nodes.length) {
       return (
@@ -227,20 +231,22 @@ export const ClusterPieCharts = observer(() => {
       );
     }
 
-    if (!metricsLoaded) {
+    if (!metrics) {
       return (
         <div className={cssNames(styles.empty, "flex justify-center align-center box grow")}>
           <Spinner/>
         </div>
       );
     }
-    const { memoryCapacity, cpuCapacity, podCapacity } = getMetricLastPoints(clusterOverviewStore.metrics);
+
+    const data = getMetricLastPoints(metrics);
+    const { memoryCapacity, cpuCapacity, podCapacity } = data;
 
     if (!memoryCapacity || !cpuCapacity || !podCapacity) {
       return <ClusterNoMetrics className={styles.empty}/>;
     }
 
-    return renderCharts();
+    return renderCharts(data);
   };
 
   return (

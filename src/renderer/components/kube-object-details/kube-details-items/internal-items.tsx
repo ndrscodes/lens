@@ -27,19 +27,19 @@ import { ConfigMapDetails } from "../../+config-maps";
 import { PodDisruptionBudgetDetails } from "../../+config-pod-disruption-budgets";
 import { ResourceQuotaDetails } from "../../+config-resource-quotas";
 import { SecretDetails } from "../../+config-secrets";
-import { CRDDetails } from "../../+custom-resources";
+import { CustomResourceDefinitionDetails } from "../../+custom-resource-definitions";
 import { EventDetails } from "../../+events";
 import { KubeEventDetails } from "../../+events/kube-event-details";
 import { NamespaceDetails } from "../../+namespaces";
-import { EndpointDetails } from "../../+network-endpoints";
-import { IngressDetails } from "../../+network-ingresses";
+import { EndpointDetails } from "../../+endpoints";
+import { IngressDetails } from "../../+ingresses";
 import { NetworkPolicyDetails } from "../../+network-policies";
-import { ServiceDetails } from "../../+network-services";
+import { ServiceDetails } from "../../+services";
 import { NodeDetails } from "../../+nodes";
 import { PodSecurityPolicyDetails } from "../../+pod-security-policies";
 import { StorageClassDetails } from "../../+storage-classes";
-import { PersistentVolumeClaimDetails } from "../../+storage-volume-claims";
-import { PersistentVolumeDetails } from "../../+storage-volumes";
+import { PersistentVolumeClaimDetails } from "../../+persistent-volume-claims";
+import { PersistentVolumeDetails } from "../../+persistent-volumes";
 import { ClusterRoleBindingDetails } from "../../+user-management/+cluster-role-bindings";
 import { ClusterRoleDetails } from "../../+user-management/+cluster-roles";
 import { RoleBindingDetails } from "../../+user-management/+role-bindings";
@@ -119,7 +119,7 @@ export const internalItems: Required<KubeObjectDetailRegistration>[] = [
     kind: "CustomResourceDefinition",
     apiVersions: ["apiextensions.k8s.io/v1", "apiextensions.k8s.io/v1beta1"],
     components: {
-      Details: CRDDetails,
+      Details: CustomResourceDefinitionDetails,
     },
   },
   {

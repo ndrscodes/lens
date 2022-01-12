@@ -20,4 +20,4 @@
  */
 
 export * from "./pod-security-policies";
-export * from "./pod-security-policy-details";
+export * from "./details";

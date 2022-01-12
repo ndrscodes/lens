@@ -25,7 +25,7 @@ import React, { Fragment } from "react";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import type { RouteComponentProps } from "react-router";
-import type { EventStore } from "../+events/event.store";
+import type { EventStore } from "../+events/store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import type { NodeApi, Pod } from "../../../common/k8s-api/endpoints";
 import { StatusBrick } from "../status-brick";
@@ -43,7 +43,7 @@ import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable
 import type { PodsStore } from "../../../extensions/renderer-api/k8s-api";
 import nodeApiInjectable from "../../../common/k8s-api/endpoints/node.api.injectable";
 import podStoreInjectable from "./store.injectable";
-import eventStoreInjectable from "../+events/event.store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
 
 enum columnId {
   name = "name",

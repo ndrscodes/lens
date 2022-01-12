@@ -24,29 +24,58 @@ import styles from "./cluster-metrics.module.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import type { ChartOptions, ChartPoint } from "chart.js";
-import { clusterOverviewStore, MetricType } from "./cluster-overview.store";
 import { BarChart } from "../chart";
 import { bytesToUnits, cssNames } from "../../utils";
 import { Spinner } from "../spinner";
 import { ZebraStripes } from "../chart/zebra-stripes.plugin";
 import { ClusterNoMetrics } from "./cluster-no-metrics";
 import { ClusterMetricSwitchers } from "./cluster-metric-switchers";
-import { getMetricLastPoints } from "../../../common/k8s-api/endpoints/metrics.api";
+import { getMetricLastPoints, normalizeMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
+import { MetricNodeRole, MetricType } from "./overview.state";
+import type { IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
 
-export const ClusterMetrics = observer(() => {
-  const { metricType, metricNodeRole, getMetricsValues, metricsLoaded, metrics } = clusterOverviewStore;
-  const { memoryCapacity, cpuCapacity } = getMetricLastPoints(clusterOverviewStore.metrics);
-  const metricValues = getMetricsValues(metrics);
+export interface ClusterMetricsProps {
+  metrics: IClusterMetrics | null;
+  metricsNodeRole: MetricNodeRole;
+  setMetricsNodeRole: (val: MetricNodeRole) => void;
+  metricsType: MetricType;
+  setMetricsType: (val: MetricType) => void;
+  masterNodes: Node[];
+  workerNodes: Node[];
+}
+
+function getMetricsValues(metricsType: MetricType, source: IClusterMetrics | null): [number, string][] {
+  switch (metricsType) {
+    case MetricType.CPU:
+      return normalizeMetrics(source?.cpuUsage).data.result[0].values;
+    case MetricType.MEMORY:
+      return normalizeMetrics(source?.memoryUsage).data.result[0].values;
+    default:
+      return [];
+  }
+}
+
+export const ClusterMetrics = observer(({
+  metricsType,
+  metrics,
+  setMetricsType,
+  metricsNodeRole,
+  setMetricsNodeRole,
+  masterNodes,
+  workerNodes,
+}: ClusterMetricsProps) => {
+  const { memoryCapacity, cpuCapacity } = getMetricLastPoints(metrics ?? {});
+  const metricsValues = getMetricsValues(metricsType, metrics);
   const colors = { cpu: "#3D90CE", memory: "#C93DCE" };
-  const data = metricValues.map(value => ({
+  const data = metricsValues.map(value => ({
     x: value[0],
     y: parseFloat(value[1]).toFixed(3),
   }));
 
   const datasets = [{
-    id: metricType + metricNodeRole,
-    label: `${metricType.toUpperCase()} usage`,
-    borderColor: colors[metricType],
+    id: metricsType + metricsNodeRole,
+    label: `${metricsType.toUpperCase()} usage`,
+    borderColor: colors[metricsType],
     data,
   }];
   const cpuOptions: ChartOptions = {
@@ -87,10 +116,10 @@ export const ClusterMetrics = observer(() => {
       },
     },
   };
-  const options = metricType === MetricType.CPU ? cpuOptions : memoryOptions;
+  const options = metricsType === MetricType.CPU ? cpuOptions : memoryOptions;
 
   const renderMetrics = () => {
-    if (!metricValues.length && !metricsLoaded) {
+    if (!metricsValues.length && !metrics) {
       return <Spinner center/>;
     }
 
@@ -100,7 +129,7 @@ export const ClusterMetrics = observer(() => {
 
     return (
       <BarChart
-        name={`${metricNodeRole}-${metricType}`}
+        name={`${metricsNodeRole}-${metricsType}`}
         options={options}
         data={{ datasets }}
         timeLabelStep={5}
@@ -113,7 +142,15 @@ export const ClusterMetrics = observer(() => {
 
   return (
     <div className={cssNames(styles.ClusterMetrics, "flex column")}>
-      <ClusterMetricSwitchers/>
+      <ClusterMetricSwitchers
+        metricsValues={metricsValues}
+        metricsNodeRole={metricsNodeRole}
+        metricsType={metricsType}
+        masterNodes={masterNodes}
+        workerNodes={workerNodes}
+        setMetricsType={setMetricsType}
+        setMetricsNodeRole={setMetricsNodeRole}
+      />
       {renderMetrics()}
     </div>
   );

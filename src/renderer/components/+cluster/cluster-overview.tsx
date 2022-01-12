@@ -21,92 +21,121 @@
 
 import styles from "./cluster-overview.module.scss";
 
-import React from "react";
-import { reaction } from "mobx";
-import { disposeOnUnmount, observer } from "mobx-react";
-import { nodesStore } from "../+nodes/nodes.store";
-import { podsStore } from "../+workloads-pods/store";
-import { getHostedClusterId, interval } from "../../utils";
+import React, { useEffect, useState } from "react";
+import { when } from "mobx";
+import { observer } from "mobx-react";
+import { disposer, interval } from "../../utils";
 import { TabLayout } from "../layout/tab-layout";
 import { Spinner } from "../spinner";
 import { ClusterIssues } from "./cluster-issues";
 import { ClusterMetrics } from "./cluster-metrics";
-import { clusterOverviewStore } from "./cluster-overview.store";
 import { ClusterPieCharts } from "./cluster-pie-charts";
 import { getActiveClusterEntity } from "../../api/catalog-entity-registry";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
-import { ClusterStore } from "../../../common/cluster-store";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
-import { eventStore } from "../+events/event.store";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import type { PodStore } from "../+workloads-pods/store";
+import type { EventStore } from "../+events/store";
+import type { NodeStore } from "../+nodes/store";
+import podStoreInjectable from "../+workloads-pods/store.injectable";
+import eventStoreInjectable from "../+events/store.injectable";
+import nodeStoreInjectable from "../+nodes/store.injectable";
+import { getMetricsByNodeNames, IClusterMetrics } from "../../../common/k8s-api/endpoints";
+import { MetricNodeRole, MetricType } from "./overview.state";
 
-@observer
-export class ClusterOverview extends React.Component {
-  private metricPoller = interval(60, () => this.loadMetrics());
+export interface ClusterOverviewProps {
+  clusterIsAvailable: boolean;
+}
 
-  loadMetrics() {
-    const cluster = ClusterStore.getInstance().getById(getHostedClusterId());
+interface Dependencies {
+  podStore: PodStore;
+  eventStore: EventStore;
+  nodeStore: NodeStore;
+}
 
-    if (cluster.available) {
-      clusterOverviewStore.loadMetrics();
+const NonInjectedClusterOverview = observer(({ podStore, eventStore, nodeStore, clusterIsAvailable }: Dependencies & ClusterOverviewProps) => {
+  const [metrics, setMetrics] = useState<IClusterMetrics | null>(null);
+  const [metricsNodeRole, setMetricsNodeRole] = useState(MetricNodeRole.MASTER);
+  const [metricsType, setMetricsType] = useState(MetricType.CPU);
+  const [loadMetricsPoller] = useState(interval(60, async () => {
+    if (!clusterIsAvailable) {
+      return;
     }
-  }
 
-  componentDidMount() {
-    this.metricPoller.start(true);
+    await when(() => nodeStore.isLoaded);
 
-    disposeOnUnmount(this, [
+    const nodes = metricsNodeRole === MetricNodeRole.MASTER
+      ? nodeStore.masterNodes
+      : nodeStore.workerNodes;
+
+    setMetrics(await getMetricsByNodeNames(nodes.map(node => node.getName())));
+  }));
+
+  useEffect(() => {
+    loadMetricsPoller.start();
+
+    return disposer(
       kubeWatchApi.subscribeStores([
-        podsStore,
+        podStore,
         eventStore,
-        nodesStore,
+        nodeStore,
       ]),
-      reaction(
-        () => clusterOverviewStore.metricNodeRole, // Toggle Master/Worker node switcher
-        () => this.metricPoller.restart(true),
-      ),
-    ]);
-  }
-
-  componentWillUnmount() {
-    this.metricPoller.stop();
-  }
-
-  renderMetrics(isMetricsHidden: boolean) {
-    if (isMetricsHidden) {
-      return null;
-    }
-
-    return (
-      <>
-        <ClusterMetrics/>
-        <ClusterPieCharts/>
-      </>
+      () => loadMetricsPoller.stop(),
     );
-  }
+  }, []);
 
-  renderClusterOverview(isLoaded: boolean, isMetricsHidden: boolean) {
-    if (!isLoaded) {
-      return <Spinner center/>;
-    }
+  const changeMetricsNodeRole = (val: MetricNodeRole) => {
+    setMetricsNodeRole(val);
+    loadMetricsPoller.restart(true);
+  };
+
+  const renderClusterOverview = () => {
+    const isMetricsHidden = getActiveClusterEntity()?.isMetricHidden(ClusterMetricsResourceType.Cluster);
 
     return (
       <>
-        {this.renderMetrics(isMetricsHidden)}
+        {isMetricsHidden && (
+          <>
+            <ClusterMetrics
+              metrics={metrics}
+              metricsType={metricsType}
+              metricsNodeRole={metricsNodeRole}
+              masterNodes={nodeStore.masterNodes}
+              workerNodes={nodeStore.workerNodes}
+              setMetricsType={setMetricsType}
+              setMetricsNodeRole={changeMetricsNodeRole}
+            />
+            <ClusterPieCharts
+              metrics={metrics}
+              metricsNodeRole={metricsNodeRole}
+              masterNodes={nodeStore.masterNodes}
+              workerNodes={nodeStore.workerNodes}
+            />
+          </>
+        )}
         <ClusterIssues className={isMetricsHidden ? "OnlyClusterIssues" : ""}/>
       </>
     );
-  }
+  };
 
-  render() {
-    const isLoaded = nodesStore.isLoaded && eventStore.isLoaded;
-    const isMetricHidden = getActiveClusterEntity()?.isMetricHidden(ClusterMetricsResourceType.Cluster);
+  return (
+    <TabLayout>
+      <div className={styles.ClusterOverview} data-testid="cluster-overview-page">
+        {
+          nodeStore.isLoaded && eventStore.isLoaded
+            ? <Spinner center/>
+            : renderClusterOverview()
+        }
+      </div>
+    </TabLayout>
+  );
+});
 
-    return (
-      <TabLayout>
-        <div className={styles.ClusterOverview} data-testid="cluster-overview-page">
-          {this.renderClusterOverview(isLoaded, isMetricHidden)}
-        </div>
-      </TabLayout>
-    );
-  }
-}
+export const ClusterOverview = withInjectables<Dependencies, ClusterOverviewProps>(NonInjectedClusterOverview, {
+  getProps: (di, props) => ({
+    podStore: di.inject(podStoreInjectable),
+    eventStore: di.inject(eventStoreInjectable),
+    nodeStore: di.inject(nodeStoreInjectable),
+    ...props,
+  }),
+});
