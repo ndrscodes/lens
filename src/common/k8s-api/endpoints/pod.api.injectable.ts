@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { PodApi } from ".";
 import apiManagerInjectable from "../api-manager.injectable";
+import type { PodApi } from "./pods.api";
 
 const podApiInjectable = getInjectable({
   instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/pods") as PodApi,

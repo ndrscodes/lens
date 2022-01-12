@@ -24,7 +24,7 @@ import { KubeObject } from "../kube-object";
 import { formatDuration } from "../../utils/formatDuration";
 import { KubeApi, SpecificApiOptions } from "../kube-api";
 
-export interface KubeEvent {
+export interface Event {
   involvedObject: {
     kind: string;
     namespace: string;
@@ -49,7 +49,7 @@ export interface KubeEvent {
   reportingInstance: string;
 }
 
-export class KubeEvent extends KubeObject {
+export class Event extends KubeObject {
   static kind = "Event";
   static namespaced = true;
   static apiBase = "/api/v1/events";
@@ -77,11 +77,11 @@ export class KubeEvent extends KubeObject {
   }
 }
 
-export class EventApi extends KubeApi<KubeEvent> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+export class EventApi extends KubeApi<Event> {
+  constructor(args: SpecificApiOptions<> = {}) {
     super({
       ...args,
-      objectConstructor: KubeEvent,
+      objectConstructor: Event,
     });
   }
 }

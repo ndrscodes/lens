@@ -62,7 +62,7 @@ export class RoleBinding extends KubeObject {
 }
 
 export class RoleBindingApi extends KubeApi<RoleBinding> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<RoleBinding> = {}) {
     super({
       ...args,
       objectConstructor: RoleBinding,

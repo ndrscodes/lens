@@ -20,11 +20,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { DeploymentApi } from "./deployment.api";
+import type { RoleBindingApi } from "./role-binding.api";
 
-const deploymentApiInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+const roleBindingApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/rbac.authorization.k8s.io/v1/rolebindings") as RoleBindingApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default deploymentApiInjectable;
+export default roleBindingApiInjectable;

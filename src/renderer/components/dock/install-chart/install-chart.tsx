@@ -40,7 +40,7 @@ import { EditorPanel } from "../editor/editor-panel";
 import { navigate } from "../../../navigation";
 import { releaseURL } from "../../../../common/routes";
 import type { DockTabStorageLayer } from "../dock-tab/store";
-import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-releases.api";
+import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import dockStoreInjectable from "../store.injectable";
 import installChartManagerInjectable from "./store.injectable";

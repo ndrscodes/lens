@@ -20,11 +20,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { DeploymentApi } from "./deployment.api";
+import type { IngressApi } from "./ingress.api";
 
-const deploymentApiInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+const ingressApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/networking.k8s.io/v1/ingresses", "/apis/extensions/v1beta1/ingresses") as IngressApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default deploymentApiInjectable;
+export default ingressApiInjectable;

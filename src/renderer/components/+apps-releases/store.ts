@@ -22,7 +22,7 @@
 import isEqual from "lodash/isEqual";
 import { action, observable, reaction, when, makeObservable } from "mobx";
 import { autoBind } from "../../utils";
-import { createRelease, deleteRelease, HelmRelease, IReleaseCreatePayload, IReleaseUpdatePayload, listReleases, rollbackRelease, updateRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
+import { createRelease, deleteRelease, HelmRelease, IReleaseCreatePayload, IReleaseUpdatePayload, listReleases, rollbackRelease, updateRelease } from "../../../common/k8s-api/endpoints/helm-release.api";
 import { ItemStore } from "../../../common/item.store";
 import type { Secret } from "../../../common/k8s-api/endpoints";
 import type { SecretStore } from "../+secrets/store";

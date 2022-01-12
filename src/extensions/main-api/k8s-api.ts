@@ -37,8 +37,8 @@ export { Secret } from "../../common/k8s-api/endpoints/secret.api";
 export { ReplicaSet } from "../../common/k8s-api/endpoints/replica-set.api";
 export { ResourceQuota } from "../../common/k8s-api/endpoints/resource-quota.api";
 export { LimitRange } from "../../common/k8s-api/endpoints/limit-range.api";
-export { HorizontalPodAutoscaler } from "../../common/k8s-api/endpoints/horizonal-pod-autoscaler.api";
-export { PodDisruptionBudget } from "../../common/k8s-api/endpoints/poddisruptionbudget.api";
+export { HorizontalPodAutoscaler } from "../../common/k8s-api/endpoints/horizontal-pod-autoscaler.api";
+export { PodDisruptionBudget } from "../../common/k8s-api/endpoints/pod-disruption-budget.api";
 export { Service } from "../../common/k8s-api/endpoints/service.api";
 export { Endpoint } from "../../common/k8s-api/endpoints/endpoint.api";
 export { Ingress, IngressApi } from "../../common/k8s-api/endpoints/ingress.api";
@@ -46,14 +46,14 @@ export { NetworkPolicy } from "../../common/k8s-api/endpoints/network-policy.api
 export { PersistentVolume } from "../../common/k8s-api/endpoints/persistent-volume.api";
 export { PersistentVolumeClaim, PersistentVolumeClaimApi as PersistentVolumeClaimsApi } from "../../common/k8s-api/endpoints/persistent-volume-claims.api";
 export { StorageClass } from "../../common/k8s-api/endpoints/storage-class.api";
-export { Namespace } from "../../common/k8s-api/endpoints/namespaces.api";
-export { KubeEvent } from "../../common/k8s-api/endpoints/events.api";
+export { Namespace } from "../../common/k8s-api/endpoints/namespace.api";
+export { Event as KubeEvent } from "../../common/k8s-api/endpoints/event.api";
 export { ServiceAccount } from "../../common/k8s-api/endpoints/service-account.api";
 export { Role } from "../../common/k8s-api/endpoints/role.api";
 export { RoleBinding } from "../../common/k8s-api/endpoints/role-binding.api";
 export { ClusterRole } from "../../common/k8s-api/endpoints/cluster-role.api";
 export { ClusterRoleBinding } from "../../common/k8s-api/endpoints/cluster-role-binding.api";
-export { CustomResourceDefinition } from "../../common/k8s-api/endpoints/crd.api";
+export { CustomResourceDefinition } from "../../common/k8s-api/endpoints/custom-resource-definition.api";
 
 // types
 export type { ILocalKubeApiConfig, IRemoteKubeApiConfig, IKubeApiCluster } from "../../common/k8s-api/kube-api";

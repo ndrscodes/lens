@@ -22,7 +22,7 @@
 import { action, comparer, computed, IReactionDisposer, makeObservable, reaction } from "mobx";
 import { autoBind, createStorage, noop, ToggleSet } from "../../utils";
 import { KubeObjectStore, KubeObjectStoreLoadingParams } from "../../../common/k8s-api/kube-object.store";
-import { Namespace, NamespaceApi } from "../../../common/k8s-api/endpoints/namespaces.api";
+import { Namespace, NamespaceApi } from "../../../common/k8s-api/endpoints/namespace.api";
 
 export class NamespaceStore extends KubeObjectStore<Namespace> {
   private storage = createStorage<string[] | undefined>("selected_namespaces", undefined);

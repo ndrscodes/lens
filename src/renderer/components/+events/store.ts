@@ -23,7 +23,7 @@ import groupBy from "lodash/groupBy";
 import compact from "lodash/compact";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
-import type { EventApi, KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
+import type { EventApi, Event } from "../../../common/k8s-api/endpoints/event.api";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Pod } from "../../../common/k8s-api/endpoints/pods.api";
 import type { PodStore } from "../+pods/store";
@@ -32,7 +32,7 @@ export interface EventStoreDependencies {
   podStore: PodStore;
 }
 
-export class EventStore extends KubeObjectStore<KubeEvent> {
+export class EventStore extends KubeObjectStore<Event> {
   limit = 1000;
   saveLimit = 50000;
 
@@ -45,13 +45,13 @@ export class EventStore extends KubeObjectStore<KubeEvent> {
     return super.bindWatchEventsUpdater(5000);
   }
 
-  protected sortItems(items: KubeEvent[]) {
+  protected sortItems(items: Event[]) {
     return super.sortItems(items, [
       event => event.getTimeDiffFromNow(), // keep events order as timeline ("fresh" on top)
     ], "asc");
   }
 
-  getEventsByObject(obj: KubeObject): KubeEvent[] {
+  getEventsByObject(obj: KubeObject): Event[] {
     return this.items.filter(evt => {
       if(obj.kind == "Node") {
         return obj.getName() == evt.involvedObject.uid && evt.involvedObject.kind == "Node";

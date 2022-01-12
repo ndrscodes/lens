@@ -118,7 +118,7 @@ export class PodSecurityPolicy extends KubeObject {
 }
 
 export class PodSecurityPolicyApi extends KubeApi<PodSecurityPolicy> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<PodSecurityPolicy> = {}) {
     super({
       ...args,
       objectConstructor: PodSecurityPolicy,

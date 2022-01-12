@@ -245,7 +245,7 @@ export class Node extends KubeObject {
 }
 
 export class NodeApi extends KubeApi<Node> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Node> = {}) {
     super({
       ...args,
       objectConstructor: Node,

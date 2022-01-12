@@ -23,7 +23,7 @@ import { KubeObject } from "../kube-object";
 import { KubeApi, SpecificApiOptions } from "../kube-api";
 
 export interface Role {
-  rules: {
+  rules?: {
     verbs: string[];
     apiGroups: string[];
     resources: string[];
@@ -42,7 +42,7 @@ export class Role extends KubeObject {
 }
 
 export class RoleApi extends KubeApi<Role> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Role> = {}) {
     super({
       ...args,
       objectConstructor: Role,

@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { StatefulSetApi } from ".";
 import apiManagerInjectable from "../api-manager.injectable";
+import type { StatefulSetApi } from "./stateful-set.api";
 
 const statefulSetApiInjectable = getInjectable({
   instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/statefulsets") as StatefulSetApi,

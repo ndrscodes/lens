@@ -27,7 +27,7 @@ import { DrawerItem, DrawerTitle } from "../drawer";
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
-import { KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
+import { Event } from "../../../common/k8s-api/endpoints/event.api";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import { LocaleDate } from "../locale-date";
@@ -37,7 +37,7 @@ import logger from "../../../common/logger";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 
-export interface EventDetailsProps extends KubeObjectDetailsProps<KubeEvent> {
+export interface EventDetailsProps extends KubeObjectDetailsProps<Event> {
 }
 
 interface Dependencies {
@@ -49,7 +49,7 @@ const NonInjectedEventDetails = observer(({ object: event, apiManager }: Depende
     return null;
   }
 
-  if (!(event instanceof KubeEvent)) {
+  if (!(event instanceof Event)) {
     logger.error("[EventDetails]: passed object that is not an instanceof KubeEvent", event);
 
     return null;

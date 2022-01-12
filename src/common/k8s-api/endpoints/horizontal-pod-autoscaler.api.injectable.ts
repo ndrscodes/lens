@@ -20,7 +20,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { HorizontalPodAutoscalerApi } from "./horizonal-pod-autoscaler.api";
+import type { HorizontalPodAutoscalerApi } from "./horizontal-pod-autoscaler.api";
 
 const horizontalPodAutoscalerApiInjectable = getInjectable({
   instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/autoscaling/v2beta1/horizontalpodautoscalers") as HorizontalPodAutoscalerApi,

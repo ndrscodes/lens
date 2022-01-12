@@ -20,7 +20,7 @@
  */
 
 import { anyObject } from "jest-mock-extended";
-import { HelmChart } from "../endpoints/helm-charts.api";
+import { HelmChart } from "../endpoints/helm-chart.api";
 
 describe("HelmChart tests", () => {
   describe("HelmChart.create() tests", () => {

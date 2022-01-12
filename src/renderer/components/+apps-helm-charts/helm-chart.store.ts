@@ -22,7 +22,7 @@
 import semver from "semver";
 import { observable, makeObservable } from "mobx";
 import { autoBind, sortCompareChartVersions } from "../../utils";
-import { getChartDetails, HelmChart, listCharts } from "../../../common/k8s-api/endpoints/helm-charts.api";
+import { getChartDetails, HelmChart, listCharts } from "../../../common/k8s-api/endpoints/helm-chart.api";
 import { ItemStore } from "../../../common/item.store";
 import flatten from "lodash/flatten";
 

@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { ReplicaSetApi } from ".";
 import apiManagerInjectable from "../api-manager.injectable";
+import type { ReplicaSetApi } from "./replica-set.api";
 
 const replicaSetApiInjectable = getInjectable({
   instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/replicasets") as ReplicaSetApi,

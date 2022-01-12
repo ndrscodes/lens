@@ -149,7 +149,7 @@ export class Endpoint extends KubeObject {
 }
 
 export class EndpointApi extends KubeApi<Endpoint> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<> = {}) {
     super({
       ...args,
       objectConstructor: Endpoint,

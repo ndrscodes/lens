@@ -20,11 +20,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { DeploymentApi } from "./deployment.api";
+import type { PodSecurityPolicyApi } from "./pod-security-policy.api";
 
-const deploymentApiInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+const podSecurityPolicyApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/policy/v1beta1/podsecuritypolicies") as PodSecurityPolicyApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default deploymentApiInjectable;
+export default podSecurityPolicyApiInjectable;

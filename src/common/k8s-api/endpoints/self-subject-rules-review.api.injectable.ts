@@ -20,11 +20,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { DeploymentApi } from "./deployment.api";
+import type { SelfSubjectRulesReviewApi } from "./self-subject-rules-review.api";
 
-const deploymentApiInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+const selfSubjectRulesReviewApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/authorization.k8s.io/v1/selfsubjectrulesreviews") as SelfSubjectRulesReviewApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default deploymentApiInjectable;
+export default selfSubjectRulesReviewApiInjectable;

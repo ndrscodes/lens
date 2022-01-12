@@ -77,7 +77,7 @@ export class SelfSubjectRulesReview extends KubeObject {
 }
 
 export class SelfSubjectRulesReviewApi extends KubeApi<SelfSubjectRulesReview> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<SelfSubjectRulesReview> = {}) {
     super({
       ...args,
       objectConstructor: SelfSubjectRulesReview,

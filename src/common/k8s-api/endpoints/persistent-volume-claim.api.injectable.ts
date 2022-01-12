@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { PersistentVolumeClaimApi } from ".";
 import apiManagerInjectable from "../api-manager.injectable";
+import type { PersistentVolumeClaimApi } from "./persistent-volume-claims.api";
 
 const persistentVolumeClaimApiInjectable = getInjectable({
   instantiate: (di) => di.inject(apiManagerInjectable).getApi("/api/v1/persistentvolumeclaims") as PersistentVolumeClaimApi,

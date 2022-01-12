@@ -20,7 +20,7 @@
  */
 
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import type { PodDisruptionBudget, PodDisruptionBudgetApi } from "../../../common/k8s-api/endpoints/poddisruptionbudget.api";
+import type { PodDisruptionBudget, PodDisruptionBudgetApi } from "../../../common/k8s-api/endpoints/pod-disruption-budget.api";
 
 export class PodDisruptionBudgetStore extends KubeObjectStore<PodDisruptionBudget> {
   constructor(public api: PodDisruptionBudgetApi) {

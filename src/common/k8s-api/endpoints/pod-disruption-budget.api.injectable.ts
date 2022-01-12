@@ -20,11 +20,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import apiManagerInjectable from "../api-manager.injectable";
-import type { DeploymentApi } from "./deployment.api";
+import type { PodDisruptionBudgetApi } from "./pod-disruption-budget.api";
 
-const deploymentApiInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/apps/v1/deployments") as DeploymentApi,
+const podDisruptionBudgetApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/policy/v1beta1/poddisruptionbudgets") as PodDisruptionBudgetApi,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default deploymentApiInjectable;
+export default podDisruptionBudgetApiInjectable;

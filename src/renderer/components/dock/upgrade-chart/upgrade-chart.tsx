@@ -32,7 +32,7 @@ import { releaseStore } from "../../+apps-releases/store";
 import { Badge } from "../../badge";
 import { EditorPanel } from "../editor/editor-panel";
 import { helmChartStore, IChartVersion } from "../../+apps-helm-charts/helm-chart.store";
-import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-releases.api";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { Select, SelectOption } from "../../select";
 import type { UpgradeChartStore } from "./store";
 import { withInjectables } from "@ogre-tools/injectable-react";

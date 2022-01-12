@@ -224,7 +224,7 @@ export class CustomResourceDefinition extends KubeObject {
 }
 
 export class CustomResourceDefinitionApi extends KubeApi<CustomResourceDefinition> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<CustomResourceDefinition> = {}) {
     super({
       ...args,
       objectConstructor: CustomResourceDefinition,

@@ -25,7 +25,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
-import type { HorizontalPodAutoscaler } from "../../../common/k8s-api/endpoints/horizonal-pod-autoscaler.api";
+import type { HorizontalPodAutoscaler } from "../../../common/k8s-api/endpoints/horizontal-pod-autoscaler.api";
 import type { HorizontalPodAutoscalerStore } from "./store";
 import { Badge } from "../badge";
 import { cssNames } from "../../utils";

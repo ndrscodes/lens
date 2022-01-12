@@ -509,7 +509,7 @@ export class Pod extends WorkloadKubeObject {
 }
 
 export class PodApi extends KubeApi<Pod> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Pod> = {}) {
     super({
       ...args,
       objectConstructor: Pod,

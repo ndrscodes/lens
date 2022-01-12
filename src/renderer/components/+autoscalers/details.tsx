@@ -27,7 +27,7 @@ import { Link } from "react-router-dom";
 import { DrawerItem, DrawerTitle } from "../drawer";
 import { Badge } from "../badge";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
-import { HorizontalPodAutoscaler, HpaMetricType, IHpaMetric } from "../../../common/k8s-api/endpoints/horizonal-pod-autoscaler.api";
+import { HorizontalPodAutoscaler, HpaMetricType, IHpaMetric } from "../../../common/k8s-api/endpoints/horizontal-pod-autoscaler.api";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { KubeObjectMeta } from "../kube-object-meta";

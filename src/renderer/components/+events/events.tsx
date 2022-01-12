@@ -28,7 +28,7 @@ import { orderBy } from "lodash";
 import { TabLayout } from "../layout/tab-layout";
 import type { EventStore } from "./store";
 import { KubeObjectListLayout, KubeObjectListLayoutProps } from "../kube-object-list-layout";
-import type { KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
+import type { Event } from "../../../common/k8s-api/endpoints/event.api";
 import type { TableSortCallbacks, TableSortParams } from "../table";
 import type { HeaderCustomizer } from "../item-object-list";
 import { Tooltip } from "../tooltip";
@@ -53,7 +53,7 @@ enum columnId {
   lastSeen = "last-seen",
 }
 
-export interface EventsProps extends Partial<KubeObjectListLayoutProps<KubeEvent>> {
+export interface EventsProps extends Partial<KubeObjectListLayoutProps<Event>> {
   className?: IClassName;
 
   /**
@@ -78,7 +78,7 @@ const NonInjectedEvents = observer(({ apiManager, eventStore, className, compact
     orderBy: "asc",
   } as TableSortParams));
 
-  const sortingCallbacks: TableSortCallbacks<KubeEvent> = {
+  const sortingCallbacks: TableSortCallbacks<Event> = {
     [columnId.namespace]: event => event.getNs(),
     [columnId.type]: event => event.type,
     [columnId.object]: event => event.involvedObject.name,

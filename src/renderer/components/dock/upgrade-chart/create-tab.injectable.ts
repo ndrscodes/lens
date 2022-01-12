@@ -20,7 +20,7 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-releases.api";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { bind } from "../../../utils";
 import { type DockTabCreateSpecific, TabKind, DockStore } from "../store";
 import dockStoreInjectable from "../store.injectable";

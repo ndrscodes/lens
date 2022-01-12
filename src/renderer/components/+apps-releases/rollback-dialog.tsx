@@ -25,7 +25,7 @@ import React, { useState } from "react";
 import { observer } from "mobx-react";
 import { Dialog, DialogProps } from "../dialog";
 import { Wizard, WizardStep } from "../wizard";
-import { getReleaseHistory, HelmRelease, IReleaseRevision } from "../../../common/k8s-api/endpoints/helm-releases.api";
+import { getReleaseHistory, HelmRelease, IReleaseRevision } from "../../../common/k8s-api/endpoints/helm-release.api";
 import type { ReleaseStore } from "./store";
 import { Select, SelectOption } from "../select";
 import { Notifications } from "../notifications";

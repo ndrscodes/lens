@@ -30,7 +30,7 @@ import { DrawerItem } from "../drawer";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { Input } from "../input";
-import { AdditionalPrinterColumnsV1, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
+import { AdditionalPrinterColumnsV1, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/custom-resource-definition.api";
 import { parseJsonPath } from "../../utils/jsonPath";
 import { KubeObject, KubeObjectMetadata, KubeObjectStatus } from "../../../common/k8s-api/kube-object";
 import logger from "../../../common/logger";

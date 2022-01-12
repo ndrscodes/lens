@@ -207,10 +207,11 @@ export class Ingress extends KubeObject {
 }
 
 export class IngressApi extends KubeApi<Ingress> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Ingress> = {}) {
+    args.checkPreferredVersion ??= true;
+    (args.fallbackApiBases ??= []).push("/apis/extensions/v1beta1/ingresses");
+
     super({
-      checkPreferredVersion: true,
-      fallbackApiBases: ["/apis/extensions/v1beta1/ingresses"],
       ...args,
       objectConstructor: Ingress,
     });

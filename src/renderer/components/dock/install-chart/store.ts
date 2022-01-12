@@ -22,7 +22,7 @@
 import { action, autorun, makeObservable } from "mobx";
 import { TabId, TabKind } from "../store";
 import { DockTabStorageLayer, DockTabStore, DockTabStoreDependencies } from "../dock-tab/store";
-import { getChartDetails, getChartValues } from "../../../../common/k8s-api/endpoints/helm-charts.api";
+import { getChartDetails, getChartValues } from "../../../../common/k8s-api/endpoints/helm-chart.api";
 import { Notifications } from "../../notifications";
 
 export interface IChartInstallData {

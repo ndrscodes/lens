@@ -145,7 +145,7 @@ export class NetworkPolicy extends KubeObject {
 }
 
 export class NetworkPolicyApi extends KubeApi<NetworkPolicy> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<NetworkPolicy> = {}) {
     super({
       ...args,
       objectConstructor: NetworkPolicy,

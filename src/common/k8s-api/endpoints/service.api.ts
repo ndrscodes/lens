@@ -148,7 +148,7 @@ export class Service extends KubeObject {
 }
 
 export class ServiceApi extends KubeApi<Service> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<Service> = {}) {
     super({
       ...args,
       objectConstructor: Service,

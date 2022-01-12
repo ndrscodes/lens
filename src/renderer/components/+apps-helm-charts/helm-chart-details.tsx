@@ -22,7 +22,7 @@
 import "./helm-chart-details.scss";
 
 import React, { useEffect, useState } from "react";
-import { getChartDetails, HelmChart } from "../../../common/k8s-api/endpoints/helm-charts.api";
+import { getChartDetails, HelmChart } from "../../../common/k8s-api/endpoints/helm-chart.api";
 import { observable, reaction } from "mobx";
 import { observer } from "mobx-react";
 import { Drawer, DrawerItem } from "../drawer";
