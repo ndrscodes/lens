@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import "./release-details.scss";
+import "./details.scss";
 
 import React, { useEffect, useState } from "react";
 import groupBy from "lodash/groupBy";
@@ -28,7 +28,7 @@ import { reaction } from "mobx";
 import { Link } from "react-router-dom";
 import kebabCase from "lodash/kebabCase";
 import { getRelease, getReleaseValues, HelmRelease, IReleaseDetails } from "../../../common/k8s-api/endpoints/helm-releases.api";
-import { HelmReleaseMenu } from "./release-menu";
+import { HelmReleaseMenu } from "./item-menu";
 import { Drawer, DrawerItem, DrawerTitle } from "../drawer";
 import { Badge } from "../badge";
 import { cssNames, disposer, stopPropagation } from "../../utils";
@@ -36,7 +36,7 @@ import { observer } from "mobx-react";
 import { Spinner } from "../spinner";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import { Button } from "../button";
-import { releaseStore } from "./store";
+import type { ReleaseStore } from "./store";
 import { Notifications } from "../notifications";
 import { ThemeStore } from "../../theme.store";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
@@ -51,6 +51,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import secretStoreInjectable from "../+config-secrets/store.injectable";
+import releaseStoreInjectable from "./store.injectable";
 
 export interface ReleaseDetailsProps {
   release: HelmRelease;
@@ -61,6 +62,7 @@ interface Dependencies {
   newUpgradeChartTab: (release: HelmRelease, data?: DockTabCreateSpecific) => DockTabData;
   apiManager: ApiManager;
   secretStore: SecretStore;
+  releaseStore: ReleaseStore;
 }
 
 const NonInjectedReleaseDetails = observer(({
@@ -69,6 +71,7 @@ const NonInjectedReleaseDetails = observer(({
   newUpgradeChartTab,
   apiManager,
   secretStore,
+  releaseStore,
 }: Dependencies & ReleaseDetailsProps) => {
   const [details, setDetails] = useState<IReleaseDetails | null>(null);
   const [values, setValues] = useState("");
@@ -211,36 +214,34 @@ const NonInjectedReleaseDetails = observer(({
     }
 
     const groups = groupBy(resources, item => item.kind);
-    const tables = Object.entries(groups).map(([kind, items]) => {
-      return (
-        <React.Fragment key={kind}>
-          <SubTitle title={kind}/>
-          <Table scrollable={false}>
-            <TableHead sticky={false}>
-              <TableCell className="name">Name</TableCell>
-              {items[0].getNs() && <TableCell className="namespace">Namespace</TableCell>}
-              <TableCell className="age">Age</TableCell>
-            </TableHead>
-            {items.map(item => {
-              const name = item.getName();
-              const namespace = item.getNs();
-              const api = apiManager.getApi(api => api.kind === kind && api.apiVersionWithGroup == item.apiVersion);
-              const detailsUrl = api ? getDetailsUrl(api.getUrl({ name, namespace })) : "";
+    const tables = Object.entries(groups).map(([kind, items]) => (
+      <React.Fragment key={kind}>
+        <SubTitle title={kind} />
+        <Table scrollable={false}>
+          <TableHead sticky={false}>
+            <TableCell className="name">Name</TableCell>
+            {items[0].getNs() && <TableCell className="namespace">Namespace</TableCell>}
+            <TableCell className="age">Age</TableCell>
+          </TableHead>
+          {items.map(item => {
+            const name = item.getName();
+            const namespace = item.getNs();
+            const api = apiManager.getApi(api => api.kind === kind && api.apiVersionWithGroup == item.apiVersion);
+            const detailsUrl = api ? getDetailsUrl(api.getUrl({ name, namespace })) : "";
 
-              return (
-                <TableRow key={item.getId()}>
-                  <TableCell className="name">
-                    {detailsUrl ? <Link to={detailsUrl}>{name}</Link> : name}
-                  </TableCell>
-                  {namespace && <TableCell className="namespace">{namespace}</TableCell>}
-                  <TableCell className="age">{item.getAge()}</TableCell>
-                </TableRow>
-              );
-            })}
-          </Table>
-        </React.Fragment>
-      );
-    });
+            return (
+              <TableRow key={item.getId()}>
+                <TableCell className="name">
+                  {detailsUrl ? <Link to={detailsUrl}>{name}</Link> : name}
+                </TableCell>
+                {namespace && <TableCell className="namespace">{namespace}</TableCell>}
+                <TableCell className="age">{item.getAge()}</TableCell>
+              </TableRow>
+            );
+          })}
+        </Table>
+      </React.Fragment>
+    ));
 
     return (
       <>
@@ -329,6 +330,7 @@ export const ReleaseDetails = withInjectables<Dependencies, ReleaseDetailsProps>
     newUpgradeChartTab: di.inject(newUpgradeChartTabInjectable),
     apiManager: di.inject(apiManagerInjectable),
     secretStore: di.inject(secretStoreInjectable),
+    releaseStore: di.inject(releaseStoreInjectable),
     ...props,
   }),
 });

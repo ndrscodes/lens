@@ -48,7 +48,7 @@ import { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cron
 import { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/store";
 import { DeploymentStore } from "../../renderer/components/+workloads-deployments/store";
 import { JobStore } from "../../renderer/components/+workloads-jobs/store";
-import { PodStore } from "../../renderer/components/+workloads-pods/pod.store";
+import { PodStore } from "../../renderer/components/+workloads-pods/store";
 import { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
 import { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/store";
 import { isClusterPageContext } from "../utils";

@@ -23,7 +23,7 @@ import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";
 import type { Job, JobApi } from "../../../common/k8s-api/endpoints/job.api";
 import { CronJob, Pod, PodStatus } from "../../../common/k8s-api/endpoints";
-import type { PodStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/store";
 
 export interface JobStoreDependencies {
   podStore: PodStore;

@@ -42,7 +42,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import type { PodsStore } from "../../../extensions/renderer-api/k8s-api";
 import nodeApiInjectable from "../../../common/k8s-api/endpoints/node.api.injectable";
-import podStoreInjectable from "./pod.store.injectable";
+import podStoreInjectable from "./store.injectable";
 import eventStoreInjectable from "../+events/event.store.injectable";
 
 enum columnId {

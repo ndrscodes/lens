@@ -21,22 +21,27 @@
 
 import "./releases.scss";
 
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import kebabCase from "lodash/kebabCase";
-import { disposeOnUnmount, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
-import { releaseStore } from "./store";
+import type { ReleaseStore } from "./store";
 import type { HelmRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
-import { ReleaseDetails } from "./release-details";
-import { ReleaseRollbackDialog } from "./release-rollback-dialog";
+import { ReleaseDetails } from "./details";
+import { ReleaseRollbackDialog } from "./rollback-dialog";
 import { navigation } from "../../navigation";
 import { ItemListLayout } from "../item-object-list/item-list-layout";
-import { HelmReleaseMenu } from "./release-menu";
-import { secretsStore } from "../+config-secrets/store";
+import { HelmReleaseMenu } from "./item-menu";
+import type { SecretStore } from "../+config-secrets/store";
 import { NamespaceSelectFilter } from "../+namespaces/namespace-select-filter";
 import type { ReleaseRouteParams } from "../../../common/routes";
 import { releaseURL } from "../../../common/routes";
-import { namespaceStore } from "../+namespaces/store";
+import type { NamespaceStore } from "../+namespaces/store";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import namespaceStoreInjectable from "../+namespaces/store.injectable";
+import releaseStoreInjectable from "./store.injectable";
+import secretStoreInjectable from "../+config-secrets/store.injectable";
+import { disposer } from "../../utils";
 
 enum columnId {
   name = "name",
@@ -49,41 +54,31 @@ enum columnId {
   updated = "update",
 }
 
-interface Props extends RouteComponentProps<ReleaseRouteParams> {
+export interface HelmReleasesProps extends RouteComponentProps<ReleaseRouteParams> {
 }
 
-@observer
-export class HelmReleases extends Component<Props> {
-  componentDidMount() {
-    const { match: { params: { namespace }}} = this.props;
+interface Dependencies {
+  releaseStore: ReleaseStore;
+  secretStore: SecretStore;
+  namespaceStore: NamespaceStore;
+}
 
+const NonInjectedHelmReleases = observer(({ releaseStore, secretStore, namespaceStore, match }: Dependencies & HelmReleasesProps) => {
+  const { params: { namespace, name }} = match;
+  const selectedRelease = releaseStore.findRelease(name, namespace);
+
+  useEffect(() => {
     if (namespace) {
       namespaceStore.selectNamespaces(namespace);
     }
 
-    disposeOnUnmount(this, [
+    return disposer(
       releaseStore.watchAssociatedSecrets(),
       releaseStore.watchSelectedNamespaces(),
-    ]);
-  }
+    );
+  }, []);
 
-  get selectedRelease() {
-    const { match: { params: { name, namespace }}} = this.props;
-
-    return releaseStore.items.find(release => {
-      return release.getName() == name && release.getNs() == namespace;
-    });
-  }
-
-  onDetails = (item: HelmRelease) => {
-    if (item === this.selectedRelease) {
-      this.hideDetails();
-    } else {
-      this.showDetails(item);
-    }
-  };
-
-  showDetails = (item: HelmRelease) => {
+  const showDetails = (item: HelmRelease) => {
     navigation.push(releaseURL({
       params: {
         name: item.getName(),
@@ -91,100 +86,108 @@ export class HelmReleases extends Component<Props> {
       },
     }));
   };
-
-  hideDetails = () => {
+  const hideDetails = () => {
     navigation.push(releaseURL());
   };
-
-  renderRemoveDialogMessage(selectedItems: HelmRelease[]) {
-    const releaseNames = selectedItems.map(item => item.getName()).join(", ");
-
-    return (
-      <div>
-        <>Remove <b>{releaseNames}</b>?</>
-        <p className="warning">
+  const onDetails = (item: HelmRelease) => {
+    if (item === selectedRelease) {
+      hideDetails();
+    } else {
+      showDetails(item);
+    }
+  };
+  const renderRemoveDialogMessage = (selectedItems: HelmRelease[]) => (
+    <div>
+      <>Remove <b>{selectedItems.map(item => item.getName()).join(", ")}</b>?</>
+      <p className="warning">
           Note: StatefulSet Volumes won&apos;t be deleted automatically
-        </p>
-      </div>
-    );
-  }
+      </p>
+    </div>
+  );
 
-  render() {
-    return (
-      <>
-        <ItemListLayout
-          isConfigurable
-          tableId="helm_releases"
-          className="HelmReleases"
-          store={releaseStore}
-          dependentStores={[secretsStore]}
-          sortingCallbacks={{
-            [columnId.name]: release => release.getName(),
-            [columnId.namespace]: release => release.getNs(),
-            [columnId.revision]: release => release.getRevision(),
-            [columnId.chart]: release => release.getChart(),
-            [columnId.status]: release => release.getStatus(),
-            [columnId.updated]: release => release.getUpdated(false, false),
-          }}
-          searchFilters={[
-            release => release.getName(),
-            release => release.getNs(),
-            release => release.getChart(),
-            release => release.getStatus(),
-            release => release.getVersion(),
-          ]}
-          customizeHeader={({ filters, searchProps, ...headerPlaceholders }) => ({
-            filters: (
-              <>
-                {filters}
-                <NamespaceSelectFilter />
-              </>
-            ),
-            searchProps: {
-              ...searchProps,
-              placeholder: "Search Releases...",
-            },
-            ...headerPlaceholders,
-          })}
-          renderHeaderTitle="Releases"
-          renderTableHeader={[
-            { title: "Name", className: "name", sortBy: columnId.name, id: columnId.name },
-            { title: "Namespace", className: "namespace", sortBy: columnId.namespace, id: columnId.namespace },
-            { title: "Chart", className: "chart", sortBy: columnId.chart, id: columnId.chart },
-            { title: "Revision", className: "revision", sortBy: columnId.revision, id: columnId.revision },
-            { title: "Version", className: "version", id: columnId.version },
-            { title: "App Version", className: "app-version", id: columnId.appVersion },
-            { title: "Status", className: "status", sortBy: columnId.status, id: columnId.status },
-            { title: "Updated", className: "updated", sortBy: columnId.updated, id: columnId.updated },
-          ]}
-          renderTableContents={release => [
-            release.getName(),
-            release.getNs(),
-            release.getChart(),
-            release.getRevision(),
-            release.getVersion(),
-            release.appVersion,
-            { title: release.getStatus(), className: kebabCase(release.getStatus()) },
-            release.getUpdated(),
-          ]}
-          renderItemMenu={release => (
-            <HelmReleaseMenu
-              release={release}
-              removeConfirmationMessage={this.renderRemoveDialogMessage([release])}
-            />
-          )}
-          customizeRemoveDialog={selectedItems => ({
-            message: this.renderRemoveDialogMessage(selectedItems),
-          })}
-          detailsItem={this.selectedRelease}
-          onDetails={this.onDetails}
-        />
-        <ReleaseDetails
-          release={this.selectedRelease}
-          hideDetails={this.hideDetails}
-        />
-        <ReleaseRollbackDialog/>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <ItemListLayout
+        isConfigurable
+        tableId="helm_releases"
+        className="HelmReleases"
+        store={releaseStore}
+        dependentStores={[secretStore]}
+        sortingCallbacks={{
+          [columnId.name]: release => release.getName(),
+          [columnId.namespace]: release => release.getNs(),
+          [columnId.revision]: release => release.getRevision(),
+          [columnId.chart]: release => release.getChart(),
+          [columnId.status]: release => release.getStatus(),
+          [columnId.updated]: release => release.getUpdated(false, false),
+        }}
+        searchFilters={[
+          release => release.getName(),
+          release => release.getNs(),
+          release => release.getChart(),
+          release => release.getStatus(),
+          release => release.getVersion(),
+        ]}
+        customizeHeader={({ filters, searchProps, ...headerPlaceholders }) => ({
+          filters: (
+            <>
+              {filters}
+              <NamespaceSelectFilter />
+            </>
+          ),
+          searchProps: {
+            ...searchProps,
+            placeholder: "Search Releases...",
+          },
+          ...headerPlaceholders,
+        })}
+        renderHeaderTitle="Releases"
+        renderTableHeader={[
+          { title: "Name", className: "name", sortBy: columnId.name, id: columnId.name },
+          { title: "Namespace", className: "namespace", sortBy: columnId.namespace, id: columnId.namespace },
+          { title: "Chart", className: "chart", sortBy: columnId.chart, id: columnId.chart },
+          { title: "Revision", className: "revision", sortBy: columnId.revision, id: columnId.revision },
+          { title: "Version", className: "version", id: columnId.version },
+          { title: "App Version", className: "app-version", id: columnId.appVersion },
+          { title: "Status", className: "status", sortBy: columnId.status, id: columnId.status },
+          { title: "Updated", className: "updated", sortBy: columnId.updated, id: columnId.updated },
+        ]}
+        renderTableContents={release => [
+          release.getName(),
+          release.getNs(),
+          release.getChart(),
+          release.getRevision(),
+          release.getVersion(),
+          release.appVersion,
+          { title: release.getStatus(), className: kebabCase(release.getStatus()) },
+          release.getUpdated(),
+        ]}
+        renderItemMenu={release => (
+          <HelmReleaseMenu
+            release={release}
+            removeConfirmationMessage={renderRemoveDialogMessage([release])}
+          />
+        )}
+        customizeRemoveDialog={selectedItems => ({
+          message: renderRemoveDialogMessage(selectedItems),
+        })}
+        detailsItem={selectedRelease}
+        onDetails={onDetails}
+      />
+      <ReleaseDetails
+        release={selectedRelease}
+        hideDetails={hideDetails}
+      />
+      <ReleaseRollbackDialog/>
+    </>
+  );
+});
+
+export const HelmReleases = withInjectables<Dependencies, HelmReleasesProps>(NonInjectedHelmReleases, {
+  getProps: (di, props) => ({
+    namespaceStore: di.inject(namespaceStoreInjectable),
+    releaseStore: di.inject(releaseStoreInjectable),
+    secretStore: di.inject(secretStoreInjectable),
+    ...props,
+  }),
+});

@@ -20,7 +20,7 @@
  */
 import { makeObservable } from "mobx";
 
-import type { PodStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/store";
 import type { Deployment, ReplicaSet, ReplicaSetApi } from "../../../common/k8s-api/endpoints";
 import { PodStatus } from "../../../common/k8s-api/endpoints/pods.api";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";

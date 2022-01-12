@@ -115,6 +115,18 @@ export class ReleaseStore extends ItemStore<HelmRelease> {
     return this.loadAllFromNamespaces(this.dependencies.namespaceStore.context.contextNamespaces);
   }
 
+  /**
+   * Find a release by name and namespace
+   * @param name The name of the release
+   * @param namespace The namespace of the release
+   */
+  findRelease(name: string, namespace: string) {
+    return this.items.find(release => (
+      release.getName() === name
+      && release.getNs() === namespace
+    ));
+  }
+
   async loadFromContextNamespaces(): Promise<void> {
     return this.loadAll();
   }

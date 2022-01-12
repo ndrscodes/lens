@@ -18,14 +18,25 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
-import type { PodStore } from "./pod.store";
+import type { HelmRelease } from "../../../common/k8s-api/endpoints";
+import { bind } from "../../utils";
+import type { HelmReleaseScaleDialogState } from "./rollback-dialog.state.injectable";
+import helmReleaseRollbackDialogStateInjectable from "./rollback-dialog.state.injectable";
 
-const podStoreInjectable = getInjectable({
-  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/api/v1/pods") as PodStore,
+interface Dependencies {
+  helmreleaseScaleDialogState: HelmReleaseScaleDialogState;
+}
+
+function openHelmReleaseScaleDialog({ helmreleaseScaleDialogState }: Dependencies, helmrelease: HelmRelease): void {
+  helmreleaseScaleDialogState.helmRelease = helmrelease;
+}
+
+const openHelmReleaseScaleDialogInjectable = getInjectable({
+  instantiate: (di) => bind(openHelmReleaseScaleDialog, null, {
+    helmreleaseScaleDialogState: di.inject(helmReleaseRollbackDialogStateInjectable),
+  }),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default podStoreInjectable;
+export default openHelmReleaseScaleDialogInjectable;

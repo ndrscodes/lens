@@ -45,7 +45,7 @@ import cronJobStoreInjectable from "../+workloads-cronjobs/cronjob.store.injecta
 import daemonSetStoreInjectable from "../+workloads-daemonsets/store.injectable";
 import deploymentStoreInjectable from "../+workloads-deployments/store.injectable";
 import jobStoreInjectable from "../+workloads-jobs/job.store.injectable";
-import podStoreInjectable from "../+workloads-pods/pod.store.injectable";
+import podStoreInjectable from "../+workloads-pods/store.injectable";
 import replicaSetStoreInjectable from "../+workloads-replica-sets/store.injectable";
 import statefulSetStoreInjectable from "../+workloads-statefulsets/store.injectable";
 

@@ -20,7 +20,7 @@
  */
 
 import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
-import { podsStore } from "../+workloads-pods/pod.store";
+import { podsStore } from "../+workloads-pods/store";
 import { deploymentStore } from "../+workloads-deployments/store";
 import { daemonSetStore } from "../+workloads-daemonsets/store";
 import { statefulSetStore } from "../+workloads-statefulsets/store";

@@ -20,7 +20,7 @@
  */
 import { makeObservable } from "mobx";
 
-import type { PodStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/store";
 import { PodStatus, StatefulSet, StatefulSetApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import { autoBind } from "../../utils";

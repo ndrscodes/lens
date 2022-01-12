@@ -18,6 +18,24 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { bind } from "../../utils";
+import type { HelmReleaseScaleDialogState } from "./rollback-dialog.state.injectable";
+import helmReleaseRollbackDialogStateInjectable from "./rollback-dialog.state.injectable";
 
-export * from "./daemonsets";
-export * from "./details";
+interface Dependencies {
+  helmreleaseScaleDialogState: HelmReleaseScaleDialogState;
+}
+
+function closeHelmReleaseScaleDialog({ helmreleaseScaleDialogState }: Dependencies): void {
+  helmreleaseScaleDialogState.helmRelease = null;
+}
+
+const closeHelmReleaseScaleDialogInjectable = getInjectable({
+  instantiate: (di) => bind(closeHelmReleaseScaleDialog, null, {
+    helmreleaseScaleDialogState: di.inject(helmReleaseRollbackDialogStateInjectable),
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default closeHelmReleaseScaleDialogInjectable;

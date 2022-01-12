@@ -18,6 +18,21 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import { observable } from "mobx";
+import type { HelmRelease } from "../../../common/k8s-api/endpoints";
 
-export * from "./daemonsets";
-export * from "./details";
+export interface HelmReleaseScaleDialogState {
+  helmRelease: HelmRelease | null;
+}
+
+const helmReleaseRollbackDialogStateInjectable = getInjectable({
+  instantiate: () => observable.object<HelmReleaseScaleDialogState>({
+    helmRelease: null,
+  }, {
+    helmRelease: observable.ref,
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default helmReleaseRollbackDialogStateInjectable;

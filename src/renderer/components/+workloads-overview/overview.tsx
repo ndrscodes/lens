@@ -25,7 +25,7 @@ import React from "react";
 import { disposeOnUnmount, observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import { eventStore } from "../+events/event.store";
-import { podsStore } from "../+workloads-pods/pod.store";
+import { podsStore } from "../+workloads-pods/store";
 import { deploymentStore } from "../+workloads-deployments/store";
 import { daemonSetStore } from "../+workloads-daemonsets/store";
 import { statefulSetStore } from "../+workloads-statefulsets/store";

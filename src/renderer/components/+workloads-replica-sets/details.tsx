@@ -29,7 +29,7 @@ import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
 import { disposeOnUnmount, observer } from "mobx-react";
-import { podsStore } from "../+workloads-pods/pod.store";
+import { podsStore } from "../+workloads-pods/store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { getMetricsForReplicaSets, IPodMetrics, ReplicaSet } from "../../../common/k8s-api/endpoints";
 import { ResourceMetrics, ResourceMetricsText } from "../resource-metrics";

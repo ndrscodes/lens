@@ -30,7 +30,7 @@ import { PodDetailsStatuses } from "../+workloads-pods/pod-details-statuses";
 import { Link } from "react-router-dom";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import type { PodStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/store";
 import type { JobStore } from "./store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { getMetricsForJobs, IPodMetrics, Job } from "../../../common/k8s-api/endpoints";
@@ -49,7 +49,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import { disposer } from "../../utils";
 import kubeWatchApiInjectable from "../../../common/k8s-api/kube-watch-api.injectable";
-import podStoreInjectable from "../+workloads-pods/pod.store.injectable";
+import podStoreInjectable from "../+workloads-pods/store.injectable";
 import jobStoreInjectable from "./store.injectable";
 
 export interface JobDetailsProps extends KubeObjectDetailsProps<Job> {

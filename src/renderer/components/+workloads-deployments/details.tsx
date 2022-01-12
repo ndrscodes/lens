@@ -29,7 +29,7 @@ import { Badge } from "../badge";
 import { Deployment, getMetricsForDeployments, IPodMetrics } from "../../../common/k8s-api/endpoints";
 import { PodDetailsTolerations } from "../+workloads-pods/pod-details-tolerations";
 import { PodDetailsAffinities } from "../+workloads-pods/pod-details-affinities";
-import type { PodStore } from "../+workloads-pods/pod.store";
+import type { PodStore } from "../+workloads-pods/store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { ResourceMetrics, ResourceMetricsText } from "../resource-metrics";
 import type { DeploymentStore } from "./store";
@@ -45,7 +45,7 @@ import { cssNames, disposer } from "../../utils";
 import logger from "../../../common/logger";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import podStoreInjectable from "../+workloads-pods/pod.store.injectable";
+import podStoreInjectable from "../+workloads-pods/store.injectable";
 import deploymentStoreInjectable from "./store.injectable";
 import replicaSetStoreInjectable from "../+workloads-replica-sets/store.injectable";
 

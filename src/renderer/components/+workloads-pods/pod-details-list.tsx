@@ -25,7 +25,7 @@ import React from "react";
 import kebabCase from "lodash/kebabCase";
 import { observable, reaction } from "mobx";
 import { disposeOnUnmount, observer } from "mobx-react";
-import { podsStore } from "./pod.store";
+import { podsStore } from "./store";
 import type { Pod, PodMetrics } from "../../../common/k8s-api/endpoints";
 import { boundMethod, bytesToUnits, cpuUnitsToNumber, cssNames, interval, prevDefault, unitsToBytes } from "../../utils";
 import { LineProgress } from "../line-progress";

@@ -22,14 +22,14 @@
 import React from "react";
 import type { HelmRelease } from "../../../common/k8s-api/endpoints/helm-releases.api";
 import { cssNames, noop } from "../../utils";
-import { ReleaseStore, releaseStore } from "./store";
+import type { ReleaseStore } from "./store";
 import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Icon } from "../icon";
-import { ReleaseRollbackDialog } from "./release-rollback-dialog";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
 import { observer } from "mobx-react";
+import releaseStoreInjectable from "./store.injectable";
 
 export interface HelmReleaseMenuProps extends MenuActionsProps {
   release: HelmRelease | null | undefined;
@@ -87,8 +87,8 @@ const NonInjectedHelmReleaseMenu = observer(({
 export const HelmReleaseMenu = withInjectables<Dependencies, HelmReleaseMenuProps>(NonInjectedHelmReleaseMenu, {
   getProps: (di, props) => ({
     newUpgradeChartTab: di.inject(newUpgradeChartTabInjectable),
-    releaseStore,
-    openRollbackReleaseDialog: ReleaseRollbackDialog.open,
+    releaseStore: di.inject(releaseStoreInjectable),
+    openRollbackReleaseDialog: di.inject(openReleaseRollbackDialogInjectable),
     ...props,
   }),
 });

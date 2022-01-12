@@ -19,5 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export * from "./daemonsets";
-export * from "./details";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import type { PodStore } from "./store";
+
+const podStoreInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/api/v1/pods") as PodStore,
+  lifecycle: lifecycleEnum.singleton,
+});
+
+export default podStoreInjectable;

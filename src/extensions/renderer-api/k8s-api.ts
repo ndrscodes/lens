@@ -19,34 +19,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import apiManagerInjectable from "../../common/k8s-api/api-manager.injectable";
-import configMapApiInjectable from "../../common/k8s-api/endpoints/configmap.api.injectable";
-import cronJobApiInjectable from "../../common/k8s-api/endpoints/cron-job.api.injectable";
-import daemonSetApiInjectable from "../../common/k8s-api/endpoints/daemon-set.api.injectable";
-import deploymentApiInjectable from "../../common/k8s-api/endpoints/deployment.api.injectable";
-import horizontalPodAutoscalerApiInjectable from "../../common/k8s-api/endpoints/horizontal-pod-autoscaler.api.injectable";
-import jobApiInjectable from "../../common/k8s-api/endpoints/job.api.injectable";
-import limitRangeApiInjectable from "../../common/k8s-api/endpoints/limit-range.api.injectable";
-import nodeApiInjectable from "../../common/k8s-api/endpoints/node.api.injectable";
-import persistentVolumeClaimApiInjectable from "../../common/k8s-api/endpoints/persistent-volume-claim.api.injectable";
-import persistentVolumeApiInjectable from "../../common/k8s-api/endpoints/persistent-volume.api.injectable";
-import podApiInjectable from "../../common/k8s-api/endpoints/pod.api.injectable";
-import replicaSetApiInjectable from "../../common/k8s-api/endpoints/replica-set.api.injectable";
-import resourceQuotaApiInjectable from "../../common/k8s-api/endpoints/resource-quota.api.injectable";
-import secretApiInjectable from "../../common/k8s-api/endpoints/secret.api.injectable";
-import serviceApiInjectable from "../../common/k8s-api/endpoints/service.api.injectable";
-import statefulSetApiInjectable from "../../common/k8s-api/endpoints/stateful-set.api.injectable";
-import horizontalPodAutoscalerStoreInjectable from "../../renderer/components/+config-autoscalers/store.injectable";
-import limitRangeStoreInjectable from "../../renderer/components/+config-limit-ranges/store.injectable";
-import resourceQuotaStoreInjectable from "../../renderer/components/+config-resource-quotas/store.injectable";
-import secretStoreInjectable from "../../renderer/components/+config-secrets/store.injectable";
-import eventStoreInjectable from "../../renderer/components/+events/event.store.injectable";
-import namespaceStoreInjectable from "../../renderer/components/+namespaces/store.injectable";
-import serviceAccountStoreInjectable from "../../renderer/components/+user-management/+service-accounts/store.injectable";
-import cronJobStoreInjectable from "../../renderer/components/+workloads-cronjobs/cronjob.store.injectable";
-import jobStoreInjectable from "../../renderer/components/+workloads-jobs/job.store.injectable";
-import replicaSetStoreInjectable from "../../renderer/components/+workloads-replica-sets/store.injectable";
-import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
+// import apiManagerInjectable from "../../common/k8s-api/api-manager.injectable";
+// import configMapApiInjectable from "../../common/k8s-api/endpoints/configmap.api.injectable";
+// import cronJobApiInjectable from "../../common/k8s-api/endpoints/cron-job.api.injectable";
+// import daemonSetApiInjectable from "../../common/k8s-api/endpoints/daemon-set.api.injectable";
+// import deploymentApiInjectable from "../../common/k8s-api/endpoints/deployment.api.injectable";
+// import horizontalPodAutoscalerApiInjectable from "../../common/k8s-api/endpoints/horizontal-pod-autoscaler.api.injectable";
+// import jobApiInjectable from "../../common/k8s-api/endpoints/job.api.injectable";
+// import limitRangeApiInjectable from "../../common/k8s-api/endpoints/limit-range.api.injectable";
+// import nodeApiInjectable from "../../common/k8s-api/endpoints/node.api.injectable";
+// import persistentVolumeClaimApiInjectable from "../../common/k8s-api/endpoints/persistent-volume-claim.api.injectable";
+// import persistentVolumeApiInjectable from "../../common/k8s-api/endpoints/persistent-volume.api.injectable";
+// import podApiInjectable from "../../common/k8s-api/endpoints/pod.api.injectable";
+// import replicaSetApiInjectable from "../../common/k8s-api/endpoints/replica-set.api.injectable";
+// import resourceQuotaApiInjectable from "../../common/k8s-api/endpoints/resource-quota.api.injectable";
+// import secretApiInjectable from "../../common/k8s-api/endpoints/secret.api.injectable";
+// import serviceApiInjectable from "../../common/k8s-api/endpoints/service.api.injectable";
+// import statefulSetApiInjectable from "../../common/k8s-api/endpoints/stateful-set.api.injectable";
+// import horizontalPodAutoscalerStoreInjectable from "../../renderer/components/+config-autoscalers/store.injectable";
+// import limitRangeStoreInjectable from "../../renderer/components/+config-limit-ranges/store.injectable";
+// import resourceQuotaStoreInjectable from "../../renderer/components/+config-resource-quotas/store.injectable";
+// import secretStoreInjectable from "../../renderer/components/+config-secrets/store.injectable";
+// import eventStoreInjectable from "../../renderer/components/+events/event.store.injectable";
+// import namespaceStoreInjectable from "../../renderer/components/+namespaces/store.injectable";
+// import serviceAccountStoreInjectable from "../../renderer/components/+user-management/+service-accounts/store.injectable";
+// import cronJobStoreInjectable from "../../renderer/components/+workloads-cronjobs/cronjob.store.injectable";
+// import jobStoreInjectable from "../../renderer/components/+workloads-jobs/job.store.injectable";
+// import replicaSetStoreInjectable from "../../renderer/components/+workloads-replica-sets/store.injectable";
+// import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
 
 export { isAllowedResource } from "../../common/utils/allowed-resource";
 export { ResourceStack } from "../../common/k8s/resource-stack";
@@ -66,22 +66,22 @@ export { ReplicaSet, ReplicaSetApi } from "../../common/k8s-api/endpoints";
 export { ResourceQuota, ResourceQuotaApi } from "../../common/k8s-api/endpoints";
 export { LimitRange, LimitRangeApi } from "../../common/k8s-api/endpoints";
 export { HorizontalPodAutoscaler, HorizontalPodAutoscalerApi } from "../../common/k8s-api/endpoints";
-export { PodDisruptionBudget, pdbApi } from "../../common/k8s-api/endpoints";
-export { Service } from "../../common/k8s-api/endpoints";
-export { Endpoint, endpointApi } from "../../common/k8s-api/endpoints";
-export { Ingress, ingressApi, IngressApi } from "../../common/k8s-api/endpoints";
-export { NetworkPolicy, networkPolicyApi } from "../../common/k8s-api/endpoints";
+export { PodDisruptionBudget, PodDisruptionBudgetApi } from "../../common/k8s-api/endpoints";
+export { Service, ServiceApi } from "../../common/k8s-api/endpoints";
+export { Endpoint, EndpointApi } from "../../common/k8s-api/endpoints";
+export { Ingress, IngressApi } from "../../common/k8s-api/endpoints";
+export { NetworkPolicy, NetworkPolicyApi } from "../../common/k8s-api/endpoints";
 export { PersistentVolume, PersistentVolumeApi } from "../../common/k8s-api/endpoints";
 export { PersistentVolumeClaim, PersistentVolumeClaimApi as PersistentVolumeClaimsApi } from "../../common/k8s-api/endpoints";
-export { StorageClass, storageClassApi } from "../../common/k8s-api/endpoints";
-export { Namespace, namespacesApi } from "../../common/k8s-api/endpoints";
-export { KubeEvent, eventApi } from "../../common/k8s-api/endpoints";
-export { ServiceAccount, serviceAccountsApi } from "../../common/k8s-api/endpoints";
-export { Role, roleApi } from "../../common/k8s-api/endpoints";
-export { RoleBinding, roleBindingApi } from "../../common/k8s-api/endpoints";
-export { ClusterRole, clusterRoleApi } from "../../common/k8s-api/endpoints";
-export { ClusterRoleBinding, clusterRoleBindingApi } from "../../common/k8s-api/endpoints";
-export { CustomResourceDefinition, crdApi } from "../../common/k8s-api/endpoints";
+export { StorageClass, StorageClassApi } from "../../common/k8s-api/endpoints";
+export { Namespace, NamespaceApi } from "../../common/k8s-api/endpoints";
+export { KubeEvent, EventApi } from "../../common/k8s-api/endpoints";
+export { ServiceAccount, ServiceAccountApi } from "../../common/k8s-api/endpoints";
+export { Role, RoleApi } from "../../common/k8s-api/endpoints";
+export { RoleBinding, RoleBindingApi } from "../../common/k8s-api/endpoints";
+export { ClusterRole, ClusterRoleApi } from "../../common/k8s-api/endpoints";
+export { ClusterRoleBinding, ClusterRoleBindingApi } from "../../common/k8s-api/endpoints";
+export { CustomResourceDefinition, CustomResourceDefinitionApi } from "../../common/k8s-api/endpoints";
 export { KubeObjectStatusLevel } from "./kube-object-status";
 export { KubeJsonApi } from "../../common/k8s-api/kube-json-api";
 
@@ -93,7 +93,7 @@ export type { KubeObjectStatus } from "./kube-object-status";
 
 // stores
 export type { EventStore } from "../../renderer/components/+events/event.store";
-export type { PodStore as PodsStore } from "../../renderer/components/+workloads-pods/pod.store";
+export type { PodStore as PodsStore } from "../../renderer/components/+workloads-pods/store";
 export type { NodeStore as NodesStore } from "../../renderer/components/+nodes/nodes.store";
 export type { DeploymentStore } from "../../renderer/components/+workloads-deployments/store";
 export type { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/store";
@@ -121,31 +121,44 @@ export type { RoleBindingStore as RoleBindingsStore } from "../../renderer/compo
 export type { CustomResourceDefinitionStore as CRDStore } from "../../renderer/components/+custom-resources/crd.store";
 export type { CRDResourceStore } from "../../renderer/components/+custom-resources/crd-resource.store";
 
-export const apiManager = asLegacyGlobalObjectForExtensionApi(apiManagerInjectable);
-export const nodesApi = asLegacyGlobalObjectForExtensionApi(nodeApiInjectable);
-export const podsApi = asLegacyGlobalObjectForExtensionApi(podApiInjectable);
-export const serviceApi = asLegacyGlobalObjectForExtensionApi(serviceApiInjectable);
-export const deploymentApi = asLegacyGlobalObjectForExtensionApi(deploymentApiInjectable);
-export const daemonSetApi = asLegacyGlobalObjectForExtensionApi(daemonSetApiInjectable);
-export const statefulSetApi = asLegacyGlobalObjectForExtensionApi(statefulSetApiInjectable);
-export const jobApi = asLegacyGlobalObjectForExtensionApi(jobApiInjectable);
-export const cronJobApi = asLegacyGlobalObjectForExtensionApi(cronJobApiInjectable);
-export const configMapApi = asLegacyGlobalObjectForExtensionApi(configMapApiInjectable);
-export const pvcApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeClaimApiInjectable);
-export const persistentVolumeApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeApiInjectable);
-export const secretApi = asLegacyGlobalObjectForExtensionApi(secretApiInjectable);
-export const replicaSetApi = asLegacyGlobalObjectForExtensionApi(replicaSetApiInjectable);
-export const resourceQuotaApi = asLegacyGlobalObjectForExtensionApi(resourceQuotaApiInjectable);
-export const limitRangeApi = asLegacyGlobalObjectForExtensionApi(limitRangeApiInjectable);
-export const hpaApi = asLegacyGlobalObjectForExtensionApi(horizontalPodAutoscalerApiInjectable);
+// export const apiManager = asLegacyGlobalObjectForExtensionApi(apiManagerInjectable);
+// export const nodesApi = asLegacyGlobalObjectForExtensionApi(nodeApiInjectable);
+// export const podsApi = asLegacyGlobalObjectForExtensionApi(podApiInjectable);
+// export const serviceApi = asLegacyGlobalObjectForExtensionApi(serviceApiInjectable);
+// export const deploymentApi = asLegacyGlobalObjectForExtensionApi(deploymentApiInjectable);
+// export const daemonSetApi = asLegacyGlobalObjectForExtensionApi(daemonSetApiInjectable);
+// export const statefulSetApi = asLegacyGlobalObjectForExtensionApi(statefulSetApiInjectable);
+// export const jobApi = asLegacyGlobalObjectForExtensionApi(jobApiInjectable);
+// export const cronJobApi = asLegacyGlobalObjectForExtensionApi(cronJobApiInjectable);
+// export const configMapApi = asLegacyGlobalObjectForExtensionApi(configMapApiInjectable);
+// export const pvcApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeClaimApiInjectable);
+// export const persistentVolumeApi = asLegacyGlobalObjectForExtensionApi(persistentVolumeApiInjectable);
+// export const secretApi = asLegacyGlobalObjectForExtensionApi(secretApiInjectable);
+// export const replicaSetApi = asLegacyGlobalObjectForExtensionApi(replicaSetApiInjectable);
+// export const resourceQuotaApi = asLegacyGlobalObjectForExtensionApi(resourceQuotaApiInjectable);
+// export const limitRangeApi = asLegacyGlobalObjectForExtensionApi(limitRangeApiInjectable);
+// export const hpaApi = asLegacyGlobalObjectForExtensionApi(horizontalPodAutoscalerApiInjectable);
+// export const pdbApi
+// endpointApi
+// ingressApi
+// networkPolicyApi
+// storageClassApi
+// namespacesApi
+// eventApi
+// serviceAccountsApi
+// roleApi
+// roleBindingApi
+// clusterRoleApi
+// clusterRoleBindingApi
+// crdApi
 
-export const eventStore = asLegacyGlobalObjectForExtensionApi(eventStoreInjectable);
-export const cronJobStore = asLegacyGlobalObjectForExtensionApi(cronJobStoreInjectable);
-export const jobStore = asLegacyGlobalObjectForExtensionApi(jobStoreInjectable);
-export const secretStore = asLegacyGlobalObjectForExtensionApi(secretStoreInjectable);
-export const replicaSetStore = asLegacyGlobalObjectForExtensionApi(replicaSetStoreInjectable);
-export const resourceQuotaStore = asLegacyGlobalObjectForExtensionApi(resourceQuotaStoreInjectable);
-export const limitRangeStore = asLegacyGlobalObjectForExtensionApi(limitRangeStoreInjectable);
-export const horizontalPodAutoscalerStore = asLegacyGlobalObjectForExtensionApi(horizontalPodAutoscalerStoreInjectable);
-export const serviceAccountStore = asLegacyGlobalObjectForExtensionApi(serviceAccountStoreInjectable);
-export const namespaceStore = asLegacyGlobalObjectForExtensionApi(namespaceStoreInjectable);
+// export const eventStore = asLegacyGlobalObjectForExtensionApi(eventStoreInjectable);
+// export const cronJobStore = asLegacyGlobalObjectForExtensionApi(cronJobStoreInjectable);
+// export const jobStore = asLegacyGlobalObjectForExtensionApi(jobStoreInjectable);
+// export const secretStore = asLegacyGlobalObjectForExtensionApi(secretStoreInjectable);
+// export const replicaSetStore = asLegacyGlobalObjectForExtensionApi(replicaSetStoreInjectable);
+// export const resourceQuotaStore = asLegacyGlobalObjectForExtensionApi(resourceQuotaStoreInjectable);
+// export const limitRangeStore = asLegacyGlobalObjectForExtensionApi(limitRangeStoreInjectable);
+// export const horizontalPodAutoscalerStore = asLegacyGlobalObjectForExtensionApi(horizontalPodAutoscalerStoreInjectable);
+// export const serviceAccountStore = asLegacyGlobalObjectForExtensionApi(serviceAccountStoreInjectable);
+// export const namespaceStore = asLegacyGlobalObjectForExtensionApi(namespaceStoreInjectable);
