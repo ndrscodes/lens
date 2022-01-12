@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import apiManagerInjectable from "../../../../common/k8s-api/api-manager.injectable";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import type { RoleStore } from "./store";
 
 const roleStoreInjectable = getInjectable({

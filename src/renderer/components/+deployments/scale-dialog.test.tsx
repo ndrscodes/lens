@@ -20,11 +20,16 @@
  */
 
 import React from "react";
-import { render, waitFor, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
 import { DeploymentScaleDialog } from "./scale-dialog";
-import { Deployment, DeploymentApi } from "../../../common/k8s-api/endpoints/deployment.api";
+import type { Deployment, DeploymentApi } from "../../../common/k8s-api/endpoints/deployment.api";
+import { getDiForUnitTesting } from "../../getDiForUnitTesting";
+import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injectable";
+import deploymentApiInjectable from "../../../common/k8s-api/endpoints/deployment.api.injectable";
+import { DiRender, renderFor } from "../test-utils/renderFor";
+import deploymentScaleDialogStateInjectable from "./scale-dialog.state.injectable";
 
 const dummyDeployment: Deployment = {
   apiVersion: "v1",
@@ -116,18 +121,26 @@ const dummyDeployment: Deployment = {
 };
 
 describe("<DeploymentScaleDialog />", () => {
-  let deploymentApi: DeploymentApi;
+  let di: ConfigurableDependencyInjectionContainer;
+  let render: DiRender;
 
-  beforeEach(() => {
-    deploymentApi = new DeploymentApi({
-      objectConstructor: Deployment,
-    });
+  beforeEach(async () => {
+    di = getDiForUnitTesting();
+    render = renderFor(di);
+
+    di.override(deploymentScaleDialogStateInjectable, () => ({
+      deployment: dummyDeployment,
+    }));
   });
 
   it("renders w/o errors", () => {
-    const { container } = render(<DeploymentScaleDialog />);
+    di.override(deploymentApiInjectable, () => ({
+      getReplicas: jest.fn().mockImplementationOnce(async () => 1),
+    }) as any as DeploymentApi);
 
-    expect(container).toBeInstanceOf(HTMLElement);
+    const result = render(<DeploymentScaleDialog />);
+
+    expect(result.container).toBeInstanceOf(HTMLElement);
   });
 
   it("inits with a dummy deployment with mocked current/desired scale", async () => {
@@ -135,48 +148,41 @@ describe("<DeploymentScaleDialog />", () => {
     // when <DeploymentScaleDialog /> rendered.
     const initReplicas = 3;
 
-    deploymentApi.getReplicas = jest.fn().mockImplementationOnce(async () => initReplicas);
-    const { getByTestId } = render(<DeploymentScaleDialog deploymentApi={deploymentApi} />);
+    di.override(deploymentApiInjectable, () => ({
+      getReplicas: jest.fn().mockImplementationOnce(async () => initReplicas),
+    }) as any as DeploymentApi);
 
-    DeploymentScaleDialog.open(dummyDeployment);
-    // we need to wait for the DeploymentScaleDialog to show up
-    // because there is an <Animate /> in <Dialog /> which renders null at start.
-    await waitFor(async () => {
-      const [currentScale, desiredScale] = await Promise.all([
-        getByTestId("current-scale"),
-        getByTestId("desired-scale"),
-      ]);
+    const result = render(<DeploymentScaleDialog />);
 
-      expect(currentScale).toHaveTextContent(`${initReplicas}`);
-      expect(desiredScale).toHaveTextContent(`${initReplicas}`);
-    });
-
+    expect(await result.findByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent(`${initReplicas}`);
   });
 
   it("changes the desired scale when clicking the icon buttons +/-", async () => {
     const initReplicas = 1;
 
-    deploymentApi.getReplicas = jest.fn().mockImplementationOnce(async () => initReplicas);
-    const component = render(<DeploymentScaleDialog deploymentApi={deploymentApi} />);
+    di.override(deploymentApiInjectable, () => ({
+      getReplicas: jest.fn().mockImplementationOnce(async () => initReplicas),
+    }) as any as DeploymentApi);
 
-    DeploymentScaleDialog.open(dummyDeployment);
-    await waitFor(async () => {
-      expect(await component.getByTestId("desired-scale")).toHaveTextContent(`${initReplicas}`);
-      expect(await component.getByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
-      expect((await component.baseElement.querySelector("input").value)).toBe(`${initReplicas}`);
-    });
-    const up = await component.getByTestId("desired-replicas-up");
-    const down = await component.getByTestId("desired-replicas-down");
+    const result = render(<DeploymentScaleDialog />);
+
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent(`${initReplicas}`);
+    expect(await result.findByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
+    expect((result.baseElement.querySelector("input").value)).toBe(`${initReplicas}`);
+
+    const up = await result.findByTestId("desired-replicas-up");
+    const down = await result.findByTestId("desired-replicas-down");
 
     fireEvent.click(up);
-    expect(await component.getByTestId("desired-scale")).toHaveTextContent(`${initReplicas + 1}`);
-    expect(await component.getByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
-    expect((await component.baseElement.querySelector("input").value)).toBe(`${initReplicas + 1}`);
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent(`${initReplicas + 1}`);
+    expect(await result.findByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
+    expect((result.baseElement.querySelector("input").value)).toBe(`${initReplicas + 1}`);
 
     fireEvent.click(down);
-    expect(await component.getByTestId("desired-scale")).toHaveTextContent(`${initReplicas}`);
-    expect(await component.getByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
-    expect((await component.baseElement.querySelector("input").value)).toBe(`${initReplicas}`);
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent(`${initReplicas}`);
+    expect(await result.findByTestId("current-scale")).toHaveTextContent(`${initReplicas}`);
+    expect((result.baseElement.querySelector("input").value)).toBe(`${initReplicas}`);
 
     // edge case, desiredScale must = 0
     let times = 10;
@@ -184,8 +190,8 @@ describe("<DeploymentScaleDialog />", () => {
     for (let i = 0; i < times; i++) {
       fireEvent.click(down);
     }
-    expect(await component.getByTestId("desired-scale")).toHaveTextContent("0");
-    expect((await component.baseElement.querySelector("input").value)).toBe("0");
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent("0");
+    expect((result.baseElement.querySelector("input").value)).toBe("0");
 
     // edge case, desiredScale must = 100 scaleMax (100)
     times = 120;
@@ -193,9 +199,9 @@ describe("<DeploymentScaleDialog />", () => {
     for (let i = 0; i < times; i++) {
       fireEvent.click(up);
     }
-    expect(await component.getByTestId("desired-scale")).toHaveTextContent("100");
-    expect((component.baseElement.querySelector("input").value)).toBe("100");
-    expect(await component.getByTestId("warning"))
+    expect(await result.findByTestId("desired-scale")).toHaveTextContent("100");
+    expect((result.baseElement.querySelector("input").value)).toBe("100");
+    expect(await result.findByTestId("warning"))
       .toHaveTextContent("High number of replicas may cause cluster performance issues");
   });
 });

@@ -24,8 +24,9 @@ import "./kube-object-status-icon.scss";
 import React from "react";
 import { Icon } from "../icon";
 import { cssNames, formatDuration } from "../../utils";
-import { KubeObject, KubeObjectStatus, KubeObjectStatusLevel } from "../../../extensions/renderer/k8s-api";
 import { KubeObjectStatusRegistry } from "../../../extensions/registries";
+import { KubeObjectStatus, KubeObjectStatusLevel } from "../../../extensions/renderer-api/kube-object-status";
+import type { KubeObject } from "../../../common/k8s-api/kube-object";
 
 function statusClassName(level: KubeObjectStatusLevel): string {
   switch (level) {
@@ -80,11 +81,11 @@ function splitByLevel(src: KubeObjectStatus[]): SplitStatusesByLevel {
   return { maxLevel, criticals, warnings, infos };
 }
 
-interface Props {
+export interface KubeObjectStatusIconProps {
   object: KubeObject;
 }
 
-export class KubeObjectStatusIcon extends React.Component<Props> {
+export class KubeObjectStatusIcon extends React.Component<KubeObjectStatusIconProps> {
   renderStatuses(statuses: KubeObjectStatus[], level: number) {
     const filteredStatuses = statuses.filter((item) => item.level == level);
 

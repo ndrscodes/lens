@@ -24,19 +24,19 @@ import "./add-dialog.scss";
 import React, { useState } from "react";
 import { observer } from "mobx-react";
 
-import { NamespaceSelect } from "../../+namespaces/namespace-select";
-import { Dialog, DialogProps } from "../../dialog";
-import { Input } from "../../input";
-import { showDetails } from "../../kube-detail-params";
-import { SubTitle } from "../../layout/sub-title";
-import { Notifications } from "../../notifications";
-import { Wizard, WizardStep } from "../../wizard";
+import { NamespaceSelect } from "../+namespaces/namespace-select";
+import { Dialog, DialogProps } from "../dialog";
+import { Input } from "../input";
+import { showDetails } from "../kube-detail-params";
+import { SubTitle } from "../layout/sub-title";
+import { Notifications } from "../notifications";
+import { Wizard, WizardStep } from "../wizard";
 import type { RoleStore } from "./store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import roleStoreInjectable from "./store.injectable";
 import addRoleDialogStateInjectable from "./add-dialog.state.injectable";
 import closeAddRoleDialogInjectable from "./close-add-dialog.injectable";
-import { cssNames } from "../../../utils";
+import { cssNames } from "../../utils";
 
 export interface AddRoleDialogProps extends Partial<DialogProps> {
 }

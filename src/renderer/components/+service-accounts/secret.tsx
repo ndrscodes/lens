@@ -25,8 +25,8 @@ import moment from "moment";
 import React, { useState } from "react";
 
 import type { Secret } from "../../../../common/k8s-api/endpoints/secret.api";
-import { prevDefault } from "../../../utils";
-import { Icon } from "../../icon";
+import { prevDefault } from "../../utils";
+import { Icon } from "../icon";
 
 export interface ServiceAccountsSecretProps {
   secret: Secret;

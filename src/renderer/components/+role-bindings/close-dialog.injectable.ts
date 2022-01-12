@@ -20,7 +20,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { runInAction } from "mobx";
-import { bind } from "../../../utils";
+import { bind } from "../../utils";
 import type { RoleBindingDialogState } from "./dialog.state.injectable";
 import roleBindingDialogStateInjectable from "./dialog.state.injectable";
 

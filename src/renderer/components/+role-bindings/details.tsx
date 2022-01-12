@@ -23,21 +23,21 @@ import "./details.scss";
 
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
-import { RoleBinding, RoleBindingSubject } from "../../../../common/k8s-api/endpoints";
-import { prevDefault } from "../../../utils";
-import { AddRemoveButtons } from "../../add-remove-buttons";
-import type { ConfirmDialogParams } from "../../confirm-dialog";
-import { DrawerTitle } from "../../drawer";
-import type { KubeObjectDetailsProps } from "../../kube-object-details";
-import { KubeObjectMeta } from "../../kube-object-meta";
-import { Table, TableCell, TableHead, TableRow } from "../../table";
+import { RoleBinding, RoleBindingSubject } from "../../../common/k8s-api/endpoints";
+import { prevDefault } from "../../utils";
+import { AddRemoveButtons } from "../add-remove-buttons";
+import type { ConfirmDialogParams } from "../confirm-dialog";
+import { DrawerTitle } from "../drawer";
+import type { KubeObjectDetailsProps } from "../kube-object-details";
+import { KubeObjectMeta } from "../kube-object-meta";
+import { Table, TableCell, TableHead, TableRow } from "../table";
 import type { RoleBindingStore } from "./store";
-import { ObservableHashSet } from "../../../../common/utils/hash-set";
+import { ObservableHashSet } from "../../../common/utils/hash-set";
 import { hashRoleBindingSubject } from "./hashers";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import roleBindingStoreInjectable from "./store.injectable";
-import openConfirmDialogInjectable from "../../confirm-dialog/dialog-open.injectable";
-import logger from "../../../../common/logger";
+import openConfirmDialogInjectable from "../confirm-dialog/dialog-open.injectable";
+import logger from "../../../common/logger";
 import openRoleBindingDialogInjectable from "./open-dialog.injectable";
 
 export interface RoleBindingDetailsProps extends KubeObjectDetailsProps<RoleBinding> {

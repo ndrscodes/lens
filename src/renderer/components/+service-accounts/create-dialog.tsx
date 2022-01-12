@@ -24,20 +24,20 @@ import "./create-dialog.scss";
 import React, { useState } from "react";
 import { observer } from "mobx-react";
 
-import { NamespaceSelect } from "../../+namespaces/namespace-select";
-import { Dialog, DialogProps } from "../../dialog";
-import { Input } from "../../input";
-import { systemName } from "../../input/input_validators";
-import { showDetails } from "../../kube-detail-params";
-import { SubTitle } from "../../layout/sub-title";
-import { Notifications } from "../../notifications";
-import { Wizard, WizardStep } from "../../wizard";
+import { NamespaceSelect } from "../+namespaces/namespace-select";
+import { Dialog, DialogProps } from "../dialog";
+import { Input } from "../input";
+import { systemName } from "../input/input_validators";
+import { showDetails } from "../kube-detail-params";
+import { SubTitle } from "../layout/sub-title";
+import { Notifications } from "../notifications";
+import { Wizard, WizardStep } from "../wizard";
 import type { ServiceAccountStore } from "./store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import createServiceAccountDialogStateInjectable from "./create-dialog.state.injectable";
 import serviceAccountStoreInjectable from "./store.injectable";
 import closeCreateServiceAccountDialogInjectable from "./close-create-dialog.injectable";
-import { cssNames } from "../../../utils";
+import { cssNames } from "../../utils";
 
 export interface CreateServiceAccountDialogProps extends Partial<DialogProps> {
 }

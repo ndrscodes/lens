@@ -52,7 +52,7 @@ const NonInjectedStatefulSetScaleDialog = observer(({ statefulSetApi, statefulSe
   const [desiredReplicas, setDesiredReplicas] = useState(0);
 
   const isOpen = Boolean(statefulSet);
-  const scaleMax = Math.min(currentReplicas, defaultScaleMax) * 2;
+  const scaleMax = Math.max(currentReplicas, defaultScaleMax) * 2;
   const scaleMin = 0;
 
   const onClose = () => setReady(false);
@@ -60,13 +60,13 @@ const NonInjectedStatefulSetScaleDialog = observer(({ statefulSetApi, statefulSe
   const desiredReplicasUp = () => setDesiredReplicas(Math.min(scaleMax, desiredReplicas + 1));
   const desiredReplicasDown = () => setDesiredReplicas(Math.max(scaleMin, desiredReplicas - 1));
   const onOpen = async () => {
-    setCurrentReplicas(
-      await statefulSetApi.getReplicas({
-        namespace: statefulSet.getNs(),
-        name: statefulSet.getName(),
-      }),
-    );
-    setDesiredReplicas(currentReplicas);
+    const replicas = await statefulSetApi.getReplicas({
+      namespace: statefulSet.getNs(),
+      name: statefulSet.getName(),
+    });
+
+    setCurrentReplicas(replicas);
+    setDesiredReplicas(replicas);
     setReady(true);
   };
   const scale = async () => {

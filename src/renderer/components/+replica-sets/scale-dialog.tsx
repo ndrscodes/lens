@@ -51,17 +51,17 @@ const NonInjectedReplicaSetScaleDialog = observer(({ replicaSetApi, replicaSet, 
   const [currentReplicas, setCurrentReplicas] = useState(0);
   const [desiredReplicas, setDesiredReplicas] = useState(0);
   const isOpen = Boolean(replicaSet);
-  const scaleMax = Math.min(currentReplicas, defaultScaleMax) * 2;
+  const scaleMax = Math.max(currentReplicas, defaultScaleMax) * 2;
   const scaleMin = 0;
 
   const onOpen = async () => {
-    setCurrentReplicas(
-      await replicaSetApi.getReplicas({
-        namespace: replicaSet.getNs(),
-        name: replicaSet.getName(),
-      }),
-    );
-    setDesiredReplicas(currentReplicas);
+    const replicas = await replicaSetApi.getReplicas({
+      namespace: replicaSet.getNs(),
+      name: replicaSet.getName(),
+    });
+
+    setCurrentReplicas(replicas);
+    setDesiredReplicas(replicas);
     setReady(true);
   };
 

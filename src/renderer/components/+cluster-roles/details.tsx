@@ -24,12 +24,12 @@ import "./details.scss";
 import { observer } from "mobx-react";
 import React from "react";
 
-import { DrawerTitle } from "../../drawer";
-import type { KubeObjectDetailsProps } from "../../kube-object-details";
-import { KubeObjectMeta } from "../../kube-object-meta";
-import { ClusterRole } from "../../../../common/k8s-api/endpoints";
+import { DrawerTitle } from "../drawer";
+import type { KubeObjectDetailsProps } from "../kube-object-details";
+import { KubeObjectMeta } from "../kube-object-meta";
+import { ClusterRole } from "../../../common/k8s-api/endpoints";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import logger from "../../../../common/logger";
+import logger from "../../../common/logger";
 
 export interface ClusterRoleDetailsProps extends KubeObjectDetailsProps<ClusterRole> {
 }

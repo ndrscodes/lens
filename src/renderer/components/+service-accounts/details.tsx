@@ -25,18 +25,18 @@ import { autorun } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { SecretStore } from "../../+secrets/store";
-import { Secret, SecretRef, SecretType, ServiceAccount } from "../../../../common/k8s-api/endpoints";
-import { DrawerItem, DrawerTitle } from "../../drawer";
-import { Icon } from "../../icon";
-import type { KubeObjectDetailsProps } from "../../kube-object-details";
-import { KubeObjectMeta } from "../../kube-object-meta";
-import { Spinner } from "../../spinner";
+import type { SecretStore } from "../+secrets/store";
+import { Secret, SecretRef, SecretType, ServiceAccount } from "../../../common/k8s-api/endpoints";
+import { DrawerItem, DrawerTitle } from "../drawer";
+import { Icon } from "../icon";
+import type { KubeObjectDetailsProps } from "../kube-object-details";
+import { KubeObjectMeta } from "../kube-object-meta";
+import { Spinner } from "../spinner";
 import { ServiceAccountsSecret } from "./secret";
-import { getDetailsUrl } from "../../kube-detail-params";
+import { getDetailsUrl } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import logger from "../../../../common/logger";
-import secretStoreInjectable from "../../+secrets/store.injectable";
+import logger from "../../../common/logger";
+import secretStoreInjectable from "../+secrets/store.injectable";
 
 export interface ServiceAccountsDetailsProps extends KubeObjectDetailsProps<ServiceAccount> {
 }

@@ -20,7 +20,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { observable } from "mobx";
-import type { RoleBinding } from "../../../../common/k8s-api/endpoints";
+import type { RoleBinding } from "../../../common/k8s-api/endpoints";
 
 export interface RoleBindingDialogState {
   isOpen: boolean;

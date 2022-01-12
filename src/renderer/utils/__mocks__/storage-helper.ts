@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { deepEqual } from "mobx/dist/internal";
+import { deepStrictEqual } from "assert";
 import type { StorageLayer } from "../storageHelper";
 
 export function getStorageLayerMock<T>(key: string, defaultValue: T): StorageLayer<T> {
@@ -27,7 +27,7 @@ export function getStorageLayerMock<T>(key: string, defaultValue: T): StorageLay
     key,
     whenReady: Promise.resolve(),
     defaultValue,
-    isDefaultValue: jest.fn().mockImplementation(val => deepEqual(val, defaultValue)),
+    isDefaultValue: jest.fn().mockImplementation(val => deepStrictEqual(val, defaultValue)),
     get: jest.fn(),
     set: jest.fn(),
     reset: jest.fn(),

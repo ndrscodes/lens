@@ -19,14 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import React from "react";
-
-import {
-  render as testingLibraryRender,
-  RenderResult,
-} from "@testing-library/react";
-
+import { render, RenderResult } from "@testing-library/react";
 import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injectable";
-
 import { DiContextProvider } from "@ogre-tools/injectable-react";
 
 export type DiRender = (ui: React.ReactElement) => RenderResult;
@@ -36,7 +30,7 @@ type DiRenderFor = (
 ) => DiRender;
 
 export const renderFor: DiRenderFor = di => ui =>
-  testingLibraryRender(
+  render(
     <DiContextProvider value={{ di }}>{ui}</DiContextProvider>,
   );
 

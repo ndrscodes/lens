@@ -23,17 +23,17 @@ import "./add-dialog.scss";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
 
-import { Dialog, DialogProps } from "../../dialog";
-import { Input } from "../../input";
-import { showDetails } from "../../kube-detail-params";
-import { SubTitle } from "../../layout/sub-title";
-import { Notifications } from "../../notifications";
-import { Wizard, WizardStep } from "../../wizard";
+import { Dialog, DialogProps } from "../dialog";
+import { Input } from "../input";
+import { showDetails } from "../kube-detail-params";
+import { SubTitle } from "../layout/sub-title";
+import { Notifications } from "../notifications";
+import { Wizard, WizardStep } from "../wizard";
 import type { ClusterRoleStore } from "./store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import clusterRoleStoreInjectable from "./store.injectable";
 import addClusterRoleDialogStateInjectable from "./add-dialog.state.injectable";
-import { cssNames } from "../../../utils";
+import { cssNames } from "../../utils";
 import closeAddClusterRoleDialogInjectable from "./close-add-dialog.injectable";
 
 export interface AddClusterRoleDialogProps extends Partial<DialogProps> {

@@ -20,8 +20,8 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { runInAction } from "mobx";
-import type { RoleBinding } from "../../../../common/k8s-api/endpoints";
-import { bind } from "../../../utils";
+import type { RoleBinding } from "../../../common/k8s-api/endpoints";
+import { bind } from "../../utils";
 import type { RoleBindingDialogState } from "./dialog.state.injectable";
 import roleBindingDialogStateInjectable from "./dialog.state.injectable";
 

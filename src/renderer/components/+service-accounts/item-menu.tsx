@@ -20,11 +20,11 @@
  */
 
 import React from "react";
-import type { ServiceAccount } from "../../../../common/k8s-api/endpoints";
-import { Icon } from "../../icon";
-import type { KubeObjectMenuProps } from "../../kube-object-menu";
-import { openServiceAccountKubeConfig } from "../../kubeconfig-dialog";
-import { MenuItem } from "../../menu";
+import type { ServiceAccount } from "../../../common/k8s-api/endpoints";
+import { Icon } from "../icon";
+import type { KubeObjectMenuProps } from "../kube-object-menu";
+import { openServiceAccountKubeConfig } from "../kubeconfig-dialog";
+import { MenuItem } from "../menu";
 
 export function ServiceAccountMenu(props: KubeObjectMenuProps<ServiceAccount>) {
   const { object, toolbar } = props;
