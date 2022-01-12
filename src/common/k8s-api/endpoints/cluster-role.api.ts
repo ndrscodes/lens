@@ -42,7 +42,7 @@ export class ClusterRole extends KubeObject {
 }
 
 export class ClusterRoleApi extends KubeApi<ClusterRole> {
-  constructor(args: SpecificApiOptions<$1> = {} = {}) {
+  constructor(args: SpecificApiOptions<ClusterRole> = {}) {
     super({
       ...args,
       objectConstructor: ClusterRole,

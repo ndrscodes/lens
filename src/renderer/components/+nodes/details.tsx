@@ -28,11 +28,11 @@ import { observer } from "mobx-react";
 import { DrawerItem, DrawerItemLabels } from "../drawer";
 import { Badge } from "../badge";
 import { ResourceMetrics } from "../resource-metrics";
-import type { PodStore } from "../+workloads-pods/store";
+import type { PodStore } from "../+pods/store";
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { formatNodeTaint, getMetricsByNodeNames, IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
 import { NodeCharts } from "./charts";
-import { PodDetailsList } from "../+workloads-pods/pod-details-list";
+import { PodDetailsList } from "../+pods/details-list";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { getActiveClusterEntity } from "../../api/catalog-entity-registry";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
@@ -41,7 +41,7 @@ import { DrawerTitle } from "../drawer/drawer-title";
 import logger from "../../../common/logger";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import podStoreInjectable from "../+workloads-pods/store.injectable";
+import podStoreInjectable from "../+pods/store.injectable";
 
 export interface NodeDetailsProps extends KubeObjectDetailsProps<Node> {
 }

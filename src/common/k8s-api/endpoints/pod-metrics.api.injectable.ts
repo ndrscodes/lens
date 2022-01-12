@@ -18,46 +18,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { KubeApi, SpecificApiOptions } from "../kube-api";
-import { KubeObject } from "../kube-object";
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import apiManagerInjectable from "../api-manager.injectable";
+import type { PodMetricsApi } from "./pod-metrics.api";
 
-export type ClusterRoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
+const podMetricsApiInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getApi("/apis/metrics.k8s.io/v1beta1/pods") as PodMetricsApi,
+  lifecycle: lifecycleEnum.singleton,
+});
 
-export interface ClusterRoleBindingSubject {
-  kind: ClusterRoleBindingSubjectKind;
-  name: string;
-  apiGroup?: string;
-  namespace?: string;
-}
-
-export interface ClusterRoleBinding {
-  subjects?: ClusterRoleBindingSubject[];
-  roleRef: {
-    kind: string;
-    name: string;
-    apiGroup?: string;
-  };
-}
-
-export class ClusterRoleBinding extends KubeObject {
-  static kind = "ClusterRoleBinding";
-  static namespaced = false;
-  static apiBase = "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings";
-
-  getSubjects() {
-    return this.subjects || [];
-  }
-
-  getSubjectNames(): string {
-    return this.getSubjects().map(subject => subject.name).join(", ");
-  }
-}
-
-export class ClusterRoleBindingApi extends KubeApi<ClusterRoleBinding> {
-  constructor(args: SpecificApiOptions<ClusterRoleBinding> = {}) {
-    super({
-      ...args,
-      objectConstructor: ClusterRoleBinding,
-    });
-  }
-}
+export default podMetricsApiInjectable;

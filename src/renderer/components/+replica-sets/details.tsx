@@ -1,0 +1,144 @@
+/**
+ * Copyright (c) 2021 OpenLens Authors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+import "./details.scss";
+import React, { useEffect, useState } from "react";
+import { DrawerItem } from "../drawer";
+import { Badge } from "../badge";
+import type { ReplicaSetStore } from "./store";
+import { PodDetailsStatuses } from "../+pods/details-statuses";
+import { PodDetailsTolerations } from "../+pods/details-tolerations";
+import { PodDetailsAffinities } from "../+pods/details-affinities";
+import { observer } from "mobx-react";
+import type { PodStore } from "../+pods/store";
+import type { KubeObjectDetailsProps } from "../kube-object-details";
+import { getMetricsForReplicaSets, IPodMetrics, ReplicaSet } from "../../../common/k8s-api/endpoints";
+import { ResourceMetrics, ResourceMetricsText } from "../resource-metrics";
+import { PodCharts, podMetricTabs } from "../+pods/charts";
+import { PodDetailsList } from "../+pods/details-list";
+import { KubeObjectMeta } from "../kube-object-meta";
+import { getActiveClusterEntity } from "../../api/catalog-entity-registry";
+import { ClusterMetricsResourceType } from "../../../common/cluster-types";
+import logger from "../../../common/logger";
+import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import podStoreInjectable from "../+pods/store.injectable";
+import replicaSetStoreInjectable from "./store.injectable";
+
+export interface ReplicaSetDetailsProps extends KubeObjectDetailsProps<ReplicaSet> {
+}
+
+interface Dependencies {
+  replicaSetStore: ReplicaSetStore;
+  podStore: PodStore;
+}
+
+const NonInjectedReplicaSetDetails = observer(({ podStore, replicaSetStore, object: replicaSet }: Dependencies & ReplicaSetDetailsProps) => {
+  const [metrics, setMetrics] = useState<IPodMetrics | null>(null);
+
+  useEffect(() => setMetrics(null), [replicaSet]);
+  useEffect(() => (
+    kubeWatchApi.subscribeStores([
+      podStore,
+    ])
+  ), []);
+
+  const loadMetrics =async () => {
+    setMetrics(await getMetricsForReplicaSets([replicaSet], replicaSet.getNs(), ""));
+  };
+
+  if (!replicaSet) {
+    return null;
+  }
+
+  if (!(replicaSet instanceof ReplicaSet)) {
+    logger.error("[ReplicaSetDetails]: passed object that is not an instanceof ReplicaSet", replicaSet);
+
+    return null;
+  }
+
+  const { availableReplicas, replicas } = replicaSet.status;
+  const selectors = replicaSet.getSelectors();
+  const nodeSelector = replicaSet.getNodeSelectors();
+  const images = replicaSet.getImages();
+  const childPods = replicaSetStore.getChildPods(replicaSet);
+  const isMetricHidden = getActiveClusterEntity()?.isMetricHidden(ClusterMetricsResourceType.ReplicaSet);
+
+  return (
+    <div className="ReplicaSetDetails">
+      {!isMetricHidden && podStore.isLoaded && (
+        <ResourceMetrics
+          loader={loadMetrics}
+          tabs={podMetricTabs}
+          object={replicaSet}
+          metrics={metrics}
+        >
+          <PodCharts/>
+        </ResourceMetrics>
+      )}
+      <KubeObjectMeta object={replicaSet}/>
+      {selectors.length > 0 &&
+        <DrawerItem name="Selector" labelsOnly>
+          {
+            selectors.map(label => <Badge key={label} label={label}/>)
+          }
+        </DrawerItem>
+      }
+      {nodeSelector.length > 0 &&
+        <DrawerItem name="Node Selector" labelsOnly>
+          {
+            nodeSelector.map(label => <Badge key={label} label={label}/>)
+          }
+        </DrawerItem>
+      }
+      {images.length > 0 &&
+        <DrawerItem name="Images">
+          {
+            images.map(image => <p key={image}>{image}</p>)
+          }
+        </DrawerItem>
+      }
+      <DrawerItem name="Replicas">
+        {`${availableReplicas || 0} current / ${replicas || 0} desired`}
+      </DrawerItem>
+      <PodDetailsTolerations workload={replicaSet}/>
+      <PodDetailsAffinities workload={replicaSet}/>
+      <DrawerItem name="Pod Status" className="pod-status">
+        <PodDetailsStatuses pods={childPods}/>
+      </DrawerItem>
+      <ResourceMetricsText metrics={metrics}/>
+      <PodDetailsList
+        pods={childPods}
+        owner={replicaSet}
+        isLoaded={podStore.isLoaded}
+      />
+    </div>
+  );
+});
+
+export const ReplicaSetDetails = withInjectables<Dependencies, ReplicaSetDetailsProps>(NonInjectedReplicaSetDetails, {
+  getProps: (di, props) => ({
+    podStore: di.inject(podStoreInjectable),
+    replicaSetStore: di.inject(replicaSetStoreInjectable),
+    ...props,
+  }),
+});
+

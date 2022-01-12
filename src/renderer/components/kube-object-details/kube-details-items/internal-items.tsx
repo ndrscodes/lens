@@ -45,13 +45,13 @@ import { ClusterRoleDetails } from "../../+cluster-roles";
 import { RoleBindingDetails } from "../../+role-bindings";
 import { RoleDetails } from "../../+roles";
 import { ServiceAccountsDetails } from "../../+service-accounts";
-import { CronJobDetails } from "../../+workloads-cronjobs";
-import { DaemonSetDetails } from "../../+workloads-daemonsets";
-import { DeploymentDetails } from "../../+workloads-deployments";
-import { JobDetails } from "../../+workloads-jobs";
-import { PodDetails } from "../../+workloads-pods";
-import { ReplicaSetDetails } from "../../+workloads-replica-sets";
-import { StatefulSetDetails } from "../../+workloads-statefulsets";
+import { CronJobDetails } from "../../+cronjobs";
+import { DaemonSetDetails } from "../../+daemonsets";
+import { DeploymentDetails } from "../../+deployments";
+import { JobDetails } from "../../+jobs";
+import { PodDetails } from "../../+pods";
+import { ReplicaSetDetails } from "../../+replica-sets";
+import { StatefulSetDetails } from "../../+stateful-sets";
 import type { KubeObjectDetailRegistration } from "./kube-detail-items";
 
 export const internalItems: Required<KubeObjectDetailRegistration>[] = [

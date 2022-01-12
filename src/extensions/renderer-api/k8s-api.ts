@@ -93,16 +93,16 @@ export type { KubeObjectStatus } from "./kube-object-status";
 
 // stores
 export type { EventStore } from "../../renderer/components/+events/store";
-export type { PodStore as PodsStore } from "../../renderer/components/+workloads-pods/store";
+export type { PodStore as PodsStore } from "../../renderer/components/+pods/store";
 export type { NodeStore as NodesStore } from "../../renderer/components/+nodes/store";
-export type { DeploymentStore } from "../../renderer/components/+workloads-deployments/store";
-export type { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/store";
-export type { StatefulSetStore } from "../../renderer/components/+workloads-statefulsets/store";
-export type { JobStore } from "../../renderer/components/+workloads-jobs/store";
-export type { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cronjob.store";
+export type { DeploymentStore } from "../../renderer/components/+deployments/store";
+export type { DaemonSetStore } from "../../renderer/components/+daemonsets/store";
+export type { StatefulSetStore } from "../../renderer/components/+stateful-sets/store";
+export type { JobStore } from "../../renderer/components/+jobs/store";
+export type { CronJobStore } from "../../renderer/components/+cronjobs/store";
 export type { ConfigMapStore as ConfigMapsStore } from "../../renderer/components/+config-maps/store";
 export type { SecretStore as SecretsStore } from "../../renderer/components/+secrets/store";
-export type { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
+export type { ReplicaSetStore } from "../../renderer/components/+replica-sets/store";
 export type { ResourceQuotaStore as ResourceQuotasStore } from "../../renderer/components/+resource-quotas/store";
 export type { LimitRangeStore as LimitRangesStore } from "../../renderer/components/+limit-ranges/store";
 export type { HorizontalPodAutoscalerStore as HPAStore } from "../../renderer/components/+autoscalers/store";

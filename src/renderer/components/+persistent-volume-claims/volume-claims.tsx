@@ -24,7 +24,7 @@ import "./volume-claims.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import { Link, RouteComponentProps } from "react-router-dom";
-import type { PodStore } from "../+workloads-pods/store";
+import type { PodStore } from "../+pods/store";
 import { KubeObjectListLayout } from "../kube-object-list-layout";
 import { unitsToBytes } from "../../../common/utils/convertMemory";
 import { stopPropagation } from "../../utils";
@@ -34,7 +34,7 @@ import { getDetailsUrl } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import type { PersistentVolumeClaimStore } from "./store";
 import type { StorageClassApi } from "../../../common/k8s-api/endpoints";
-import podStoreInjectable from "../+workloads-pods/store.injectable";
+import podStoreInjectable from "../+pods/store.injectable";
 import persistentVolumeClaimStoreInjectable from "./store.injectable";
 import storageClassApiInjectable from "../../../common/k8s-api/endpoints/storage-class.api.injectable";
 

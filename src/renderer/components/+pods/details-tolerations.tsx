@@ -18,46 +18,30 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { KubeApi, SpecificApiOptions } from "../kube-api";
-import { KubeObject } from "../kube-object";
 
-export type ClusterRoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
+import "./details-tolerations.scss";
+import React from "react";
+import { DrawerParamToggler, DrawerItem } from "../drawer";
+import type  { WorkloadKubeObject } from "../../../common/k8s-api/workload-kube-object";
+import { PodTolerations } from "./tolerations";
 
-export interface ClusterRoleBindingSubject {
-  kind: ClusterRoleBindingSubjectKind;
-  name: string;
-  apiGroup?: string;
-  namespace?: string;
+interface Props {
+  workload: WorkloadKubeObject;
 }
 
-export interface ClusterRoleBinding {
-  subjects?: ClusterRoleBindingSubject[];
-  roleRef: {
-    kind: string;
-    name: string;
-    apiGroup?: string;
-  };
-}
+export class PodDetailsTolerations extends React.Component<Props> {
+  render() {
+    const { workload } = this.props;
+    const tolerations = workload.getTolerations();
 
-export class ClusterRoleBinding extends KubeObject {
-  static kind = "ClusterRoleBinding";
-  static namespaced = false;
-  static apiBase = "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings";
+    if (!tolerations.length) return null;
 
-  getSubjects() {
-    return this.subjects || [];
-  }
-
-  getSubjectNames(): string {
-    return this.getSubjects().map(subject => subject.name).join(", ");
-  }
-}
-
-export class ClusterRoleBindingApi extends KubeApi<ClusterRoleBinding> {
-  constructor(args: SpecificApiOptions<ClusterRoleBinding> = {}) {
-    super({
-      ...args,
-      objectConstructor: ClusterRoleBinding,
-    });
+    return (
+      <DrawerItem name="Tolerations" className="PodDetailsTolerations">
+        <DrawerParamToggler label={tolerations.length}>
+          <PodTolerations tolerations={tolerations} />
+        </DrawerParamToggler>
+      </DrawerItem>
+    );
   }
 }

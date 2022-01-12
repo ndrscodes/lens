@@ -25,14 +25,14 @@ import React, { createContext, useEffect, useState } from "react";
 import { Radio, RadioGroup } from "../radio";
 import { useInterval } from "../../hooks";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
-import { cssNames } from "../../utils";
+import { cssNames, noop } from "../../utils";
 import { Spinner } from "../spinner";
 import type { IMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 
 export interface ResourceMetricsProps {
   tabs: React.ReactNode[];
-  object: KubeObject;
-  loader: () => void;
+  object?: KubeObject;
+  loader?: () => void;
   /**
    * The time (in seconds) between each call to `loader`
    *
@@ -45,14 +45,14 @@ export interface ResourceMetricsProps {
 }
 
 export interface IResourceMetricsValue {
-  object: KubeObject;
+  object?: KubeObject;
   tabId: number;
   metrics: Record<string, IMetrics | undefined> | null;
 }
 
 export const ResourceMetricsContext = createContext<IResourceMetricsValue>(null);
 
-export function ResourceMetrics({ object, loader, interval = 60, tabs, children, metrics, className }: ResourceMetricsProps) {
+export function ResourceMetrics({ object, loader = noop, interval = 60, tabs, children, metrics, className }: ResourceMetricsProps) {
   const [tabId, setTabId] = useState(0);
 
   useEffect(() => {

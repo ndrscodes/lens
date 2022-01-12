@@ -20,8 +20,8 @@
  */
 
 import { observable } from "mobx";
-import { daemonSetStore } from "../+workloads-daemonsets/store";
-import { podsStore } from "../+workloads-pods/store";
+import { daemonSetStore } from "../+daemonsets/store";
+import { podsStore } from "../+pods/store";
 import { DaemonSet, Pod } from "../../../common/k8s-api/endpoints";
 
 const runningDaemonSet = new DaemonSet({

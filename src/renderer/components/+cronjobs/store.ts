@@ -18,46 +18,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { KubeApi, SpecificApiOptions } from "../kube-api";
-import { KubeObject } from "../kube-object";
 
-export type ClusterRoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
+import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
+import { autoBind } from "../../utils";
+import type { CronJob, CronJobApi } from "../../../common/k8s-api/endpoints/cron-job.api";
+import type { JobStore } from "../+jobs/store";
 
-export interface ClusterRoleBindingSubject {
-  kind: ClusterRoleBindingSubjectKind;
-  name: string;
-  apiGroup?: string;
-  namespace?: string;
+export interface CronJobStoreDependencies {
+  jobStore: JobStore;
 }
 
-export interface ClusterRoleBinding {
-  subjects?: ClusterRoleBindingSubject[];
-  roleRef: {
-    kind: string;
-    name: string;
-    apiGroup?: string;
-  };
-}
-
-export class ClusterRoleBinding extends KubeObject {
-  static kind = "ClusterRoleBinding";
-  static namespaced = false;
-  static apiBase = "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings";
-
-  getSubjects() {
-    return this.subjects || [];
+export class CronJobStore extends KubeObjectStore<CronJob> {
+  constructor(public api: CronJobApi, protected dependencies: CronJobStoreDependencies) {
+    super();
+    autoBind(this);
   }
 
-  getSubjectNames(): string {
-    return this.getSubjects().map(subject => subject.name).join(", ");
-  }
-}
+  getStatuses(cronJobs?: CronJob[]) {
+    const status = { scheduled: 0, suspended: 0 };
 
-export class ClusterRoleBindingApi extends KubeApi<ClusterRoleBinding> {
-  constructor(args: SpecificApiOptions<ClusterRoleBinding> = {}) {
-    super({
-      ...args,
-      objectConstructor: ClusterRoleBinding,
+    cronJobs.forEach(cronJob => {
+      if (cronJob.spec.suspend) {
+        status.suspended++;
+      }
+      else {
+        status.scheduled++;
+      }
     });
+
+    return status;
+  }
+
+  getActiveJobsNum(cronJob: CronJob) {
+    // Active jobs are jobs without any condition 'Complete' nor 'Failed'
+    const jobs = this.dependencies.jobStore.getJobsByOwner(cronJob);
+
+    if (!jobs.length) return 0;
+
+    return jobs.filter(job => !job.getCondition()).length;
   }
 }

@@ -33,7 +33,7 @@ import type { ResourceQuotaStore } from "../+resource-quotas/store";
 import { KubeObjectMeta } from "../kube-object-meta";
 import type { LimitRangeStore } from "../+limit-ranges/store";
 import { ResourceMetrics } from "../resource-metrics";
-import { PodCharts, podMetricTabs } from "../+workloads-pods/pod-charts";
+import { PodCharts, podMetricTabs } from "../+pods/charts";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
 import { getActiveClusterEntity } from "../../api/catalog-entity-registry";
 import { getDetailsUrl } from "../kube-detail-params";

@@ -20,7 +20,7 @@
  */
 
 import { Pod } from "../../../common/k8s-api/endpoints";
-import { podsStore } from "../+workloads-pods/store";
+import { podsStore } from "../+pods/store";
 
 const runningPod = new Pod({
   apiVersion: "foo",

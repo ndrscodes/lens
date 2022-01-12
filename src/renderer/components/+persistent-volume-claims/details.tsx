@@ -25,7 +25,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { DrawerItem, DrawerTitle } from "../drawer";
 import { Badge } from "../badge";
-import type { PodStore } from "../+workloads-pods/store";
+import type { PodStore } from "../+pods/store";
 import { Link } from "react-router-dom";
 import { ResourceMetrics } from "../resource-metrics";
 import { VolumeClaimDiskChart } from "./disk-chart";
@@ -37,7 +37,7 @@ import { KubeObjectMeta } from "../kube-object-meta";
 import { getDetailsUrl } from "../kube-detail-params";
 import logger from "../../../common/logger";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import podStoreInjectable from "../+workloads-pods/store.injectable";
+import podStoreInjectable from "../+pods/store.injectable";
 
 export interface PersistentVolumeClaimDetailsProps extends KubeObjectDetailsProps<PersistentVolumeClaim> {
 }

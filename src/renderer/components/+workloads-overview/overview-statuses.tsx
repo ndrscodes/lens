@@ -32,22 +32,22 @@ import { workloadURL } from "../../../common/routes";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import type { CronJobStore } from "../+workloads-cronjobs/cronjob.store";
-import type { DaemonSetStore } from "../+workloads-daemonsets/store";
-import type { DeploymentStore } from "../+workloads-deployments/store";
-import type { JobStore } from "../+workloads-jobs/store";
-import type { ReplicaSetStore } from "../+workloads-replica-sets/store";
-import type { StatefulSetStore } from "../+workloads-statefulsets/store";
+import type { CronJobStore } from "../+cronjobs/store";
+import type { DaemonSetStore } from "../+daemonsets/store";
+import type { DeploymentStore } from "../+deployments/store";
+import type { JobStore } from "../+jobs/store";
+import type { ReplicaSetStore } from "../+replica-sets/store";
+import type { StatefulSetStore } from "../+stateful-sets/store";
 import type { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import type { PodsStore } from "../../../extensions/renderer-api/k8s-api";
-import cronJobStoreInjectable from "../+workloads-cronjobs/cronjob.store.injectable";
-import daemonSetStoreInjectable from "../+workloads-daemonsets/store.injectable";
-import deploymentStoreInjectable from "../+workloads-deployments/store.injectable";
-import jobStoreInjectable from "../+workloads-jobs/job.store.injectable";
-import podStoreInjectable from "../+workloads-pods/store.injectable";
-import replicaSetStoreInjectable from "../+workloads-replica-sets/store.injectable";
-import statefulSetStoreInjectable from "../+workloads-statefulsets/store.injectable";
+import cronJobStoreInjectable from "../+cronjobs/store.injectable";
+import daemonSetStoreInjectable from "../+daemonsets/store.injectable";
+import deploymentStoreInjectable from "../+deployments/store.injectable";
+import jobStoreInjectable from "../+jobs/job.store.injectable";
+import podStoreInjectable from "../+pods/store.injectable";
+import replicaSetStoreInjectable from "../+replica-sets/store.injectable";
+import statefulSetStoreInjectable from "../+stateful-sets/store.injectable";
 
 export interface OverviewStatusesProps {
 }

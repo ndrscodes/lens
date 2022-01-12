@@ -18,46 +18,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { KubeApi, SpecificApiOptions } from "../kube-api";
-import { KubeObject } from "../kube-object";
 
-export type ClusterRoleBindingSubjectKind = "Group" | "ServiceAccount" | "User";
+import "./details-statuses.scss";
+import React from "react";
+import countBy from "lodash/countBy";
+import kebabCase from "lodash/kebabCase";
+import type { Pod } from "../../../common/k8s-api/endpoints";
 
-export interface ClusterRoleBindingSubject {
-  kind: ClusterRoleBindingSubjectKind;
-  name: string;
-  apiGroup?: string;
-  namespace?: string;
+interface Props {
+  pods: Pod[];
 }
 
-export interface ClusterRoleBinding {
-  subjects?: ClusterRoleBindingSubject[];
-  roleRef: {
-    kind: string;
-    name: string;
-    apiGroup?: string;
-  };
-}
+export class PodDetailsStatuses extends React.Component<Props> {
+  render() {
+    const { pods } = this.props;
 
-export class ClusterRoleBinding extends KubeObject {
-  static kind = "ClusterRoleBinding";
-  static namespaced = false;
-  static apiBase = "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings";
+    if (!pods.length) return null;
+    const statuses = countBy(pods.map(pod => pod.getStatus()));
 
-  getSubjects() {
-    return this.subjects || [];
-  }
-
-  getSubjectNames(): string {
-    return this.getSubjects().map(subject => subject.name).join(", ");
-  }
-}
-
-export class ClusterRoleBindingApi extends KubeApi<ClusterRoleBinding> {
-  constructor(args: SpecificApiOptions<ClusterRoleBinding> = {}) {
-    super({
-      ...args,
-      objectConstructor: ClusterRoleBinding,
-    });
+    return (
+      <div className="PodDetailsStatuses">
+        {
+          Object.keys(statuses).map(key => (
+            <span key={key} className={kebabCase(key)}>
+              {key}: {statuses[key]}
+            </span>
+          ))
+        }
+      </div>
+    );
   }
 }
