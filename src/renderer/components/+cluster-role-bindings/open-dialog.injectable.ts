@@ -19,16 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import { runInAction } from "mobx";
+import type { ClusterRoleBinding } from "../../../common/k8s-api/endpoints";
+import { bind } from "../../utils";
+import type { ClusterRoleBindingDialogState } from "./dialog.state.injectable";
+import clusterRoleBindingDialogStateInjectable from "./dialog.state.injectable";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
+interface Dependencies {
+  state: ClusterRoleBindingDialogState;
+}
+
+function openClusterRoleBindingDialog({ state }: Dependencies, clusterRoleBinding: ClusterRoleBinding | null = null): void {
+  runInAction(() => {
+    state.isOpen = true;
+    state.clusterRoleBinding = clusterRoleBinding;
+  });
+}
+
+const openClusterRoleBindingDialogInjectable = getInjectable({
+  instantiate: (di) => bind(openClusterRoleBindingDialog, null, {
+    state: di.inject(clusterRoleBindingDialogStateInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default releaseStoreInjectable;
+export default openClusterRoleBindingDialogInjectable;

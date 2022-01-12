@@ -21,12 +21,12 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { ClusterStore } from "../../renderer/components/+cluster/store";
-import { HorizontalPodAutoscalerStore } from "../../renderer/components/+config-autoscalers/store";
-import { LimitRangeStore } from "../../renderer/components/+config-limit-ranges/store";
+import { HorizontalPodAutoscalerStore } from "../../renderer/components/+autoscalers/store";
+import { LimitRangeStore } from "../../renderer/components/+limit-ranges/store";
 import { ConfigMapStore } from "../../renderer/components/+config-maps/store";
-import { PodDisruptionBudgetStore } from "../../renderer/components/+config-pod-disruption-budgets/store";
-import { ResourceQuotaStore } from "../../renderer/components/+config-resource-quotas/store";
-import { SecretStore } from "../../renderer/components/+config-secrets/store";
+import { PodDisruptionBudgetStore } from "../../renderer/components/+pod-disruption-budgets/store";
+import { ResourceQuotaStore } from "../../renderer/components/+resource-quotas/store";
+import { SecretStore } from "../../renderer/components/+secrets/store";
 import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resource-definitions/store";
 import { EventStore } from "../../renderer/components/+events/store";
 import { NamespaceStore } from "../../renderer/components/+namespaces/store";
@@ -39,11 +39,11 @@ import { PodSecurityPolicyStore } from "../../renderer/components/+pod-security-
 import { StorageClassStore } from "../../renderer/components/+storage-classes/store";
 import { PersistentVolumeClaimStore } from "../../renderer/components/+persistent-volume-claims/store";
 import { PersistentVolumeStore } from "../../renderer/components/+persistent-volumes/store";
-import { ClusterRoleBindingStore } from "../../renderer/components/+user-management/+cluster-role-bindings/store";
-import { ClusterRoleStore } from "../../renderer/components/+user-management/+cluster-roles/store";
-import { RoleBindingStore } from "../../renderer/components/+user-management/+role-bindings/store";
-import { RoleStore } from "../../renderer/components/+user-management/+roles/store";
-import { ServiceAccountStore } from "../../renderer/components/+user-management/+service-accounts/store";
+import { ClusterRoleBindingStore } from "../../renderer/components/+cluster-role-bindings/store";
+import { ClusterRoleStore } from "../../renderer/components/+cluster-roles/store";
+import { RoleBindingStore } from "../../renderer/components/+role-bindings/store";
+import { RoleStore } from "../../renderer/components/+roles/store";
+import { ServiceAccountStore } from "../../renderer/components/+service-accounts/store";
 import { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cronjob.store";
 import { DaemonSetStore } from "../../renderer/components/+workloads-daemonsets/store";
 import { DeploymentStore } from "../../renderer/components/+workloads-deployments/store";

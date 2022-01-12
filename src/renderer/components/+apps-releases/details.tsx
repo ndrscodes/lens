@@ -41,7 +41,7 @@ import { Notifications } from "../notifications";
 import { ThemeStore } from "../../theme.store";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";
-import type { SecretStore } from "../+config-secrets/store";
+import type { SecretStore } from "../+secrets/store";
 import type { Secret } from "../../../common/k8s-api/endpoints";
 import { getDetailsUrl } from "../kube-detail-params";
 import { Checkbox } from "../checkbox";
@@ -50,7 +50,7 @@ import type { DockTabCreateSpecific, DockTabData } from "../dock/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
-import secretStoreInjectable from "../+config-secrets/store.injectable";
+import secretStoreInjectable from "../+secrets/store.injectable";
 import releaseStoreInjectable from "./store.injectable";
 
 export interface ReleaseDetailsProps {

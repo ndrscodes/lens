@@ -19,16 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
+import type { ClusterRoleBindingStore } from "./store";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
-  }),
+const clusterRoleBindingStoreInjectable = getInjectable({
+  instantiate: (di) => di.inject(apiManagerInjectable).getStore("/apis/rbac.authorization.k8s.io/v1/clusterrolebindings") as ClusterRoleBindingStore,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default releaseStoreInjectable;
+export default clusterRoleBindingStoreInjectable;

@@ -18,17 +18,20 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import type { ClusterRole, ClusterRoleApi } from "../../../common/k8s-api/endpoints";
+import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
+import { autoBind } from "../../utils";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
-  }),
-  lifecycle: lifecycleEnum.singleton,
-});
+export class ClusterRoleStore extends KubeObjectStore<ClusterRole> {
+  constructor(public api: ClusterRoleApi) {
+    super();
+    autoBind(this);
+  }
 
-export default releaseStoreInjectable;
+  protected sortItems(items: ClusterRole[]) {
+    return super.sortItems(items, [
+      clusterRole => clusterRole.kind,
+      clusterRole => clusterRole.getName(),
+    ]);
+  }
+}

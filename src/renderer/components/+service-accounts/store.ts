@@ -18,17 +18,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
-  }),
-  lifecycle: lifecycleEnum.singleton,
-});
+import type { ServiceAccount, ServiceAccountApi } from "../../../common/k8s-api/endpoints";
+import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
 
-export default releaseStoreInjectable;
+export class ServiceAccountStore extends KubeObjectStore<ServiceAccount> {
+  constructor(public api: ServiceAccountApi) {
+    super();
+  }
+
+  protected createItem = async (params: { name: string; namespace?: string }) => {
+    await super.createItem(params);
+
+    return this.api.get(params); // hackfix: load freshly created account, cause it doesn't have "secrets" field yet
+  };
+}

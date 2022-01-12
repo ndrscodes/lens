@@ -18,17 +18,14 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
-  }),
-  lifecycle: lifecycleEnum.singleton,
-});
+import { MD5 } from "crypto-js";
+import type { ClusterRoleBindingSubject } from "../../../common/k8s-api/endpoints";
 
-export default releaseStoreInjectable;
+export function hashClusterRoleBindingSubject(subject: ClusterRoleBindingSubject): string {
+  return MD5(JSON.stringify([
+    ["kind", subject.kind],
+    ["name", subject.name],
+    ["apiGroup", subject.apiGroup],
+  ])).toString();
+}

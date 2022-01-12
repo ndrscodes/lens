@@ -27,11 +27,11 @@ import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
 import { PodSecurityPolicies } from "../+pod-security-policies";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
 import * as routes from "../../../common/routes";
-import { ClusterRoleBindings } from "./+cluster-role-bindings";
-import { ServiceAccounts } from "./+service-accounts";
-import { Roles } from "./+roles";
-import { RoleBindings } from "./+role-bindings";
-import { ClusterRoles } from "./+cluster-roles";
+import { ClusterRoleBindings } from "../+cluster-role-bindings";
+import { ServiceAccounts } from "../+service-accounts";
+import { Roles } from "../+roles";
+import { RoleBindings } from "../+role-bindings";
+import { ClusterRoles } from "../+cluster-roles";
 
 @observer
 export class UserManagement extends React.Component {

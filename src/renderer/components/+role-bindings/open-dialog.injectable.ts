@@ -19,16 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import { runInAction } from "mobx";
+import type { RoleBinding } from "../../../../common/k8s-api/endpoints";
+import { bind } from "../../../utils";
+import type { RoleBindingDialogState } from "./dialog.state.injectable";
+import roleBindingDialogStateInjectable from "./dialog.state.injectable";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
+interface Dependencies {
+  state: RoleBindingDialogState;
+}
+
+function openRoleBindingDialog({ state }: Dependencies, roleBinding: RoleBinding | null = null): void {
+  runInAction(() => {
+    state.isOpen = true;
+    state.roleBinding = roleBinding;
+  });
+}
+
+const openRoleBindingDialogInjectable = getInjectable({
+  instantiate: (di) => bind(openRoleBindingDialog, null, {
+    state: di.inject(roleBindingDialogStateInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default releaseStoreInjectable;
+export default openRoleBindingDialogInjectable;

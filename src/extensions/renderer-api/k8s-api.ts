@@ -101,12 +101,12 @@ export type { StatefulSetStore } from "../../renderer/components/+workloads-stat
 export type { JobStore } from "../../renderer/components/+workloads-jobs/store";
 export type { CronJobStore } from "../../renderer/components/+workloads-cronjobs/cronjob.store";
 export type { ConfigMapStore as ConfigMapsStore } from "../../renderer/components/+config-maps/store";
-export type { SecretStore as SecretsStore } from "../../renderer/components/+config-secrets/store";
+export type { SecretStore as SecretsStore } from "../../renderer/components/+secrets/store";
 export type { ReplicaSetStore } from "../../renderer/components/+workloads-replica-sets/store";
-export type { ResourceQuotaStore as ResourceQuotasStore } from "../../renderer/components/+config-resource-quotas/store";
-export type { LimitRangeStore as LimitRangesStore } from "../../renderer/components/+config-limit-ranges/store";
-export type { HorizontalPodAutoscalerStore as HPAStore } from "../../renderer/components/+config-autoscalers/store";
-export type { PodDisruptionBudgetStore as PodDisruptionBudgetsStore } from "../../renderer/components/+config-pod-disruption-budgets/store";
+export type { ResourceQuotaStore as ResourceQuotasStore } from "../../renderer/components/+resource-quotas/store";
+export type { LimitRangeStore as LimitRangesStore } from "../../renderer/components/+limit-ranges/store";
+export type { HorizontalPodAutoscalerStore as HPAStore } from "../../renderer/components/+autoscalers/store";
+export type { PodDisruptionBudgetStore as PodDisruptionBudgetsStore } from "../../renderer/components/+pod-disruption-budgets/store";
 export type { ServiceStore } from "../../renderer/components/+services/services.store";
 export type { EndpointStore } from "../../renderer/components/+endpoints/store";
 export type { IngressStore } from "../../renderer/components/+ingresses/store";

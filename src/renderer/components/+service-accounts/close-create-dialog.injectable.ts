@@ -19,16 +19,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import { runInAction } from "mobx";
+import { bind } from "../../../utils";
+import type { ServiceAccountCreateDialogState } from "./create-dialog.state.injectable";
+import ServiceAccountDialogStateInjectable from "./create-dialog.state.injectable";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
+interface Dependencies {
+  state: ServiceAccountCreateDialogState;
+}
+
+function closeCreateServiceAccountDialog({ state }: Dependencies): void {
+  runInAction(() => {
+    state.isOpen = false;
+  });
+}
+
+const closeCreateServiceAccountDialogInjectable = getInjectable({
+  instantiate: (di) => bind(closeCreateServiceAccountDialog, null, {
+    state: di.inject(ServiceAccountDialogStateInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default releaseStoreInjectable;
+export default closeCreateServiceAccountDialogInjectable;

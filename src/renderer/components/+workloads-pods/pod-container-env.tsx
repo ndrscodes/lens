@@ -26,13 +26,13 @@ import { observer } from "mobx-react";
 import type { IPodContainer, Secret } from "../../../common/k8s-api/endpoints";
 import { DrawerItem } from "../drawer";
 import { autorun } from "mobx";
-import type { SecretStore } from "../+config-secrets/store";
+import type { SecretStore } from "../+secrets/store";
 import type { ConfigMapStore } from "../+config-maps/store";
 import { Icon } from "../icon";
 import { base64, cssNames, iter } from "../../utils";
 import _ from "lodash";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import secretStoreInjectable from "../+config-secrets/store.injectable";
+import secretStoreInjectable from "../+secrets/store.injectable";
 import configMapStoreInjectable from "../+config-maps/store.injectable";
 
 export interface ContainerEnvironmentProps {

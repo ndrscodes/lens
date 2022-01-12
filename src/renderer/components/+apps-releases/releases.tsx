@@ -32,7 +32,7 @@ import { ReleaseRollbackDialog } from "./rollback-dialog";
 import { navigation } from "../../navigation";
 import { ItemListLayout } from "../item-object-list/item-list-layout";
 import { HelmReleaseMenu } from "./item-menu";
-import type { SecretStore } from "../+config-secrets/store";
+import type { SecretStore } from "../+secrets/store";
 import { NamespaceSelectFilter } from "../+namespaces/namespace-select-filter";
 import type { ReleaseRouteParams } from "../../../common/routes";
 import { releaseURL } from "../../../common/routes";
@@ -40,7 +40,7 @@ import type { NamespaceStore } from "../+namespaces/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import namespaceStoreInjectable from "../+namespaces/store.injectable";
 import releaseStoreInjectable from "./store.injectable";
-import secretStoreInjectable from "../+config-secrets/store.injectable";
+import secretStoreInjectable from "../+secrets/store.injectable";
 import { disposer } from "../../utils";
 
 enum columnId {

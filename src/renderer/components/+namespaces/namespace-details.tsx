@@ -29,9 +29,9 @@ import { getMetricsForNamespace, IPodMetrics, Namespace } from "../../../common/
 import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { Link } from "react-router-dom";
 import { Spinner } from "../spinner";
-import type { ResourceQuotaStore } from "../+config-resource-quotas/store";
+import type { ResourceQuotaStore } from "../+resource-quotas/store";
 import { KubeObjectMeta } from "../kube-object-meta";
-import type { LimitRangeStore } from "../+config-limit-ranges/store";
+import type { LimitRangeStore } from "../+limit-ranges/store";
 import { ResourceMetrics } from "../resource-metrics";
 import { PodCharts, podMetricTabs } from "../+workloads-pods/pod-charts";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
@@ -40,8 +40,8 @@ import { getDetailsUrl } from "../kube-detail-params";
 import logger from "../../../common/logger";
 import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import resourceQuotaStoreInjectable from "../+config-resource-quotas/store.injectable";
-import limitRangeStoreInjectable from "../+config-limit-ranges/store.injectable";
+import resourceQuotaStoreInjectable from "../+resource-quotas/store.injectable";
+import limitRangeStoreInjectable from "../+limit-ranges/store.injectable";
 
 export interface NamespaceDetailsProps extends KubeObjectDetailsProps<Namespace> {
 }

@@ -18,17 +18,24 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import secretStoreInjectable from "../+secrets/store.injectable";
-import namespaceStoreInjectable from "../+namespaces/store.injectable";
-import { ReleaseStore } from "./store";
+import type { Role, RoleApi } from "../../../common/k8s-api/endpoints";
+import { KubeObjectStore } from "../../../common/k8s-api/kube-object.store";
+import { autoBind } from "../../utils";
 
-const releaseStoreInjectable = getInjectable({
-  instantiate: (di) => new ReleaseStore({
-    namespaceStore: di.inject(namespaceStoreInjectable),
-    secretStore: di.inject(secretStoreInjectable),
-  }),
-  lifecycle: lifecycleEnum.singleton,
-});
+export class RoleStore extends KubeObjectStore<Role> {
+  constructor(public api: RoleApi) {
+    super();
+    autoBind(this);
+  }
 
-export default releaseStoreInjectable;
+  protected sortItems(items: Role[]) {
+    return super.sortItems(items, [
+      role => role.kind,
+      role => role.getName(),
+    ]);
+  }
+
+  protected async createItem(params: { name: string; namespace?: string }, data?: Partial<Role>) {
+    return this.api.create(params, data);
+  }
+}

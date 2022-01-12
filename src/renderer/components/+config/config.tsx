@@ -23,12 +23,12 @@ import React from "react";
 import { observer } from "mobx-react";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
 import { ConfigMaps } from "../+config-maps";
-import { Secrets } from "../+config-secrets";
-import { ResourceQuotas } from "../+config-resource-quotas";
-import { PodDisruptionBudgets } from "../+config-pod-disruption-budgets";
-import { HorizontalPodAutoscalers } from "../+config-autoscalers";
+import { Secrets } from "../+secrets";
+import { ResourceQuotas } from "../+resource-quotas";
+import { PodDisruptionBudgets } from "../+pod-disruption-budgets";
+import { HorizontalPodAutoscalers } from "../+autoscalers";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
-import { LimitRanges } from "../+config-limit-ranges";
+import { LimitRanges } from "../+limit-ranges";
 import * as routes from "../../../common/routes";
 
 @observer
